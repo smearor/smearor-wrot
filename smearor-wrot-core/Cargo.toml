@@ -1,0 +1,17 @@
+[package]
+name = "smearor-wrot-core"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+miette = { workspace = true }
+thiserror = { workspace = true }
+smithay = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

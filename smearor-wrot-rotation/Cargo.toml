@@ -1,0 +1,17 @@
+[package]
+name = "smearor-wrot-rotation"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+glib = { workspace = true }
+gtk4 = { workspace = true }
+gtk4-layer-shell = { workspace = true }
+miette = { workspace = true }
+serde = { workspace = true }

@@ -1,0 +1,18 @@
+[package]
+name = "smearor-wrot-test-client"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "smearor-wrot-test-client"
+path = "src/main.rs"
+
+[dependencies]
+miette = { workspace = true }
+tokio = { workspace = true }
