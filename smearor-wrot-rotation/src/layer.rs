@@ -1,6 +1,7 @@
-use std::str::FromStr;
 use gtk4_layer_shell::Layer;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use serde::Serialize;
+use std::str::FromStr;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum SmearorLayer {
@@ -46,7 +47,6 @@ impl FromStr for SmearorLayer {
 }
 
 impl From<&str> for SmearorLayer {
-
     fn from(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "background" => SmearorLayer::Background,

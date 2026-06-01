@@ -60,8 +60,7 @@ pub fn init_logging() {
 /// }
 /// ```
 pub fn init_logging_with_level(level: tracing::Level) {
-    let env_filter = EnvFilter::from_default_env()
-        .add_directive(level.into());
+    let env_filter = EnvFilter::from_default_env().add_directive(level.into());
 
     tracing_subscriber::fmt()
         .with_env_filter(env_filter)

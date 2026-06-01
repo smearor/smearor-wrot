@@ -46,10 +46,9 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
     content_box.add_css_class("semi-transparent-background");
     let css_provider = gtk4::CssProvider::new();
     css_provider.load_from_data(".semi-transparent-background { background-color: rgba(0, 0, 0, 0.5); }");
-    content_box.style_context().add_provider(
-        &css_provider,
-        gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION,
-    );
+    content_box
+        .style_context()
+        .add_provider(&css_provider, gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION);
 
     // Create Debug Pointer toggle
     let debug_pointer_label = gtk4::Label::builder().label("Debug Pointer").build();

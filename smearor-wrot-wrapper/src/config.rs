@@ -172,11 +172,9 @@ pub struct CompositorConfig {
 ///
 /// * `Result<Config, ConfigError>` - The loaded configuration or an error
 pub fn load_config(path: &Path) -> Result<Config, ConfigError> {
-    let content = fs::read_to_string(path)
-        .map_err(|e| ConfigError::ReadError(e.to_string()))?;
+    let content = fs::read_to_string(path).map_err(|e| ConfigError::ReadError(e.to_string()))?;
 
-    let config: Config = toml::from_str(&content)
-        .map_err(|e| ConfigError::ParseError(e.to_string()))?;
+    let config: Config = toml::from_str(&content).map_err(|e| ConfigError::ParseError(e.to_string()))?;
 
     Ok(config)
 }

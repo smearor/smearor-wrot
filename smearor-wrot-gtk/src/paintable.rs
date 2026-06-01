@@ -17,13 +17,7 @@ impl TexturePaintable {
     pub fn from_rgba(data: &[u8], width: i32, height: i32) -> Self {
         let bytes = glib::Bytes::from(data);
         let stride = width * 4; // 4 bytes per pixel (RGBA)
-        let texture = gdk::MemoryTexture::new(
-            width,
-            height,
-            gdk::MemoryFormat::B8g8r8a8,
-            &bytes,
-            stride as usize,
-        );
+        let texture = gdk::MemoryTexture::new(width, height, gdk::MemoryFormat::B8g8r8a8, &bytes, stride as usize);
 
         Self {
             texture: texture.into(),

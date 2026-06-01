@@ -48,7 +48,8 @@ impl DialogSizeQuery for SmearorCompositor {
             .space
             .elements()
             .find(|window| window.wl_surface().as_deref() == Some(dialog_surface))
-            .cloned() {
+            .cloned()
+        {
             // Send close event to the dialog's toplevel surface
             if let Some(toplevel) = window_to_remove.toplevel() {
                 toplevel.send_close();

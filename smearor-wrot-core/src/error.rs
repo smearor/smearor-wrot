@@ -14,10 +14,7 @@ use thiserror::Error;
 pub enum CoreError {
     /// Error related to Wayland compositor operations
     #[error("Compositor error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::compositor),
-        help("Check that the Wayland compositor is running and accessible")
-    )]
+    #[diagnostic(code(smearor_wrot::compositor), help("Check that the Wayland compositor is running and accessible"))]
     Compositor {
         /// Error message describing the compositor issue
         message: String,
@@ -25,10 +22,7 @@ pub enum CoreError {
 
     /// Error related to rendering operations
     #[error("Rendering error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::rendering),
-        help("Ensure GPU acceleration is available and drivers are up to date")
-    )]
+    #[diagnostic(code(smearor_wrot::rendering), help("Ensure GPU acceleration is available and drivers are up to date"))]
     Rendering {
         /// Error message describing the rendering issue
         message: String,
@@ -36,10 +30,7 @@ pub enum CoreError {
 
     /// Error related to surface management
     #[error("Surface error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::surface),
-        help("Verify the application supports Wayland and is properly configured")
-    )]
+    #[diagnostic(code(smearor_wrot::surface), help("Verify the application supports Wayland and is properly configured"))]
     Surface {
         /// Error message describing the surface issue
         message: String,
@@ -47,10 +38,7 @@ pub enum CoreError {
 
     /// Error related to buffer management
     #[error("Buffer error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::buffer),
-        help("Check available memory and GPU resources")
-    )]
+    #[diagnostic(code(smearor_wrot::buffer), help("Check available memory and GPU resources"))]
     Buffer {
         /// Error message describing the buffer issue
         message: String,
@@ -58,10 +46,7 @@ pub enum CoreError {
 
     /// Error related to input handling
     #[error("Input error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::input),
-        help("Verify input devices are properly connected and configured")
-    )]
+    #[diagnostic(code(smearor_wrot::input), help("Verify input devices are properly connected and configured"))]
     Input {
         /// Error message describing the input issue
         message: String,
@@ -69,10 +54,7 @@ pub enum CoreError {
 
     /// Error related to window lifecycle
     #[error("Window error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::window),
-        help("Check window manager configuration and permissions")
-    )]
+    #[diagnostic(code(smearor_wrot::window), help("Check window manager configuration and permissions"))]
     Window {
         /// Error message describing the window issue
         message: String,
@@ -85,10 +67,7 @@ pub enum CoreError {
 
     /// Error related to configuration
     #[error("Configuration error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::config),
-        help("Review configuration file syntax and values")
-    )]
+    #[diagnostic(code(smearor_wrot::config), help("Review configuration file syntax and values"))]
     Configuration {
         /// Error message describing the configuration issue
         message: String,
@@ -96,10 +75,7 @@ pub enum CoreError {
 
     /// Error related to Wayland protocol
     #[error("Wayland protocol error: {message}")]
-    #[diagnostic(
-        code(smearor_wrot::wayland),
-        help("Ensure Wayland libraries are installed and compatible")
-    )]
+    #[diagnostic(code(smearor_wrot::wayland), help("Ensure Wayland libraries are installed and compatible"))]
     Wayland {
         /// Error message describing the Wayland protocol issue
         message: String,
@@ -109,58 +85,42 @@ pub enum CoreError {
 impl CoreError {
     /// Create a new compositor error
     pub fn compositor(message: impl Into<String>) -> Self {
-        Self::Compositor {
-            message: message.into(),
-        }
+        Self::Compositor { message: message.into() }
     }
 
     /// Create a new rendering error
     pub fn rendering(message: impl Into<String>) -> Self {
-        Self::Rendering {
-            message: message.into(),
-        }
+        Self::Rendering { message: message.into() }
     }
 
     /// Create a new surface error
     pub fn surface(message: impl Into<String>) -> Self {
-        Self::Surface {
-            message: message.into(),
-        }
+        Self::Surface { message: message.into() }
     }
 
     /// Create a new buffer error
     pub fn buffer(message: impl Into<String>) -> Self {
-        Self::Buffer {
-            message: message.into(),
-        }
+        Self::Buffer { message: message.into() }
     }
 
     /// Create a new input error
     pub fn input(message: impl Into<String>) -> Self {
-        Self::Input {
-            message: message.into(),
-        }
+        Self::Input { message: message.into() }
     }
 
     /// Create a new window error
     pub fn window(message: impl Into<String>) -> Self {
-        Self::Window {
-            message: message.into(),
-        }
+        Self::Window { message: message.into() }
     }
 
     /// Create a new configuration error
     pub fn configuration(message: impl Into<String>) -> Self {
-        Self::Configuration {
-            message: message.into(),
-        }
+        Self::Configuration { message: message.into() }
     }
 
     /// Create a new Wayland protocol error
     pub fn wayland(message: impl Into<String>) -> Self {
-        Self::Wayland {
-            message: message.into(),
-        }
+        Self::Wayland { message: message.into() }
     }
 }
 

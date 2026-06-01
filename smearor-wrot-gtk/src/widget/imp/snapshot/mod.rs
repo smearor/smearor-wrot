@@ -16,7 +16,6 @@ use std::sync::atomic::Ordering;
 use tracing::debug;
 
 pub mod background_color;
-pub mod color_mask;
 
 impl crate::widget::imp::CompositorWidgetImpl {
     pub(crate) fn render_snapshot(&self, snapshot: &gtk4::Snapshot) {

@@ -331,7 +331,7 @@ impl WidgetImpl for PieMenuWidgetImpl {
             // Draw item background circle
             let item_color: RGBA = RgbaColor::parse_hex(&item.color).unwrap_or(RgbaColor::with_rgb(0.5, 0.5, 0.5, 0.5)).into();
             let item_radius = item.radius();
-            
+
             // Highlight if hovered
             let is_hovered = index as i32 == hovered_index;
             let item_color = if is_hovered {
@@ -382,14 +382,14 @@ impl WidgetImpl for PieMenuWidgetImpl {
 
             let label_x = item_x - label_width / 2.0;
             let label_y = item_y + item_radius;
-            
+
             // Draw label shadow
             let shadow_offset = 1.0;
             let shadow_color = RGBA::new(0.0, 0.0, 0.0, 0.8);
             snapshot.translate(&Point::new(label_x + shadow_offset, label_y + shadow_offset));
             snapshot.append_layout(&pango_layout, &shadow_color);
             snapshot.translate(&Point::new(-(label_x + shadow_offset), -(label_y + shadow_offset)));
-            
+
             // Draw label
             snapshot.translate(&Point::new(label_x, label_y));
             snapshot.append_layout(&pango_layout, &label_color);
