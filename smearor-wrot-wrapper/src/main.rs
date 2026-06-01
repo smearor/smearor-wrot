@@ -5,9 +5,13 @@ pub mod config;
 pub mod icon;
 pub mod screenshot;
 pub mod settings;
+pub mod socket;
 
 use crate::args::Arguments;
 use crate::screenshot::ScreenshotManager;
+use crate::socket::build_socket_path;
+use crate::socket::check_socket_exists;
+use crate::socket::generate_unique_socket_name;
 use clap::Parser;
 use gtk4::gdk::Display;
 use gtk4::gdk::Toplevel;
@@ -71,54 +75,6 @@ use tracing::info;
 use tracing::warn;
 use which::which;
 
-/// Build the full socket path from a relative name in XDG_RUNTIME_DIR
-fn build_socket_path(socket_name: &str) -> Result<PathBuf, Box<dyn Error>> {
-    let runtime_dir = std::env::var("XDG_RUNTIME_DIR").map_err(|e| format!("XDG_RUNTIME_DIR not set: {}", e))?;
-
-    let socket_path = PathBuf::from(runtime_dir.clone()).join(socket_name);
-    debug!("Building socket path: {:?} from XDG_RUNTIME_DIR={}", socket_path, runtime_dir);
-
-    Ok(socket_path)
-}
-
-/// Generate a unique socket name by incrementing the number at the end
-fn generate_unique_socket_name(base_name: &str) -> Result<String, Box<dyn Error>> {
-    let runtime_dir = std::env::var("XDG_RUNTIME_DIR").map_err(|e| format!("XDG_RUNTIME_DIR not set: {}", e))?;
-
-    // Start with base name (e.g., "smearor-wrot-0")
-    let mut counter = 0;
-    let mut socket_name = format!("{}-{}", base_name, counter);
-
-    loop {
-        let socket_path = PathBuf::from(&runtime_dir).join(&socket_name);
-        if !socket_path.exists() {
-            return Ok(socket_name);
-        }
-
-        counter += 1;
-        socket_name = format!("{}-{}", base_name, counter);
-
-        // Safety limit to prevent infinite loop
-        if counter > 10000 {
-            return Err(format!("Failed to generate unique socket name after 1000 attempts: {:?}", socket_path)
-                .to_string()
-                .into());
-        }
-    }
-}
-
-/// Check if a socket exists and return an error if it does
-fn check_socket_exists(socket_name: &str) -> Result<(), Box<dyn Error>> {
-    let runtime_dir = std::env::var("XDG_RUNTIME_DIR").map_err(|e| format!("XDG_RUNTIME_DIR not set: {}", e))?;
-    let socket_path = PathBuf::from(runtime_dir).join(socket_name);
-
-    if socket_path.exists() {
-        return Err(format!("Socket already exists: {:?}", socket_path).into());
-    }
-
-    Ok(())
-}
-
 /// Parse a hex color string (e.g., "#FF0000" or "FF0000") into RGB values (0.0-1.0 range)
 fn parse_hex_color(hex: &str) -> Result<RgbaColor, String> {
     let hex = hex.trim_start_matches('#');
@@ -169,8 +125,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
     args.socket = Some(socket_path_str.clone());
     command_line_arguments = Arc::new(args);
 
-    // Store the relative socket name for WAYLAND_DISPLAY environment variable
-    let socket_name_for_env = socket_name.clone();
+    // Store the full socket path for WAYLAND_DISPLAY environment variable
+    // This is necessary for confined environments like Snap which have different XDG_RUNTIME_DIR
+    let socket_name_for_env = socket_path_str.clone();
 
     // Load configuration file if provided
     if let Some(config_path) = &command_line_arguments.config {
@@ -1286,6 +1243,14 @@ fn launch_application(
     // Force Wayland backend for GTK applications
     command.env("GDK_BACKEND", "wayland");
 
+    if let Ok(xdg_runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
+        command.env("XDG_RUNTIME_DIR", xdg_runtime_dir);
+    }
+
+    if let Ok(session_bus) = std::env::var("DBUS_SESSION_BUS_ADDRESS") {
+        command.env("DBUS_SESSION_BUS_ADDRESS", session_bus);
+    }
+
     // Log environment variables for debugging
     if wayland_debug {
         debug!("Child process environment variables:");
@@ -1297,6 +1262,10 @@ fn launch_application(
 
         // Print environment variables for child process to verify
         command.env("PRINT_ENV", "1");
+    }
+
+    for (key, value) in command.get_envs() {
+        info!("{}={}", key.to_string_lossy().to_string(), value.map(|v| v.to_string_lossy().to_string()).unwrap_or_default());
     }
 
     // Capture stdout and stderr for logging
