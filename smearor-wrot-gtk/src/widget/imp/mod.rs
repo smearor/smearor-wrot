@@ -266,45 +266,6 @@ void main() {
         self.dmabuf_registry.remove(texture);
     }
 
-    // /// Set the supported GTK DMA-BUF formats whitelist
-    // ///
-    // /// This should be called during initialization after querying both renderer and GTK formats.
-    // pub fn set_supported_gtk_formats(&self, formats: DashSet<(Fourcc, u64)>) {
-    //     // Clear existing formats and insert new ones
-    //     self.supported_gtk_formats.clear();
-    //     for format in formats {
-    //         self.supported_gtk_formats.insert(format);
-    //     }
-    //     debug!("Set supported GTK DMA-BUF formats");
-    // }
-    //
-    // /// Check if a DMA-BUF format is supported by GTK
-    // pub fn is_format_supported_by_gtk(&self, fourcc: Fourcc, modifier: u64) -> bool {
-    //     // Extract u32 value from Fourcc for DRM code comparison
-    //     // DrmFourcc(AR24) and gdk::Fourcc::Argb8888 are technically identical
-    //     // but incompatible in Rust's type system. Both use standardized DRM values.
-    //     let fourcc_u32 = fourcc as u32;
-    //
-    //     // Linear modifier (0) is widely supported and compatible with most hardware
-    //     // Allow all common formats with Linear modifier
-    //     if modifier == 0 {
-    //         match fourcc_u32 {
-    //             // ARGB8888 (DRM_FORMAT_ARGB8888 = 0x34325241 = 'AR24')
-    //             0x34325241 |
-    //             // XRGB8888 (DRM_FORMAT_XRGB8888 = 0x34325258 = 'XR24')
-    //             0x34325258 |
-    //             // ABGR8888 (DRM_FORMAT_ABGR8888 = 0x34324241 = 'AB24')
-    //             0x34324241 |
-    //             // XBGR8888 (DRM_FORMAT_XBGR8888 = 0x34324258 = 'XB24')
-    //             0x34324258 => {
-    //                 return true;
-    //             }
-    //             _ => {}
-    //         }
-    //     }
-    //     self.supported_gtk_formats.contains(&(fourcc, modifier))
-    // }
-
     /// Cleanup destroyed DMA-BUF textures from the registry
     ///
     /// This function removes textures that are no longer referenced (ref count = 1, only the registry holds a reference).
