@@ -1,0 +1,60 @@
+# Example configuration file for smearor-wrot
+# This file demonstrates all available configuration options
+
+[window]
+# Window title (optional)
+title = "Smearor Compositor"
+
+# Initial window dimensions (optional, defaults: 1200x1200)
+width = 1200
+height = 1200
+
+# Window decorations (optional, default: true)
+decorated = true
+
+# Window resizeable (optional, default: true)
+resizable = true
+
+# Initial window position (optional)
+position_x = 0
+position_y = 0
+
+# Minimum window size (optional)
+min_width = 800
+min_height = 600
+
+# Maximum window size (optional)
+max_width = 1920
+max_height = 1080
+
+# Aspect ratio (optional, e.g., 1.777 for 16:9)
+aspect_ratio = 1.777
+
+# Start in fullscreen mode (optional, default: false)
+fullscreen = false
+
+# Start in maximized mode (optional, default: false)
+maximized = false
+
+[compositor]
+# Enable double buffering (optional, default: true)
+double_buffer = true
+
+# Disable rotation widget (optional, default: false)
+disable_rotation = false
+
+# Rotation angle in degrees (optional, default: 0.0)
+rotation = 0.0
+
+# Wayland socket path (optional, default: /tmp/io.smearor.wrot.sock)
+socket = "/tmp/io.smearor.wrot.sock"
+
+# Layer shell protocol layer (optional)
+# Options: Background, Bottom, Top, Overlay
+layer = "Top"
+
+# Layer shell namespace (optional)
+namespace = "smearor-wrot"
+
+# Run command in shell (optional, default: false)
+shell = false

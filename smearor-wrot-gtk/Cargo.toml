@@ -10,6 +10,18 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+dashmap = { workspace = true }
 glib = { workspace = true }
 gtk4 = { workspace = true }
+gl = { workspace = true }
+glib-unix = { workspace = true }
+glow = { workspace = true }
+image = { workspace = true }
+khronos-egl = { workspace = true }
+miette = { workspace = true }
 smearor-wrot-core = { path = "../smearor-wrot-core" }
+smearor-wrot-model = { path = "../smearor-wrot-model", features = ["gtk4", "smithay"] }
+smithay = { workspace = true, features = ["backend_winit", "backend_egl", "desktop", "wayland_frontend", "renderer_gl", "renderer_glow", "use_system_lib"] }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }

@@ -10,8 +10,18 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+dashmap = { workspace = true }
+drm = { workspace = true }
+gbm = { workspace = true }
+image = { workspace = true }
+input-event-codes = { workspace = true }
 miette = { workspace = true }
+nix = { workspace = true }
+smearor-wrot-model = { path = "../smearor-wrot-model", features = ["smithay"] }
+smithay = { workspace = true, features = ["backend_winit", "desktop", "wayland_frontend", "renderer_gl", "use_system_lib"] }
 thiserror = { workspace = true }
-smithay = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+xkbcommon = { workspace = true }
+xkeysym = { workspace = true }

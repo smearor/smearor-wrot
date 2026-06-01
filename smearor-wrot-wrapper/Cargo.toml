@@ -15,10 +15,18 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { workspace = true }
+directories = { workspace = true }
+gtk4 = { workspace = true }
+gtk4-layer-shell = { workspace = true }
 miette = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+toml = { workspace = true }
 smearor-wrot-core = { path = "../smearor-wrot-core" }
 smearor-wrot-gtk = { path = "../smearor-wrot-gtk" }
+smearor-wrot-model = { path = "../smearor-wrot-model" }
+smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
 smearor-wrot-rotation = { path = "../smearor-wrot-rotation" }
 tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+which = { workspace = true }

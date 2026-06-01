@@ -1,0 +1,20 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Hintergrund-Shape: Ein abgerundetes Quadrat (Squircle) -->
+    <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#paint0_linear)"/>
+
+    <!-- Die "Brücke" / Abstraktes 'S' -->
+    <path d="M40 35H88C92.4183 35 96 38.5817 96 43V55C96 59.4183 92.4183 63 88 63H55C50.5817 63 47 66.5817 47 71V83C47 87.4183 50.5817 91 55 91H88"
+          stroke="white" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- Kleines Akzent-Element (Symbol für einen Buffer/Pixel) -->
+    <rect x="80" y="75" width="16" height="16" rx="4" fill="white" fill-opacity="0.6">
+        <animate attributeName="fill-opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
+    </rect>
+
+    <defs>
+        <linearGradient id="paint0_linear" x1="8" y1="8" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#E66229"/> <!-- Rust Orange -->
+            <stop offset="1" stop-color="#3584E4"/> <!-- GTK Blue -->
+        </linearGradient>
+    </defs>
+</svg>

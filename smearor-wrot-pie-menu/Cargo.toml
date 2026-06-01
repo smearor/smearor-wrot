@@ -1,0 +1,24 @@
+[package]
+name = "smearor-wrot-pie-menu"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+atomic_float = { workspace = true }
+dashmap = { workspace = true }
+glib = { workspace = true }
+gtk4 = { workspace = true }
+gtk4-layer-shell = { workspace = true }
+miette = { workspace = true }
+serde = { workspace = true }
+smearor-wrot-core = { path = "../smearor-wrot-core" }
+smearor-wrot-model = { path = "../smearor-wrot-model", features = ["gtk4"] }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+typed-builder = { workspace = true }

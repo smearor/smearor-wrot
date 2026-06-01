@@ -4,6 +4,8 @@ resolver = "3"
 members = [
     "smearor-wrot-core",
     "smearor-wrot-gtk",
+    "smearor-wrot-model",
+    "smearor-wrot-pie-menu",
     "smearor-wrot-rotation",
     "smearor-wrot-wrapper",
     "smearor-wrot-test-client"
@@ -15,38 +17,52 @@ authors = ["Andreas Schaeffer <hanack@nooblounge.net>"]
 edition = "2024"
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/smearor/casilda-rs"
+repository = "https://github.com/smearor/smearor-wrot"
 homepage = "https://smearor.io/"
 rust-version = "1.87.0"
 
 [workspace.dependencies]
+atomic_float = "1.1.0"
 clap = { version = "4.6", features = ["derive"] }
+dashmap = "6"
+directories = "6.0.0"
+drm = "0.15.0"
+gbm = "0.18.0"
+gl = "0.14"
 glib = "0.22"
-glib-unix = "0.22"
 glib-sys = "0.22"
+glib-unix = "0.22"
+glow = { version = "0.16" }
 gobject-sys = "0.22"
-gdk4 = "0.11"
-gdk4-sys = "0.11"
-gtk4 = "0.11"
-gtk4-layer-shell = "0.8.0"
-gtk4-sys = "0.11"
+gtk4 = { version = "0.11", features = ["v4_20"] }
+gtk4-layer-shell = { version = "0.8.0" }
+gtk4-sys = { version = "0.11", features = ["v4_20"] }
+image = "0.25"
+input-event-codes = "6.2"
+khronos-egl = "6.0"
 libc = "0.2"
 miette = "7.6"
+nix = { version = "0.29", features = ["fs", "poll", "process", "term"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 shell-words = "1.1"
-smithay = { version = "0.7", features = ["backend_winit", "desktop", "wayland_frontend"] }
+smithay = { version = "0.7", features = ["backend_winit", "backend_egl", "desktop", "wayland_frontend", "renderer_gl", "renderer_glow", "use_system_lib"] }
 system-deps = "7.0"
 tempfile = "3"
 thiserror = "2.0"
 tokio = { version = "1.0", features = ["full"] }
 tokio-util = "0.7"
+toml = "1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.23", features = ["ansi", "env-filter"] }
+typed-builder = "0.23.2"
+wayland-client = "0.31"
 wayland-server = "0.31"
 wayland-protocols = "0.32"
+wayland-protocols-wlr = "0.3"
 which = "8.0.2"
 xkeysym = "0.2.1"
+xkbcommon = "0.8"
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin_include)', 'cfg(fn_traits)', 'cfg(unboxed_closures)'] }
