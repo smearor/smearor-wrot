@@ -11,4 +11,5 @@ pub mod dmabuf;
 pub mod output;
 pub mod seat;
 pub mod shm;
+pub mod viewporter;
 pub mod xdg_shell;

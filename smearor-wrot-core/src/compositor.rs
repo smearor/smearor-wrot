@@ -46,6 +46,7 @@ use smithay::utils::Physical;
 use smithay::utils::Rectangle;
 use smithay::wayland::compositor::CompositorState;
 use smithay::wayland::dmabuf;
+use smithay::wayland::viewporter::ViewporterState;
 use smithay::wayland::dmabuf::DmabufFeedbackBuilder;
 use smithay::wayland::dmabuf::DmabufState;
 use smithay::wayland::output::OutputManagerState;
@@ -81,6 +82,7 @@ pub struct SmearorCompositor {
     pub xdg_shell_state: XdgShellState,
     pub xdg_decoration_state: XdgDecorationState,
     pub xdg_dialog_state: XdgDialogState,
+    pub viewporter_state: ViewporterState,
     pub shm_state: ShmState,
     pub output_manager_state: OutputManagerState,
     pub seat_state: SeatState<SmearorCompositor>,
@@ -219,11 +221,13 @@ impl SmearorCompositor {
         let xdg_shell_state = XdgShellState::new::<Self>(&dh);
         let xdg_decoration_state = XdgDecorationState::new::<Self>(&dh);
         let xdg_dialog_state = XdgDialogState::new::<Self>(&dh);
+        let viewporter_state = ViewporterState::new::<Self>(&dh);
 
         // TODO: Phase 5 - Ensure XDG-Shell global is advertised
         // The delegate_xdg_shell macro should handle this, but we need to verify
         // Add logging to confirm global creation
         debug!("XDG-Shell state initialized, checking global advertisement");
+        debug!("Viewporter state initialized for wp_viewporter protocol");
 
         let shm_state = ShmState::new::<Self>(&dh, vec![smithay::reexports::wayland_server::protocol::wl_shm::Format::Argb8888]);
         let output_manager_state = OutputManagerState::new_with_xdg_output::<Self>(&dh);
@@ -311,6 +315,9 @@ impl SmearorCompositor {
             },
         );
 
+        // Advertise the output as a global to clients
+        let _output_global = virtual_output.create_global::<SmearorCompositor>(&dh);
+
         let initial_display_mode = smithay::output::Mode {
             size: (initial_width, initial_height).into(),
             refresh: 60_000,
@@ -338,6 +345,7 @@ impl SmearorCompositor {
             xdg_shell_state,
             xdg_decoration_state,
             xdg_dialog_state,
+            viewporter_state,
             shm_state,
             output_manager_state,
             seat_state,
