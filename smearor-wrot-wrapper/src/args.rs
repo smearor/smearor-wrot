@@ -4,7 +4,7 @@ use smearor_wrot_core::DEFAULT_WINDOW_WIDTH;
 use smearor_wrot_rotation::layer::SmearorLayer;
 use std::ffi::OsString;
 
-/// Command line arguments for the Adlisac wrapper application.
+/// Smearor WROT
 #[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
 pub struct Arguments {
