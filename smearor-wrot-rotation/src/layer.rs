@@ -3,22 +3,17 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::str::FromStr;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
 pub enum SmearorLayer {
     #[serde(alias = "background", alias = "Background", alias = "BACKGROUND")]
     Background,
     #[serde(alias = "bottom", alias = "Bottom", alias = "BOTTOM")]
     Bottom,
     #[serde(alias = "top", alias = "Top", alias = "TOP")]
+    #[default]
     Top,
     #[serde(alias = "overlay", alias = "Overlay", alias = "OVERLAY")]
     Overlay,
-}
-
-impl Default for SmearorLayer {
-    fn default() -> Self {
-        SmearorLayer::Top
-    }
 }
 
 impl From<SmearorLayer> for Layer {

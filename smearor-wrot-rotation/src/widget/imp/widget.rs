@@ -25,7 +25,6 @@ use gtk4::subclass::prelude::WidgetImpl;
 use gtk4::subclass::prelude::WidgetImplExt;
 use std::cell::Cell;
 use std::cell::RefCell;
-use std::cmp::Ordering;
 use std::rc::Rc;
 use std::time::Duration;
 use tracing::debug;
@@ -257,7 +256,7 @@ impl ObjectImpl for RotationWidgetImpl {
                     Err(_) => return,
                 };
 
-                layout.imp().rotation.set(final_rotation as f32);
+                layout.imp().rotation.set(final_rotation);
                 widget_clone.queue_allocate();
                 *rotation_applied_clone.borrow_mut() = true;
                 return;

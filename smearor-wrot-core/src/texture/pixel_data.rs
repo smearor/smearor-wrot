@@ -58,7 +58,7 @@ impl PixelData<BGRA> {
     }
 
     pub fn get_frequency_map(&self, quantization_step: u8) -> Option<ColorFrequencyMap<RgbColor24>> {
-        if quantization_step <= 0 {
+        if quantization_step == 0 {
             return None;
         }
         if self.0.len() < 4 {
@@ -171,7 +171,7 @@ impl PixelData<RGBA> {
     }
 
     pub fn get_frequency_map(&self, quantization_step: u8) -> Option<ColorFrequencyMap<RgbColor24>> {
-        if quantization_step <= 0 {
+        if quantization_step == 0 {
             return None;
         }
         if self.0.len() < 4 {
@@ -198,7 +198,7 @@ impl PixelData<RGBA> {
 
     pub fn save_png(&self, path: &Path, size: &Size<u32>) -> Result<(), PixelDataSaveError> {
         let buffer = ImageBuffer::<Rgba<u8>, _>::from_raw(size.width, size.height, self.0.as_slice()).ok_or(PixelDataSaveError::BufferCreationFailed)?;
-        buffer.save(path).map_err(|e| PixelDataSaveError::ImageError(e))?;
+        buffer.save(path).map_err(PixelDataSaveError::ImageError)?;
         Ok(())
     }
 }

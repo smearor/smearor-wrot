@@ -70,7 +70,7 @@ pub trait SurfaceDamage {
 impl SurfaceDamage for SmearorCompositor {
     fn mark_surface_damage(&mut self, surface: &WlSurface, region: Option<Rectangle<i32, Physical>>) {
         if let Some(damage_rect) = region {
-            self.surface_damage.entry(surface.clone()).or_insert_with(Vec::new).push(damage_rect);
+            self.surface_damage.entry(surface.clone()).or_default().push(damage_rect);
         } else {
             // Mark entire surface as damaged by storing a large rectangle
             let entire_damage = Rectangle::new(Point::new(0, 0), Size::new(i32::MAX, i32::MAX));

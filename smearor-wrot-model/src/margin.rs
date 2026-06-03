@@ -2,7 +2,7 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use typed_builder::TypedBuilder;
 
-#[derive(Debug, Clone, Copy, TypedBuilder)]
+#[derive(Debug, Default, Clone, Copy, TypedBuilder)]
 pub struct Margins {
     pub left: u32,
     pub right: u32,
@@ -16,16 +16,6 @@ impl Margins {
     }
 }
 
-impl Default for Margins {
-    fn default() -> Self {
-        Self {
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-        }
-    }
-}
 impl Display for Margins {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "(left: {}, right: {}, top: {}, bottom: {})", self.left, self.right, self.top, self.bottom)

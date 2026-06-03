@@ -39,7 +39,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
                 return;
             };
             let element_count = compositor.count_elements();
-            if element_count <= 0 {
+            if element_count == 0 {
                 return;
             }
             debug!("Snapshot: rendering {} surfaces", element_count);
@@ -333,7 +333,8 @@ impl crate::widget::imp::CompositorWidgetImpl {
                     let (dialog_offset_x, dialog_offset_y) = {
                         let mut offset_x = 0;
                         let mut offset_y = 0;
-                        for window in compositor.space.elements() {
+
+                        if let Some(window) = compositor.space.elements().next() {
                             let window_geometry = window.geometry();
                             let window_location = compositor.space.element_location(window);
 
@@ -345,8 +346,6 @@ impl crate::widget::imp::CompositorWidgetImpl {
                                 // Fallback to negating geometry offset if position not available
                                 (-(window_geometry.loc.x as f32), -(window_geometry.loc.y as f32))
                             };
-
-                            break;
                         }
                         (offset_x, offset_y)
                     };

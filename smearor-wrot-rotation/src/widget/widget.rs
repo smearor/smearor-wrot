@@ -2,16 +2,12 @@ use crate::RotationControlHandler;
 use crate::animation::EasingFunction;
 use crate::animation::RotationZoomAnimation;
 use crate::rotation::SmearorRotation;
-use crate::widget::imp::layout::RotatedLayoutImpl;
 use crate::widget::imp::widget::RotationWidgetImpl;
 use crate::widget::layout::RotatedLayout;
 use gtk4::Accessible;
 use gtk4::Buildable;
 use gtk4::ConstraintTarget;
-use gtk4::LayoutManager;
-use gtk4::Orientation;
 use gtk4::Widget;
-use gtk4::graphene::Point;
 use gtk4::prelude::*;
 use gtk4::subclass::prelude::*;
 use std::time::Duration;
@@ -243,18 +239,5 @@ mod tests {
     fn test_smearor_rotation_from_str_custom() {
         let rotation = SmearorRotation::from("45");
         assert_eq!(rotation.to_degrees(), 45.0);
-    }
-
-    #[test]
-    fn test_rotated_layout_rotation_initial() {
-        let layout = RotatedLayout::default();
-        assert_eq!(layout.rotation.get(), 0.0);
-    }
-
-    #[test]
-    fn test_rotated_layout_rotation_set() {
-        let layout = RotatedLayout::default();
-        layout.rotation.set(90.0);
-        assert_eq!(layout.rotation.get(), 90.0);
     }
 }

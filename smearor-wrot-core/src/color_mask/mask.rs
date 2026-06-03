@@ -20,7 +20,7 @@ impl ColorMask {
     }
 
     pub fn color(&self) -> RgbColor {
-        self.color.clone()
+        self.color
     }
 
     pub fn tolerance(&self) -> f32 {

@@ -40,7 +40,7 @@ impl OutputDamage for SmearorCompositor {
     fn mark_output_damage(&mut self, output: &Output, region: Option<Rectangle<i32, Logical>>) {
         let output_name = output.name();
         if let Some(damage_rect) = region {
-            self.output_damage.entry(output_name.clone()).or_insert_with(Vec::new).push(damage_rect);
+            self.output_damage.entry(output_name.clone()).or_default().push(damage_rect);
         } else {
             // Mark entire output as damaged by storing a large rectangle
             let entire_damage = Rectangle::new(smithay::utils::Point::new(0, 0), smithay::utils::Size::new(i32::MAX, i32::MAX));

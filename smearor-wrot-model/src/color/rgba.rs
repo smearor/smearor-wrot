@@ -40,7 +40,7 @@ impl RgbaColor {
 }
 impl ToHex for RgbaColor {
     fn to_hex(&self) -> String {
-        RgbaColor24::from(self.clone()).to_hex()
+        RgbaColor24::from(*self).to_hex()
     }
 
     fn parse_hex(hex: &str) -> Result<Self, ParseHexError>
@@ -106,7 +106,7 @@ impl ToHex for RgbaColor24 {
     where
         Self: Sized,
     {
-        RgbaColor::parse_hex(hex).map(|c| Self::from(c))
+        RgbaColor::parse_hex(hex).map(Self::from)
     }
 }
 

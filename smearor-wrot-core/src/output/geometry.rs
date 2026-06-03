@@ -36,7 +36,7 @@ impl OutputGeometry for SmearorCompositor {
         if let Some(output) = output {
             // Check if the size actually changed to avoid unnecessary configure events
             let current_mode = output.current_mode();
-            let size_changed = current_mode.map_or(true, |mode| mode.size != output_size.into());
+            let size_changed = current_mode.is_none_or(|mode| mode.size != output_size.into());
 
             if !size_changed {
                 debug!("Output size unchanged at {output_size}, skipping configure events");

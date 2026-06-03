@@ -228,11 +228,11 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
         let mut config = compositor_widget_clone.config();
         config.auto_color_mask = is_active;
         compositor_widget_clone.set_config(config);
-        compositor_widget_clone.apply_config_to_compositor();
+        let _ = compositor_widget_clone.apply_config_to_compositor();
 
         // Clear cached dominant color and update compositor when enabling auto color mask
         if is_active {
-            compositor_widget_clone.clear_cached_dominant_color();
+            let _ = compositor_widget_clone.clear_cached_dominant_color();
         }
 
         glib::Propagation::Proceed
@@ -245,11 +245,11 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
         let mut config = compositor_widget_clone.config();
         config.auto_subsurface_color_mask = is_active;
         compositor_widget_clone.set_config(config);
-        compositor_widget_clone.apply_config_to_compositor();
+        let _ = compositor_widget_clone.apply_config_to_compositor();
 
         // Clear cached dominant color and update compositor when enabling auto subsurface color mask
         if is_active {
-            compositor_widget_clone.clear_cached_dominant_color_subsurface();
+            let _ = compositor_widget_clone.clear_cached_dominant_color_subsurface();
         }
 
         glib::Propagation::Proceed
@@ -283,7 +283,7 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
         let mut config = compositor_widget_clone.config();
         config.disable_client_decorations = is_active;
         compositor_widget_clone.set_config(config);
-        compositor_widget_clone.apply_config_to_compositor();
+        let _ = compositor_widget_clone.apply_config_to_compositor();
         glib::Propagation::Proceed
     });
 
@@ -294,7 +294,7 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
         let mut config = compositor_widget_clone.config();
         config.color_mask_shader = is_active;
         compositor_widget_clone.set_config(config);
-        compositor_widget_clone.apply_config_to_compositor();
+        let _ = compositor_widget_clone.apply_config_to_compositor();
         glib::Propagation::Proceed
     });
 

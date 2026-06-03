@@ -40,7 +40,7 @@ impl RgbColor {
 
 impl ToHex for RgbColor {
     fn to_hex(&self) -> String {
-        RgbColor24::from(self.clone()).to_hex()
+        RgbColor24::from(*self).to_hex()
     }
 
     fn parse_hex(hex: &str) -> Result<Self, ParseHexError>
@@ -118,7 +118,7 @@ impl ToHex for RgbColor24 {
     where
         Self: Sized,
     {
-        RgbColor::parse_hex(hex).map(|c| Self::from(c))
+        RgbColor::parse_hex(hex).map(Self::from)
     }
 }
 

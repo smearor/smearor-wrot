@@ -193,7 +193,7 @@ pub struct SmearorCompositor {
     pub subsurface_color_mask_detected: Arc<AtomicBool>,
     pub frame_count: Arc<AtomicU32>,
     pub commit_counts: Arc<DashMap<ObjectId, Arc<AtomicU32>>>,
-    pub first_commit_times: Arc<DashMap<ObjectId, Arc<Mutex<std::time::Instant>>>>,
+    pub first_commit_times: Arc<DashMap<ObjectId, Arc<Mutex<Instant>>>>,
     pub last_window_sizes: Arc<DashMap<ObjectId, Arc<Mutex<Option<(i32, i32)>>>>>,
 
     // Clipboard state for bidirectional synchronization

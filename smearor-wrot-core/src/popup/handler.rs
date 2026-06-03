@@ -31,7 +31,7 @@ impl PopupHandler for SmearorCompositor {
         for window in self.space.elements() {
             if let Some(toplevel) = window.toplevel() {
                 let surface = toplevel.wl_surface();
-                let popup_iter = PopupManager::popups_for_surface(&surface);
+                let popup_iter = PopupManager::popups_for_surface(surface);
                 for (popup, position) in popup_iter {
                     all_popups.push((popup, position));
                 }

@@ -69,7 +69,7 @@ impl ShmRenderNode for CompositorWidgetImpl {
         if let Ok(Some(texture)) = with_buffer_contents(&buffer, |memory_pointer, data_length, buffer_metadata| {
             let buffer_metadata = BufferMetadata::from(&buffer_metadata);
             debug!("Buffer contents accessible from holding area (SHM): {}", buffer_metadata);
-            if data_length <= 0 {
+            if data_length == 0 {
                 debug!("Buffer data length is zero, skipping texture creation");
                 return None;
             }

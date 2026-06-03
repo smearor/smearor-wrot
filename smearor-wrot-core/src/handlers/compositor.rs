@@ -121,7 +121,7 @@ impl CompositorHandler for SmearorCompositor {
 
                 // Check if buffer is DMA-BUF
                 use smithay::wayland::dmabuf::get_dmabuf;
-                if let Ok(_dmabuf) = get_dmabuf(&buffer) {
+                if let Ok(_dmabuf) = get_dmabuf(buffer) {
                     debug!("Buffer is DMA-BUF for surface: {:?}", surface_id);
                 } else {
                     debug!("Buffer is not DMA-BUF for surface: {:?}", surface_id);
@@ -129,7 +129,7 @@ impl CompositorHandler for SmearorCompositor {
                     // Cache SHM buffer data in texture_cache for both toplevels and subsurfaces
                     // This ensures subsurfaces can be rendered even after the surface is destroyed
                     use smithay::wayland::shm::with_buffer_contents;
-                    if let Ok(()) = with_buffer_contents(&buffer, |memory_pointer, data_length, buffer_metadata| {
+                    if let Ok(()) = with_buffer_contents(buffer, |memory_pointer, data_length, buffer_metadata| {
                         if data_length > 0 {
                             let pixel_data_slice = unsafe { std::slice::from_raw_parts(memory_pointer, data_length) };
                             let texture_cache_entry =
@@ -261,8 +261,8 @@ impl CompositorHandler for SmearorCompositor {
                         let adjusted_height = adjusted_height.max(100);
 
                         let window_geometry = window.geometry();
-                        let current_width = window_geometry.size.w as i32;
-                        let current_height = window_geometry.size.h as i32;
+                        let current_width = window_geometry.size.w;
+                        let current_height = window_geometry.size.h;
 
                         debug!("Dialog size: {}x{}, adjusted size: {}x{}", current_width, current_height, adjusted_width, adjusted_height);
 

@@ -689,7 +689,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
 
         // Apply config to compositor after it has been initialized
-        compositor_widget.apply_config_to_compositor();
+        let _ = compositor_widget.apply_config_to_compositor();
 
         // Apply double buffering setting
         if let Ok(compositor) = compositor_widget.compositor() {
@@ -727,7 +727,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 // Parse background color from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.background_color {
                     if let Ok(rgba_color) = parse_hex_color(hex_color) {
-                        guard.set_background_color(rgba_color);
+                        let _ = guard.set_background_color(rgba_color);
                     } else {
                         error!("Invalid hex color format: {}", hex_color);
                     }
@@ -736,7 +736,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 // Parse subsurface background color from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.subsurface_background_color {
                     if let Ok(rgba_color) = parse_hex_color(hex_color) {
-                        guard.set_subsurface_background_color(rgba_color);
+                        let _ = guard.set_subsurface_background_color(rgba_color);
                     } else {
                         error!("Invalid hex color format for subsurface background color: {}", hex_color);
                     }
@@ -745,7 +745,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 // Parse color mask from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.color_mask {
                     if let Ok(rgba_color) = parse_hex_color(hex_color) {
-                        guard.set_color_mask(ColorMask::new(rgba_color.color, command_line_arguments_for_closure.color_mask_tolerance));
+                        let _ = guard.set_color_mask(ColorMask::new(rgba_color.color, command_line_arguments_for_closure.color_mask_tolerance));
                         debug!(
                             "Manual color mask set to {} with tolerance {}",
                             hex_color, command_line_arguments_for_closure.color_mask_tolerance
@@ -767,7 +767,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 // Parse subsurface color mask from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.subsurface_color_mask {
                     if let Ok(rgba_color) = parse_hex_color(hex_color) {
-                        guard.set_subsurface_color_mask(ColorMask::new(rgba_color.color, command_line_arguments_for_closure.color_mask_tolerance));
+                        let _ = guard.set_subsurface_color_mask(ColorMask::new(rgba_color.color, command_line_arguments_for_closure.color_mask_tolerance));
                         debug!(
                             "Manual subsurface color mask set to {} with tolerance {}",
                             hex_color, command_line_arguments_for_closure.color_mask_tolerance
@@ -947,7 +947,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             PieMenuMessage::Settings => {
                                 info!("Received Settings message from pie menu");
                                 settings::show_settings_dialog(
-                                    (&window_clone).as_ref(),
+                                    window_clone.as_ref(),
                                     &compositor_widget_clone,
                                     &rotation_widget_clone,
                                     command_line_arguments_clone.disable_dma_buf,
@@ -1003,7 +1003,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             }
 
             // Check if there are no more surfaces and request shutdown
-            compositor_widget_clone.check_and_request_shutdown();
+            let _ = compositor_widget_clone.check_and_request_shutdown();
             ControlFlow::Continue
         });
 
@@ -1074,12 +1074,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let key_controller = gtk4::EventControllerKey::new();
         key_controller.connect_key_pressed(move |_controller, keyval, keycode, _state| {
             debug!("Key pressed in GTK window: keyval={:?} keycode={}", keyval, keycode);
-            compositor_widget_clone_press.handle_key_press(keyval, keycode);
+            let _ = compositor_widget_clone_press.handle_key_press(keyval, keycode);
             glib::Propagation::Proceed
         });
         key_controller.connect_key_released(move |_controller, keyval, keycode, _state| {
             debug!("Key released in GTK window: keyval={:?} keycode={}", keyval, keycode);
-            compositor_widget_clone_release.handle_key_release(keyval, keycode);
+            let _ = compositor_widget_clone_release.handle_key_release(keyval, keycode);
         });
         window.add_controller(key_controller);
 
@@ -1290,10 +1290,8 @@ fn launch_application(
     if let Some(stdout) = child.stdout.take() {
         let reader = std::io::BufReader::new(stdout);
         thread::spawn(move || {
-            for line in reader.lines() {
-                if let Ok(line) = line {
-                    info!("[CHILD STDOUT] {}", line);
-                }
+            for line in reader.lines().flatten() {
+                info!("[CHILD STDOUT] {}", line);
             }
         });
     }

@@ -63,6 +63,7 @@ pub trait DmaBufAllocator {
 ///
 /// This structure provides methods for allocating and managing DMA-BUF buffers
 /// for hardware-accelerated rendering using DRM/GEM.
+#[derive(Default)]
 pub struct DmaBufAllocatorImpl {
     /// DRM node for device management
     drm_node: Option<DrmNode>,

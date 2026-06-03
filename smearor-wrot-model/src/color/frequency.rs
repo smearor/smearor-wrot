@@ -36,6 +36,12 @@ impl<PDF: Clone + Eq> Ord for ColorFrequency<PDF> {
 
 pub struct ColorFrequencyMap<PDF: Eq + Hash>(pub DashMap<PDF, usize>);
 
+impl<PDF: Clone + Copy + Eq + Hash + ToHex> Default for ColorFrequencyMap<PDF> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<PDF: Clone + Copy + Eq + Hash + ToHex> ColorFrequencyMap<PDF> {
     pub fn new() -> Self {
         Self(DashMap::new())
