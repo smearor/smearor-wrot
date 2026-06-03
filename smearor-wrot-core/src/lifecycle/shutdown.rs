@@ -12,14 +12,25 @@ impl ShutdownHandler for SmearorCompositor {
     fn check_and_request_shutdown(&mut self) {
         // Check XdgShellState instead of Space, as Smithay manages surface lifecycle there
         let toplevel_count = self.xdg_shell_state.toplevel_surfaces().len();
-        if toplevel_count == 0 {
+        
+        // Also check for active subsurfaces - Firefox uses subsurface architecture
+        // where content is in subsurface but toplevel might not have buffer
+        let subsurface_count = if let Ok(subsurfaces) = self.subsurfaces.lock() {
+            subsurfaces.len()
+        } else {
+            0
+        };
+        
+        if toplevel_count == 0 && subsurface_count == 0 {
             // Only shutdown if the compositor has ever had a surface
             if let Ok(flag) = self.has_had_surface.lock() {
                 if *flag {
-                    debug!("No more toplevels remaining, requesting compositor shutdown");
+                    debug!("No more toplevels or subsurfaces remaining, requesting compositor shutdown");
                     self.send_message(CompositorMessage::Shutdown);
                 }
             }
+        } else {
+            debug!("Still have {} toplevel surfaces and {} subsurfaces, not shutting down", toplevel_count, subsurface_count);
         }
     }
 }
