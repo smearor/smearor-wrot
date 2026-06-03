@@ -144,6 +144,9 @@ pub struct SmearorCompositor {
     // Commit callback for notifying GTK widget when a surface commits
     pub commit_callback: Arc<Mutex<Option<CommitCallback>>>,
 
+    // Pending frame callbacks to send after GTK renders frame
+    pub pending_frame_callbacks: Arc<Mutex<Vec<(smithay::reexports::wayland_server::protocol::wl_surface::WlSurface, std::time::Duration)>>>,
+
     // Channel sender for sending messages to GTK wrapper
     pub message_sender: Arc<Mutex<Option<Sender<CompositorMessage>>>>,
 
@@ -377,6 +380,7 @@ impl SmearorCompositor {
 
             window_size_callback: Arc::new(Mutex::new(None)),
             commit_callback: Arc::new(Mutex::new(None)),
+            pending_frame_callbacks: Arc::new(Mutex::new(Vec::new())),
             message_sender: Arc::new(Mutex::new(None)),
             has_had_surface: Arc::new(Mutex::new(false)),
             first_commit_received: Arc::new(AtomicBool::new(false)),
@@ -597,6 +601,28 @@ impl SmearorCompositor {
         debug!("DMA-BUF global created successfully");
 
         Ok(())
+    }
+
+    /// Send pending frame callbacks after GTK has finished rendering
+    /// This synchronizes Firefox with GTK's rendering cycle
+    pub fn send_pending_frame_callbacks(&self) {
+        if let Some(output) = &self.virtual_output {
+            let mut pending_exists = false;
+            if let Ok(mut pending) = self.pending_frame_callbacks.lock() {
+                if !pending.is_empty() {
+                    pending_exists = true;
+                    pending.clear();
+                }
+            }
+
+            if pending_exists {
+                let elapsed = self.start_time.elapsed();
+                for window in self.space.elements() {
+                    window.send_frame(output, elapsed, Some(std::time::Duration::ZERO), |_, _| self.virtual_output.clone());
+                    debug!("Sent pending frame callbacks for window {:?}", window);
+                }
+            }
+        }
     }
 }
 

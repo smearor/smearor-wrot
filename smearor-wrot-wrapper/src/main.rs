@@ -24,8 +24,10 @@ use gtk4_layer_shell::LayerShell;
 use smearor_wrot_core::DEFAULT_WINDOW_HEIGHT;
 use smearor_wrot_core::DEFAULT_WINDOW_WIDTH;
 use smearor_wrot_core::DoubleBuffer;
+use smearor_wrot_core::ObjectId;
 use smearor_wrot_core::background::subsurface::SubsurfaceBackground;
 use smearor_wrot_core::background::toplevel::ToplevelBackground;
+use smearor_wrot_core::callback::commit::CommitCallbackAware;
 use smearor_wrot_core::color_mask::mask::ColorMask;
 use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;
 use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;
@@ -38,7 +40,6 @@ use smearor_wrot_core::message::sender::CompositorMessageSender;
 use smearor_wrot_core::windows::decoration::ClientDecorationAware;
 use smearor_wrot_core::windows::title::WindowTitle;
 use smearor_wrot_gtk::CompositorWidget;
-use smearor_wrot_core::ObjectId;
 use smearor_wrot_gtk::clipboard::sync_manager::SyncManager;
 use smearor_wrot_gtk::event_handler::keyboard::KeyboardInputEventHandler;
 use smearor_wrot_gtk::widget::compositor::handler::CompositorHandler;
@@ -814,8 +815,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let command_line_arguments_clone = command_line_arguments_for_closure.clone();
         let application_id_clone = application_id.clone();
 
-        glib::timeout_add_local(Duration::from_millis(100), move || {
+        glib::timeout_add_local(Duration::from_millis(16), move || {
             if let Ok(message) = compositor_message_receiver.try_recv() {
+                debug!("Received compositor message: {:?}", message);
                 match message {
                     CompositorMessage::Maximize => {
                         info!("Received Maximize message from compositor core");
@@ -911,6 +913,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 }
                             }
                         }
+                    }
+                    CompositorMessage::FrameRendered => {
+                        debug!("Received FrameRendered message, sending pending frame callbacks");
+                        if let Ok(compositor) = compositor_widget_clone.compositor() {
+                            if let Ok(guard) = compositor.lock() {
+                                guard.send_pending_frame_callbacks();
+                            }
+                        }
+                    }
+                    CompositorMessage::ForceRedraw => {
+                        debug!("Received ForceRedraw message, queueing draw immediately");
+                        compositor_widget_clone.queue_draw();
                     }
                 }
             }

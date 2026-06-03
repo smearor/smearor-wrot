@@ -94,8 +94,11 @@ impl CompositorHandler for SmearorCompositor {
         if self.get_commit_count(surface_id.clone()) == 1 {
             self.record_first_commit_time(surface_id.clone());
             debug!("Recorded first commit time for surface: {:?}", surface_id);
-            self.first_commit_received.store(true, Ordering::Relaxed);
-            self.send_message(CompositorMessage::FirstCommit);
+            // Only send FirstCommit message once globally, not per surface
+            if !self.first_commit_received.load(Ordering::Relaxed) {
+                self.first_commit_received.store(true, Ordering::Relaxed);
+                self.send_message(CompositorMessage::FirstCommit);
+            }
         }
 
         // Buffer thief: We intercept the buffer before Smithay processes it
@@ -108,7 +111,7 @@ impl CompositorHandler for SmearorCompositor {
             debug!("Checking current buffer state {:?}: {:?}", surface_id, current_buffer);
 
             if let Some(BufferAssignment::NewBuffer(buffer)) = current_buffer {
-                debug!("CAPTURED: Buffer intercepted and secured in Holding-Area: {:?}", surface_id);
+                debug!("CAPTURED: Buffer of type  {:?} intercepted and secured in Holding-Area: {:?}", buffer.id(), surface_id);
 
                 // Store buffer in Holding-Area (hard reference)
                 // This increases the reference count and prevents Smithay from releasing the buffer
@@ -123,9 +126,8 @@ impl CompositorHandler for SmearorCompositor {
                 } else {
                     debug!("Buffer is not DMA-BUF for surface: {:?}", surface_id);
 
-                    // TODO: Phase 5 - Subsurface Rendering - Cache SHM buffer data in texture_cache
-                    // For SHM buffers, we need to cache the buffer data in texture_cache
-                    // so that subsurfaces can be rendered even after the surface is destroyed.
+                    // Cache SHM buffer data in texture_cache for both toplevels and subsurfaces
+                    // This ensures subsurfaces can be rendered even after the surface is destroyed
                     use smithay::wayland::shm::with_buffer_contents;
                     if let Ok(()) = with_buffer_contents(&buffer, |memory_pointer, data_length, buffer_metadata| {
                         if data_length > 0 {
@@ -194,18 +196,30 @@ impl CompositorHandler for SmearorCompositor {
                 }
             }
         } else {
-            // No damage regions provided by client, skip damage marking
-            debug!("No damage regions from client, skipping damage marking");
+            // No damage regions provided by client - mark entire surface as damaged
+            // This is correct Wayland behavior: a commit without damage implies the entire surface should be rendered
+            debug!("No damage regions from client, marking entire surface as damaged");
+            self.mark_surface_damage(surface, None);
         }
         debug!("Marked surface {:?} as damaged", surface.id());
 
-        // Send frame callbacks to allow clients to continue rendering
-        // Frame callbacks are sent on the window level, not surface level
+        // Store frame callbacks to send after GTK renders frame
+        // This synchronizes Firefox with GTK's rendering cycle
         if let Some(output) = &self.virtual_output {
-            for window in self.space.elements() {
-                if window.toplevel().map(|t| t.wl_surface() == surface).unwrap_or(false) {
-                    window.send_frame(output, self.start_time.elapsed(), Some(std::time::Duration::ZERO), |_, _| self.virtual_output.clone());
-                    debug!("Sent frame callback for window {:?} with surface {:?}", window, surface.id());
+            let mut root = surface.clone();
+            while let Some(parent) = get_parent(&root) {
+                root = parent;
+            }
+            if let Some(window) = self.window_for_surface(&root) {
+                let has_frame_callbacks = with_states(surface, |surface_data| {
+                    !surface_data.cached_state.get::<SurfaceAttributes>().current().frame_callbacks.is_empty()
+                });
+                if has_frame_callbacks {
+                    let elapsed = self.start_time.elapsed();
+                    if let Ok(mut pending) = self.pending_frame_callbacks.lock() {
+                        pending.push((surface.clone(), elapsed));
+                        debug!("Stored pending frame callback for surface {:?}", surface.id());
+                    }
                 }
             }
         }
@@ -269,6 +283,37 @@ impl CompositorHandler for SmearorCompositor {
         };
 
         self.handle_toplevel_commit(surface);
+
+        // If this is a subsurface with a buffer, mark damage on parent toplevel to trigger rendering
+        // Firefox uses subsurface architecture where content is in subsurface but toplevel needs rendering
+        let is_subsurface = if let Ok(subsurfaces) = self.subsurfaces.lock() {
+            subsurfaces.contains(surface)
+        } else {
+            false
+        };
+
+        let has_buffer = if let Ok(holding_area) = self.buffer_holding_area.lock() {
+            holding_area.contains_key(&surface_id)
+        } else {
+            false
+        };
+
+        if is_subsurface && has_buffer {
+            debug!("Subsurface with buffer detected, finding parent toplevel to mark damage");
+            // Find parent toplevel surface using get_parent function
+            if let Some(parent) = get_parent(surface) {
+                debug!("Found parent toplevel for subsurface: {:?}", parent.id());
+                // Mark entire parent surface as damaged to trigger rendering
+                self.mark_surface_damage(&parent, None);
+                debug!("Marked parent toplevel as damaged for subsurface commit");
+            }
+            // Send message to force GTK to redraw immediately
+            if let Ok(sender_option) = self.message_sender.lock() {
+                if let Some(sender) = sender_option.as_ref() {
+                    let _ = sender.send(CompositorMessage::ForceRedraw);
+                }
+            }
+        }
 
         // TODO: Phase 5 - Implement buffer caching at commit time
         // Render buffer when committed and store in texture_cache for snapshot()

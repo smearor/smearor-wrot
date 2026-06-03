@@ -44,6 +44,11 @@ pub use render::OutputRendering;
 pub use render::RenderingPipeline;
 pub use render::SurfaceRendering;
 pub use state::ClientState;
+use crate::message::compositor_message::CompositorMessage;
+
+
+// Re-export smithay types for wrapper
+pub use smithay::reexports::wayland_server::backend::ObjectId;
 
 pub const DEFAULT_WINDOW_WIDTH: i32 = 1200;
 pub const DEFAULT_WINDOW_HEIGHT: i32 = 1200;

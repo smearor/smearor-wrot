@@ -1,11 +1,20 @@
 use glib::subclass::prelude::ObjectSubclassExt;
+use gtk4::prelude::ObjectExt;
 use gtk4::prelude::WidgetExt;
-use tracing::debug;
-
 use smearor_wrot_core::damage::surface::SurfaceDamage;
+use tracing::debug;
 
 impl crate::widget::imp::CompositorWidgetImpl {
     pub fn request_render(&self) {
+        self.request_render_internal(false);
+    }
+
+    pub fn request_render_force(&self) {
+        debug!("request_render_force: forcing render (bypassing damage check)");
+        self.request_render_internal(true);
+    }
+
+    fn request_render_internal(&self, force: bool) {
         let compositor = self.compositor.borrow();
         let Some(compositor) = compositor.as_ref() else {
             return;
@@ -18,7 +27,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
         // Check for damage regions before queueing draw
         let all_damage = compositor.get_all_surface_damage();
 
-        if all_damage.is_empty() {
+        if !force && all_damage.is_empty() {
             debug!("request_render: no damage regions, skipping queue_draw (GTK4 will use cached render nodes)");
             return;
         }
@@ -32,7 +41,12 @@ impl crate::widget::imp::CompositorWidgetImpl {
             total_damage_area = total_damage_area.saturating_add(area);
         }
 
-        debug!("request_render: found {} damage regions, total area: {} pixels", all_damage.len(), total_damage_area);
+        debug!(
+            "request_render: force={}, found {} damage regions, total area: {} pixels",
+            force,
+            all_damage.len(),
+            total_damage_area
+        );
 
         // Log individual damage regions for debugging
         for (i, region) in all_damage.iter().enumerate() {
@@ -45,6 +59,12 @@ impl crate::widget::imp::CompositorWidgetImpl {
             );
         }
 
-        self.obj().queue_draw();
+        // Force redraw by invalidating the widget when force rendering
+        if force {
+            // Force redraw without re-layout to avoid flickering
+            self.obj().queue_draw();
+        } else {
+            self.obj().queue_draw();
+        }
     }
 }

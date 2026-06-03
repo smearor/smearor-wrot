@@ -282,7 +282,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
 
                         debug!("Snapshot: appended subsurface texture to snapshot with bounds: {:?}", subsurface_bounds);
                     } else {
-                        debug!("Snapshot: failed to render subsurface to texture");
+                        debug!("Snapshot: subsurface has no buffer, skipping subsurface rendering");
                     }
                 }
             }
