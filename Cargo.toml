@@ -19,7 +19,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/smearor/smearor-wrot"
 homepage = "https://smearor.io/"
-rust-version = "1.87.0"
+rust-version = "1.92.0"
 
 [workspace.dependencies]
 atomic_float = "1.1.0"
