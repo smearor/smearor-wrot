@@ -32,20 +32,22 @@ pub mod winit;
 pub use buffer::BufferImportExport;
 pub use buffer::BufferLifecycle;
 pub use buffer::BufferTracking;
+pub use callback::commit::CommitCallbackAware;
+pub use callback::window_size::WindowSizeCallbackAware;
 pub use compositor::CalloopData;
 pub use compositor::SmearorCompositor;
+pub use dma::allocator::DmaBufAllocator;
 pub use dma::buffer::DmaBuffer;
 pub use error::CoreError;
 pub use logging::init_logging;
 pub use logging::init_logging_with_level;
+pub use message::compositor_message::CompositorMessage;
 pub use output::OutputGeometry;
 pub use render::DoubleBuffer;
 pub use render::OutputRendering;
 pub use render::RenderingPipeline;
 pub use render::SurfaceRendering;
 pub use state::ClientState;
-use crate::message::compositor_message::CompositorMessage;
-
 
 // Re-export smithay types for wrapper
 pub use smithay::reexports::wayland_server::backend::ObjectId;

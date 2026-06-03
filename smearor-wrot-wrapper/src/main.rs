@@ -914,18 +914,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             }
                         }
                     }
-                    CompositorMessage::FrameRendered => {
-                        debug!("Received FrameRendered message, sending pending frame callbacks");
-                        if let Ok(compositor) = compositor_widget_clone.compositor() {
-                            if let Ok(guard) = compositor.lock() {
-                                guard.send_pending_frame_callbacks();
-                            }
-                        }
-                    }
-                    CompositorMessage::ForceRedraw => {
-                        debug!("Received ForceRedraw message, queueing draw immediately");
-                        compositor_widget_clone.queue_draw();
-                    }
                 }
             }
 

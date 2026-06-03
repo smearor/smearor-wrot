@@ -1,6 +1,7 @@
 use super::*;
 use crate::color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
 use crate::opengl_renderer::OpenGLRenderer;
+use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::config::handler::ConfigHandler;
 use crate::widget::imp::dmabuf::formats::DmabufFormats;
 use crate::widget::imp::event::touch::TouchEventSetup;
@@ -358,12 +359,6 @@ void main() {
                     debug!("tick_callback: Queueing draw with {} damage regions", all_damage.len());
                     // Increment frame count for auto-detection timing
                     compositor.increment_frame_count();
-                    // Send FrameRendered message to trigger pending frame callbacks
-                    if let Ok(sender) = compositor.message_sender.lock() {
-                        if let Some(sender) = sender.as_ref() {
-                            let _ = sender.send(CompositorMessage::FrameRendered);
-                        }
-                    }
                 }
             }
             glib::ControlFlow::Continue
@@ -487,6 +482,13 @@ impl WidgetImpl for CompositorWidgetImpl {
                 snapshot.append_color(&app_color, &right_bounds);
             }
         }
+        let Ok(compositor) = self.compositor() else {
+            return;
+        };
+        let Ok(compositor) = compositor.lock() else {
+            return;
+        };
+        compositor.send_pending_frame_callbacks();
     }
 }
 

@@ -7,10 +7,11 @@ use glib::subclass::prelude::ObjectSubclassIsExt;
 use gtk4::prelude::GtkWindowExt;
 use gtk4::prelude::WidgetExt;
 use smearor_wrot_core::CalloopData;
+use smearor_wrot_core::CommitCallbackAware;
+use smearor_wrot_core::DmaBufAllocator;
 use smearor_wrot_core::OutputGeometry;
 use smearor_wrot_core::SmearorCompositor;
-use smearor_wrot_core::callback::window_size::WindowSizeCallbackAware;
-use smearor_wrot_core::dma::allocator::DmaBufAllocator;
+use smearor_wrot_core::WindowSizeCallbackAware;
 use smearor_wrot_model::geometry::size::Size;
 use smithay::reexports::calloop::EventLoop;
 use smithay::reexports::wayland_server::Display;
@@ -82,8 +83,17 @@ impl crate::widget::imp::CompositorWidgetImpl {
                 }
             });
 
+            // Register commit callback for compositor for redrawing the GTK widget if a subsurface commits
+            let widget_weak = self.obj().downgrade();
+            let commit_cb = Arc::new(move |surface_id| {
+                if let Some(widget) = widget_weak.upgrade() {
+                    widget.queue_draw();
+                }
+            });
+
             if let Ok(comp) = compositor.lock() {
                 comp.set_window_size_callback(callback);
+                comp.set_commit_callback(commit_cb);
             }
 
             // Initialize OpenGL renderer with surfaceless EGL and GBM device

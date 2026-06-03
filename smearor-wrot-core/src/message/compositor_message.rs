@@ -29,8 +29,4 @@ pub enum CompositorMessage {
     MoveRequest(u32),
     /// Client requested to resize window (drag by edge)
     ResizeRequest(u32),
-    /// GTK has finished rendering a frame, now safe to send frame callbacks
-    FrameRendered,
-    /// Force GTK to redraw immediately (for subsurface commits)
-    ForceRedraw,
 }

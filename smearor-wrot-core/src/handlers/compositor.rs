@@ -307,10 +307,10 @@ impl CompositorHandler for SmearorCompositor {
                 self.mark_surface_damage(&parent, None);
                 debug!("Marked parent toplevel as damaged for subsurface commit");
             }
-            // Send message to force GTK to redraw immediately
-            if let Ok(sender_option) = self.message_sender.lock() {
-                if let Some(sender) = sender_option.as_ref() {
-                    let _ = sender.send(CompositorMessage::ForceRedraw);
+            // Force GTK to redraw immediately
+            if let Ok(commit_callback) = self.commit_callback.lock() {
+                if let Some(commit_callback) = commit_callback.as_ref() {
+                    commit_callback(surface.id());
                 }
             }
         }
