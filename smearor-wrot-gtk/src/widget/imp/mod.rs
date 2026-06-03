@@ -14,7 +14,6 @@ use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::WidgetExtManual;
 use smearor_wrot_core::damage::surface::SurfaceDamage;
 use smearor_wrot_core::frame::count::FrameCounter;
-use smearor_wrot_core::message::compositor_message::CompositorMessage;
 use smithay::backend::allocator::Fourcc;
 use smithay::backend::allocator::dmabuf::Dmabuf;
 use std::cell::Ref;
