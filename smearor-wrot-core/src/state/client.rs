@@ -1,6 +1,8 @@
 //! Client state for Wayland clients
 
-use smithay::reexports::wayland_server::backend::{ClientData, ClientId, DisconnectReason};
+use smithay::reexports::wayland_server::backend::ClientData;
+use smithay::reexports::wayland_server::backend::ClientId;
+use smithay::reexports::wayland_server::backend::DisconnectReason;
 use smithay::wayland::compositor::CompositorClientState;
 
 /// State associated with a Wayland client
