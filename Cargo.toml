@@ -62,7 +62,7 @@ wayland-protocols = "0.32"
 wayland-protocols-wlr = "0.3"
 which = "8.0.2"
 xkeysym = "0.2.1"
-xkbcommon = "0.8"
+xkbcommon = "0.9"
 
 [workspace.lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin_include)', 'cfg(fn_traits)', 'cfg(unboxed_closures)'] }
