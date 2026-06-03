@@ -6,4 +6,5 @@ pub mod rotation;
 pub mod widget;
 
 pub use rotation::SmearorRotation;
-pub use widget::RotationWidget;
+pub use widget::rotation::RotationControlHandler;
+pub use widget::widget::RotationWidget;

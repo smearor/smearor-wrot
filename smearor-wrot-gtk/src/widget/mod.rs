@@ -3,6 +3,7 @@
 use crate::clipboard::error::CompositorClipboardError;
 use crate::config::CompositorWidgetConfig;
 use crate::widget::imp::ApplicationError;
+use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::imp::clipboard::handler::ClipboardHandler;
 use crate::widget::socket::handler::SocketHandler;
 use gtk4::glib;
@@ -27,7 +28,7 @@ pub mod socket;
 pub mod window_state;
 
 glib::wrapper! {
-    pub struct CompositorWidget(ObjectSubclass<imp::CompositorWidgetImpl>)
+    pub struct CompositorWidget(ObjectSubclass<CompositorWidgetImpl>)
         @extends gtk4::Widget,
         @implements gtk4::Accessible, gtk4::Buildable, gtk4::ConstraintTarget;
 }
@@ -63,6 +64,10 @@ impl CompositorWidget {
 
     pub fn request_render(&self) {
         self.imp().request_render();
+    }
+
+    pub fn request_render_force(&self) {
+        self.imp().request_render_force();
     }
 
     pub fn set_header_bar_title(&self, title: &str) {

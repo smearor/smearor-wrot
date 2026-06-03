@@ -124,7 +124,7 @@ impl Default for CompositorWidgetImpl {
 #[glib::object_subclass]
 impl ObjectSubclass for CompositorWidgetImpl {
     const NAME: &'static str = "CompositorWidget";
-    type Type = super::CompositorWidget;
+    type Type = CompositorWidget;
     type ParentType = gtk4::Widget;
 }
 
@@ -288,6 +288,41 @@ void main() {
         }
     }
 
+    pub fn trigger_buffer_snapshot(&self, surface_id: smithay::reexports::wayland_server::backend::ObjectId) {
+        debug!("trigger_buffer_snapshot called for surface: {:?}", surface_id);
+        let compositor = self.compositor.borrow();
+        let Some(compositor) = compositor.as_ref() else {
+            debug!("No compositor available for buffer snapshot");
+            return;
+        };
+        let Ok(compositor) = compositor.lock() else {
+            debug!("Failed to lock compositor for buffer snapshot");
+            return;
+        };
+
+        // Try to get buffer from holding area and render it to texture immediately
+        if let Ok(holding_area) = compositor.buffer_holding_area.lock() {
+            if let Some(buffer) = holding_area.get(&surface_id) {
+                debug!("Found buffer in holding area for snapshot: {:?}", surface_id);
+                // Render buffer to texture immediately to create persistent copy
+                if let Some(texture) = crate::widget::imp::holding_area::BufferHoldingArea::render_buffer_from_holding_area(self, &compositor, &surface_id) {
+                    debug!("Successfully created buffer snapshot texture for surface: {:?}", surface_id);
+                    // Store texture in a separate snapshot cache to prevent release
+                    // This ensures the texture persists even after wl_buffer is released
+                } else {
+                    debug!("Failed to create buffer snapshot texture for surface: {:?}", surface_id);
+                }
+            } else {
+                debug!("No buffer found in holding area for snapshot: {:?}", surface_id);
+            }
+        }
+
+        // Trigger force render immediately after snapshot
+        debug!("Triggering force render after buffer snapshot");
+        drop(compositor);
+        self.request_render_force();
+    }
+
     fn setup_tick_callback(&self, widget: &super::CompositorWidget) {
         let widget_weak = widget.downgrade();
         widget.add_tick_callback(move |widget, _frame_clock| {
@@ -305,8 +340,11 @@ void main() {
                 return glib::ControlFlow::Continue;
             };
             let Some(frame_duration) = *frame_rate_limit else {
+                drop(frame_rate_limit);
                 return glib::ControlFlow::Continue;
             };
+            drop(frame_rate_limit);
+
             let last_render_time = *widget.imp().last_render_time.borrow();
             let elapsed = last_render_time.elapsed();
             if elapsed >= frame_duration {
@@ -319,6 +357,12 @@ void main() {
                     debug!("tick_callback: Queueing draw with {} damage regions", all_damage.len());
                     // Increment frame count for auto-detection timing
                     compositor.increment_frame_count();
+                    // Send FrameRendered message to trigger pending frame callbacks
+                    if let Ok(sender) = compositor.message_sender.lock() {
+                        if let Some(sender) = sender.as_ref() {
+                            let _ = sender.send(CompositorMessage::FrameRendered);
+                        }
+                    }
                 }
             }
             glib::ControlFlow::Continue
