@@ -53,6 +53,15 @@ impl DmabufFormats for CompositorWidgetImpl {
             (Fourcc::Rgb565, 0),
             // NV12 (DRM_FORMAT_NV12 = 0x3231564e)
             (Fourcc::Nv12, 0),
+            // 10-bit 'Deep Color' (HDR-ready formats)
+            // ARGB2101010: [A:2, R:10, G:10, B:10] - Little Endian
+            // Provides 1024 color steps per channel, essential for reducing
+            // banding artifacts in smooth gradients.
+            (Fourcc::Argb2101010, 0),
+            // BGRA1010102: [B:10, G:10, R:10, A:2] - Little Endian
+            // Hardware-optimized layout for specific GPU vendors (e.g., AMD/Intel).
+            // Required for full compatibility with modern WebKitGTK accelerated compositing.
+            (Fourcc::Bgra1010102, 0),
         ]
         .iter()
         .cloned()
