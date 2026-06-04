@@ -178,7 +178,7 @@ pub struct Arguments {
 
     /// Maximum frames per second (default: 60).
     #[arg(long, default_value_t = 60)]
-    pub(crate) max_fps: u32,
+    pub(crate) max_fps: i64,
 
     /// Dialog margin in pixels for dialog positioning (default: 0).
     #[arg(long, default_value_t = 0)]

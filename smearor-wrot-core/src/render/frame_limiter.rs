@@ -4,8 +4,10 @@
 //! of compositor rendering to improve performance and reduce resource usage.
 
 use crate::compositor::SmearorCompositor;
+use std::sync::atomic::Ordering;
 use std::time::Duration;
-use std::time::Instant;
+use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 
 /// Trait for limiting frame rate during rendering
 ///
@@ -32,27 +34,22 @@ pub trait FrameLimiter {
 
 impl FrameLimiter for SmearorCompositor {
     fn should_render(&self) -> bool {
-        let Ok(frame_rate_limit) = self.frame_rate_limit.lock() else {
+        let frame_rate_limit_ms = self.frame_rate_limit_ms.load(Ordering::Relaxed);
+        if frame_rate_limit_ms < 0 {
             return true;
-        };
-        let Some(limit) = *frame_rate_limit else {
-            return true;
-        };
-        let Ok(last_frame_time) = self.last_frame_time.lock() else {
-            return true;
-        };
-        last_frame_time.elapsed() > limit
+        }
+        let last_frame_time = self.last_frame_time.load(Ordering::Relaxed);
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0);
+        (now - last_frame_time) >= frame_rate_limit_ms
     }
 
     fn update_frame_time(&self) {
-        if let Ok(mut last_frame_time) = self.last_frame_time.lock() {
-            *last_frame_time = Instant::now();
-        }
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0);
+        self.last_frame_time.store(now, Ordering::Relaxed);
     }
 
-    fn set_frame_rate_limit(&self, limit: Option<Duration>) {
-        if let Ok(mut frame_rate_limit) = self.frame_rate_limit.lock() {
-            *frame_rate_limit = limit;
-        }
+    fn set_frame_rate_limit(&self, frame_rate_limit_ms: Option<Duration>) {
+        self.frame_rate_limit_ms
+            .store(frame_rate_limit_ms.map(|d| d.as_millis() as i64).unwrap_or(-1), Ordering::Relaxed);
     }
 }

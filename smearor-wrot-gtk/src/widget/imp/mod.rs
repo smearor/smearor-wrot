@@ -8,12 +8,14 @@ use crate::widget::imp::event::touch::TouchEventSetup;
 use crate::widget::resize::handler::ResizeHandler;
 use dashmap::DashMap;
 use dashmap::DashSet;
+use glib::ControlFlow;
 use glib::object::ObjectExt;
 use gtk4::graphene::Rect;
 use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::WidgetExtManual;
 use smearor_wrot_core::damage::surface::SurfaceDamage;
 use smearor_wrot_core::frame::count::FrameCounter;
+use smearor_wrot_core::frame::limit::FrameLimiter;
 use smithay::backend::allocator::Fourcc;
 use smithay::backend::allocator::dmabuf::Dmabuf;
 use std::cell::Ref;
@@ -22,7 +24,11 @@ use std::cell::RefMut;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::atomic::AtomicBool;
+use std::sync::atomic::AtomicI64;
+use std::sync::atomic::Ordering;
 use std::time::Instant;
+use std::time::SystemTime;
+use std::time::UNIX_EPOCH;
 use tracing::debug;
 use tracing::error;
 use tracing::warn;
@@ -81,7 +87,7 @@ pub struct CompositorWidgetImpl {
     auto_resize_handling: RefCell<bool>,
     touch_transform_callback: RefCell<Option<Box<dyn Fn(usize, f64, f64) -> (f64, f64) + 'static>>>,
     pointer_transform_callback: RefCell<Option<Box<dyn Fn(f64, f64) -> (f64, f64) + 'static>>>,
-    last_render_time: RefCell<Instant>,
+    last_render_time: Arc<AtomicI64>,
     opengl_renderer: RefCell<Option<OpenGLRenderer>>,
     dmabuf_registry: DashMap<gtk4::gdk::Texture, Dmabuf>,
     supported_gtk_formats: DashSet<(Fourcc, u64)>,
@@ -107,7 +113,7 @@ impl Default for CompositorWidgetImpl {
             auto_resize_handling: RefCell::new(true),
             touch_transform_callback: RefCell::new(None),
             pointer_transform_callback: RefCell::new(None),
-            last_render_time: RefCell::new(Instant::now()),
+            last_render_time: Arc::new(AtomicI64::new(0)),
             opengl_renderer: RefCell::new(None),
             dmabuf_registry: DashMap::new(),
             supported_gtk_formats: DashSet::new(),
@@ -324,43 +330,61 @@ void main() {
         self.request_render_force();
     }
 
-    fn setup_tick_callback(&self, widget: &super::CompositorWidget) {
+    fn setup_tick_callback(&self, widget: &CompositorWidget) {
         let widget_weak = widget.downgrade();
-        widget.add_tick_callback(move |widget, _frame_clock| {
+        widget.add_tick_callback(move |widget, frame_clock| {
             let Some(widget) = widget_weak.upgrade() else {
-                return glib::ControlFlow::Continue;
+                return ControlFlow::Continue;
             };
-            let compositor = widget.imp().compositor.borrow();
-            let Some(compositor) = compositor.as_ref() else {
-                return glib::ControlFlow::Continue;
+            let Ok(compositor) = widget.compositor() else {
+                return ControlFlow::Continue;
             };
             let Ok(compositor) = compositor.lock() else {
-                return glib::ControlFlow::Continue;
+                return ControlFlow::Continue;
             };
-            let Ok(frame_rate_limit) = compositor.frame_rate_limit.lock() else {
-                return glib::ControlFlow::Continue;
-            };
-            let Some(frame_duration) = *frame_rate_limit else {
-                drop(frame_rate_limit);
-                return glib::ControlFlow::Continue;
-            };
-            drop(frame_rate_limit);
-
-            let last_render_time = *widget.imp().last_render_time.borrow();
-            let elapsed = last_render_time.elapsed();
-            if elapsed >= frame_duration {
-                widget.imp().last_render_time.replace(Instant::now());
-
-                // Check for damage regions before queueing draw to avoid unnecessary CPU usage
-                let all_damage = compositor.get_all_surface_damage();
-                if !all_damage.is_empty() {
-                    widget.queue_draw();
-                    debug!("tick_callback: Queueing draw with {} damage regions", all_damage.len());
-                    // Increment frame count for auto-detection timing
-                    compositor.increment_frame_count();
+            match compositor.frame_rate_limit() {
+                Some(frame_rate_limit_ms) => {
+                    let frame_duration = frame_rate_limit_ms; // ms
+                    let now_millis = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0);
+                    let last_render_time = widget.imp().last_render_time.load(Ordering::Relaxed);
+                    if (now_millis - last_render_time) >= frame_duration {
+                        widget.imp().last_render_time.store(now_millis, Ordering::Relaxed);
+                        let all_damage = compositor.get_all_surface_damage();
+                        if !all_damage.is_empty() {
+                            widget.queue_draw();
+                            debug!("tick_callback: Queueing draw with {} damage regions", all_damage.len());
+                            compositor.increment_frame_count();
+                        }
+                    }
+                }
+                None => {
+                    let all_damage = compositor.get_all_surface_damage();
+                    if !all_damage.is_empty() {
+                        widget.queue_draw();
+                    }
                 }
             }
-            glib::ControlFlow::Continue
+            // let frame_rate_limit_ms = compositor.frame_rate_limit_ms.load(Ordering::Relaxed);
+            // if frame_rate_limit_ms >= 0 {
+            //     let frame_duration = frame_rate_limit_ms; // ms
+            //     let now_millis = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0);
+            //     let last_render_time = widget.imp().last_render_time.load(Ordering::Relaxed);
+            //     if (now_millis - last_render_time) >= frame_duration {
+            //         widget.imp().last_render_time.store(now_millis, Ordering::Relaxed);
+            //         let all_damage = compositor.get_all_surface_damage();
+            //         if !all_damage.is_empty() {
+            //             widget.queue_draw();
+            //             debug!("tick_callback: Queueing draw with {} damage regions", all_damage.len());
+            //             compositor.increment_frame_count();
+            //         }
+            //     }
+            // } else {
+            //     let all_damage = compositor.get_all_surface_damage();
+            //     if !all_damage.is_empty() {
+            //         widget.queue_draw();
+            //     }
+            // }
+            ControlFlow::Continue
         });
     }
 }

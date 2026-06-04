@@ -62,6 +62,7 @@ use smithay::wayland::viewporter::ViewporterState;
 use std::ffi::OsString;
 use std::os::unix::io::RawFd;
 use std::sync::atomic::AtomicBool;
+use std::sync::atomic::AtomicI64;
 use std::sync::atomic::AtomicU32;
 use std::sync::mpsc::Sender;
 use std::time::Duration;
@@ -130,6 +131,10 @@ pub struct SmearorCompositor {
     // Dialog configure sizes for tracking dialog sizes from configure events
     pub dialog_configure_sizes: Arc<DashMap<WlSurface, (i32, i32)>>,
 
+    // Frame rate limiting
+    pub frame_rate_limit_ms: Arc<AtomicI64>,
+    pub last_frame_time: Arc<AtomicI64>,
+
     // Rendering state
     pub rendered_surfaces: Arc<DashSet<ObjectId>>,
     pub rendered_outputs: Arc<DashSet<String>>,
@@ -137,8 +142,6 @@ pub struct SmearorCompositor {
     pub output_damage: Arc<DashMap<String, Vec<Rectangle<i32, Logical>>>>,
     pub surface_damage: Arc<DashMap<WlSurface, Vec<Rectangle<i32, Physical>>>>,
     pub render_cache: Arc<DashMap<ObjectId, Vec<u8>>>,
-    pub frame_rate_limit: Arc<Mutex<Option<Duration>>>,
-    pub last_frame_time: Arc<Mutex<Instant>>,
 
     // Window size callback for application -> compositor size coupling
     pub window_size_callback: Arc<Mutex<Option<WindowSizeCallback>>>,
@@ -388,14 +391,15 @@ impl SmearorCompositor {
             dialogs: Arc::new(Mutex::new(Vec::new())),
             dialog_configure_sizes: Arc::new(DashMap::new()),
 
+            frame_rate_limit_ms: Arc::new(AtomicI64::new(16)),
+            last_frame_time: Arc::new(AtomicI64::new(0)),
+
             rendered_surfaces: Arc::new(DashSet::new()),
             rendered_outputs: Arc::new(DashSet::new()),
             last_render_times: Arc::new(DashMap::new()),
             output_damage: Arc::new(DashMap::new()),
             surface_damage: Arc::new(DashMap::new()),
             render_cache: Arc::new(DashMap::new()),
-            frame_rate_limit: Arc::new(Mutex::new(Some(Duration::from_millis(16)))),
-            last_frame_time: Arc::new(Mutex::new(Instant::now())),
 
             window_size_callback: Arc::new(Mutex::new(None)),
             commit_callback: Arc::new(Mutex::new(None)),

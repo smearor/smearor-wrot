@@ -147,7 +147,7 @@ pub struct CompositorConfig {
 
     /// Maximum frames per second (default: 60)
     #[serde(default)]
-    pub max_fps: Option<u32>,
+    pub max_fps: Option<i64>,
 
     /// Dialog margin in pixels for dialog positioning (default: 0)
     #[serde(default)]
