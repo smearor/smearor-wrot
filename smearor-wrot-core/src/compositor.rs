@@ -17,6 +17,7 @@ use crate::error::CoreError;
 use crate::error::Result;
 use crate::input::touch::slot_manager::ThreadSafeTouchSlotManager;
 use crate::message::compositor_message::CompositorMessage;
+use crate::subsurface::model::SubsurfaceData;
 use crate::texture::cache::TextureCacheEntry;
 use crate::texture::pixel_data::BGRA;
 use crate::wayland::listener::WaylandListener;
@@ -29,6 +30,7 @@ use smithay::desktop::Space;
 use smithay::desktop::Window;
 use smithay::input::Seat;
 use smithay::input::SeatState;
+use smithay::input::keyboard::XkbConfig;
 use smithay::output::Output;
 use smithay::output::PhysicalProperties;
 use smithay::reexports::calloop::EventLoop;
@@ -120,7 +122,7 @@ pub struct SmearorCompositor {
     pub buffer_holding_area: Arc<Mutex<std::collections::HashMap<ObjectId, WlBuffer>>>,
 
     // Subsurface registry for tracking subsurfaces
-    pub subsurfaces: Arc<Mutex<Vec<WlSurface>>>,
+    pub subsurfaces: Arc<Mutex<Vec<SubsurfaceData>>>,
 
     // Dialog registry for tracking modal dialogs
     pub dialogs: Arc<Mutex<Vec<ToplevelSurface>>>,

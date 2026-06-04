@@ -29,6 +29,7 @@ use crate::margin::handler::MarginHandler;
 use crate::message::compositor_message::CompositorMessage;
 use crate::message::sender::CompositorMessageSender;
 use crate::popup::handler::PopupHandler;
+use crate::subsurface::model::SubsurfaceData;
 use crate::surface::SurfaceQuery;
 use crate::surface::commit::TopLevelCommitHandler;
 use crate::texture::cache::TextureCacheEntry;
@@ -52,8 +53,8 @@ impl CompositorHandler for SmearorCompositor {
         })
     }
 
-    fn destroyed(&mut self, surface: &WlSurface) {
-        let surface_id = surface.id();
+    fn destroyed(&mut self, subsurface: &WlSurface) {
+        let surface_id = subsurface.id();
         debug!("Surface destroyed: {:?}", surface_id);
 
         // TODO: Phase 5 - Subsurface Rendering - Implement buffer cleanup strategy
@@ -71,20 +72,20 @@ impl CompositorHandler for SmearorCompositor {
         debug!("Cleaned up surface data for: {:?}", surface_id);
     }
 
-    fn new_subsurface(&mut self, surface: &WlSurface, parent: &WlSurface) {
-        debug!("New subsurface created: {:?} with parent: {:?}", surface.id(), parent.id());
+    fn new_subsurface(&mut self, subsurface: &WlSurface, parent: &WlSurface) {
+        debug!("New subsurface created: {:?} with parent: {:?}", subsurface.id(), parent.id());
         let Ok(mut subsurfaces) = self.subsurfaces.lock() else {
             error!("Failed to lock subsurfaces registry");
             return;
         };
-        subsurfaces.push(surface.clone());
+        subsurfaces.push(SubsurfaceData::new(parent, subsurface));
         debug!("Subsurface registry now has {} subsurfaces", subsurfaces.len());
     }
 
-    fn commit(&mut self, surface: &WlSurface) {
-        debug!("=== COMMIT START === Commit called for surface: {:?}", surface.id());
+    fn commit(&mut self, subsurface: &WlSurface) {
+        debug!("=== COMMIT START === Commit called for surface: {:?}", subsurface.id());
 
-        let surface_id = surface.id();
+        let surface_id = subsurface.id();
 
         // Increment commit count for this surface
         self.increment_commit_count(surface_id.clone());
@@ -102,7 +103,7 @@ impl CompositorHandler for SmearorCompositor {
         }
 
         // Buffer thief: We intercept the buffer before Smithay processes it
-        with_states(surface, |surface_data| {
+        with_states(subsurface, |surface_data| {
             let mut attrs = surface_data.cached_state.get::<SurfaceAttributes>();
 
             // We check the current state (pending is already None when we are here)
@@ -157,17 +158,17 @@ impl CompositorHandler for SmearorCompositor {
         });
 
         // IMPORTANT: Now run Smithay's standard logic
-        on_commit_buffer_handler::<Self>(surface);
+        on_commit_buffer_handler::<Self>(subsurface);
 
         // Now the buffer in Smithay might be 'Removed',
         // but we have our own clone in 'buffer_holding_area'!
 
         // Extract damage information from surface attributes
-        let has_damage_regions = with_states(surface, |surface_data| !surface_data.cached_state.get::<SurfaceAttributes>().current().damage.is_empty());
+        let has_damage_regions = with_states(subsurface, |surface_data| !surface_data.cached_state.get::<SurfaceAttributes>().current().damage.is_empty());
 
         if has_damage_regions {
             // Extract and convert damage regions
-            let damage_regions = with_states(surface, |surface_data| {
+            let damage_regions = with_states(subsurface, |surface_data| {
                 let mut regions = Vec::new();
                 for damage in &surface_data.cached_state.get::<SurfaceAttributes>().current().damage {
                     let rect = match damage {
@@ -189,43 +190,43 @@ impl CompositorHandler for SmearorCompositor {
                 // All damage regions were filtered out (all were full damage)
                 // Mark entire surface as damaged
                 debug!("All damage regions were full damage, marking entire surface as damaged");
-                self.mark_surface_damage(surface, None);
+                self.mark_surface_damage(subsurface, None);
             } else {
                 for region in damage_regions {
-                    self.mark_surface_damage(surface, Some(region));
+                    self.mark_surface_damage(subsurface, Some(region));
                 }
             }
         } else {
             // No damage regions provided by client - mark entire surface as damaged
             // This is correct Wayland behavior: a commit without damage implies the entire surface should be rendered
             debug!("No damage regions from client, marking entire surface as damaged");
-            self.mark_surface_damage(surface, None);
+            self.mark_surface_damage(subsurface, None);
         }
-        debug!("Marked surface {:?} as damaged", surface.id());
+        debug!("Marked surface {:?} as damaged", subsurface.id());
 
         // Store frame callbacks to send after GTK renders frame
         // This synchronizes Firefox with GTK's rendering cycle
-        if let Some(output) = &self.virtual_output {
-            let mut root = surface.clone();
+        if let Some(_output) = &self.virtual_output {
+            let mut root = subsurface.clone();
             while let Some(parent) = get_parent(&root) {
                 root = parent;
             }
-            if let Some(window) = self.window_for_surface(&root) {
-                let has_frame_callbacks = with_states(surface, |surface_data| {
+            if let Some(_window) = self.window_for_surface(&root) {
+                let has_frame_callbacks = with_states(subsurface, |surface_data| {
                     !surface_data.cached_state.get::<SurfaceAttributes>().current().frame_callbacks.is_empty()
                 });
                 if has_frame_callbacks {
                     let elapsed = self.start_time.elapsed();
                     if let Ok(mut pending) = self.pending_frame_callbacks.lock() {
-                        pending.push((surface.clone(), elapsed));
-                        debug!("Stored pending frame callback for surface {:?}", surface.id());
+                        pending.push((subsurface.clone(), elapsed));
+                        debug!("Stored pending frame callback for surface {:?}", subsurface.id());
                     }
                 }
             }
         }
 
-        if !is_sync_subsurface(surface) {
-            let mut root = surface.clone();
+        if !is_sync_subsurface(subsurface) {
+            let mut root = subsurface.clone();
             while let Some(parent) = get_parent(&root) {
                 root = parent;
             }
@@ -282,12 +283,12 @@ impl CompositorHandler for SmearorCompositor {
             }
         };
 
-        self.handle_toplevel_commit(surface);
+        self.handle_toplevel_commit(subsurface);
 
         // If this is a subsurface with a buffer, mark damage on parent toplevel to trigger rendering
         // Firefox uses subsurface architecture where content is in subsurface but toplevel needs rendering
         let is_subsurface = if let Ok(subsurfaces) = self.subsurfaces.lock() {
-            subsurfaces.contains(surface)
+            subsurfaces.iter().any(|subsurface_data| subsurface_data.subsurface.id() == subsurface.id())
         } else {
             false
         };
@@ -301,7 +302,7 @@ impl CompositorHandler for SmearorCompositor {
         if is_subsurface && has_buffer {
             debug!("Subsurface with buffer detected, finding parent toplevel to mark damage");
             // Find parent toplevel surface using get_parent function
-            if let Some(parent) = get_parent(surface) {
+            if let Some(parent) = get_parent(subsurface) {
                 debug!("Found parent toplevel for subsurface: {:?}", parent.id());
                 // Mark entire parent surface as damaged to trigger rendering
                 self.mark_surface_damage(&parent, None);
@@ -310,7 +311,7 @@ impl CompositorHandler for SmearorCompositor {
             // Force GTK to redraw immediately
             if let Ok(commit_callback) = self.commit_callback.lock() {
                 if let Some(commit_callback) = commit_callback.as_ref() {
-                    commit_callback(surface.id());
+                    commit_callback(subsurface.id());
                 }
             }
         }
@@ -319,7 +320,7 @@ impl CompositorHandler for SmearorCompositor {
         // Render buffer when committed and store in texture_cache for snapshot()
         // This fixes the timing issue where buffer is marked as "Removed" before snapshot() renders
 
-        self.handle_popup_commits(surface);
+        self.handle_popup_commits(subsurface);
     }
 }
 

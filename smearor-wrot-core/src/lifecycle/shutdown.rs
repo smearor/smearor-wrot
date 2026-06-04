@@ -1,6 +1,7 @@
 use crate::SmearorCompositor;
 use crate::message::compositor_message::CompositorMessage;
 use crate::message::sender::CompositorMessageSender;
+use crate::subsurface::handler::SubsurfaceHandler;
 use tracing::debug;
 
 pub trait ShutdownHandler {
@@ -15,11 +16,7 @@ impl ShutdownHandler for SmearorCompositor {
 
         // Also check for active subsurfaces - Firefox uses subsurface architecture
         // where content is in subsurface but toplevel might not have buffer
-        let subsurface_count = if let Ok(subsurfaces) = self.subsurfaces.lock() {
-            subsurfaces.len()
-        } else {
-            0
-        };
+        let subsurface_count = self.active_subsurface_count();
 
         if toplevel_count == 0 && subsurface_count == 0 {
             // Only shutdown if the compositor has ever had a surface
@@ -30,7 +27,10 @@ impl ShutdownHandler for SmearorCompositor {
                 }
             }
         } else {
-            debug!("Still have {} toplevel surfaces and {} subsurfaces, not shutting down", toplevel_count, subsurface_count);
+            debug!(
+                "Still have {} toplevel surfaces and {} active subsurfaces, not shutting down",
+                toplevel_count, subsurface_count
+            );
         }
     }
 }
