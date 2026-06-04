@@ -208,6 +208,14 @@ pub struct Arguments {
     #[arg(long)]
     pub(crate) override_wayland_display: Option<String>,
 
+    /// Keyboard layout (e.g., "de", "us"). Overrides automatic detection.
+    #[arg(long)]
+    pub(crate) keyboard_layout: Option<String>,
+
+    /// Keyboard variant (e.g., "nodeadkeys"). Overrides automatic detection.
+    #[arg(long)]
+    pub(crate) keyboard_variant: Option<String>,
+
     /// Arguments to be passed to the client application.
     #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
     pub(crate) command_arguments: Vec<OsString>,

@@ -62,6 +62,10 @@ pub struct CompositorWidgetConfig {
     pub color_mask_shader: bool,
     /// Enable animations for visual effects
     pub animations: bool,
+    /// Keyboard layout (e.g., "de", "us")
+    pub keyboard_layout: Option<String>,
+    /// Keyboard variant (e.g., "nodeadkeys")
+    pub keyboard_variant: Option<String>,
 }
 
 /// Color mask configuration for background replacement
@@ -122,6 +126,8 @@ impl Default for CompositorWidgetConfig {
             disable_client_decorations: false,
             color_mask_shader: false,
             animations: true,
+            keyboard_layout: None,
+            keyboard_variant: None,
         }
     }
 }

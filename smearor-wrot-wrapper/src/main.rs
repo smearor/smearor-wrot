@@ -3,11 +3,14 @@
 pub mod args;
 pub mod config;
 pub mod icon;
+pub mod keyboard_layout;
 pub mod screenshot;
 pub mod settings;
 pub mod socket;
 
 use crate::args::Arguments;
+use crate::keyboard_layout::detect_keyboard_layout;
+use crate::keyboard_layout::KeyboardLayout;
 use crate::screenshot::ScreenshotManager;
 use crate::socket::build_socket_path;
 use crate::socket::check_socket_exists;
@@ -655,6 +658,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let initial_width = command_line_arguments_for_closure.width;
         let initial_height = command_line_arguments_for_closure.height;
         info!("Configuring compositor with DMA-BUF enabled: {}", !command_line_arguments_for_closure.disable_dma_buf);
+        
+        // Use CLI parameters if provided, otherwise detect keyboard layout
+        let keyboard_layout = if command_line_arguments_for_closure.keyboard_layout.is_some() 
+            || command_line_arguments_for_closure.keyboard_variant.is_some() {
+            info!("Using CLI keyboard layout parameters");
+            Some(KeyboardLayout::new(
+                command_line_arguments_for_closure.keyboard_layout.clone().unwrap_or_default(),
+                command_line_arguments_for_closure.keyboard_variant.clone()
+            ))
+        } else {
+            info!("Detecting keyboard layout automatically");
+            detect_keyboard_layout()
+        };
+        
         let config = smearor_wrot_gtk::CompositorWidgetConfig {
             show_decorations: command_line_arguments_for_closure.decorated,
             fullscreen: command_line_arguments_for_closure.fullscreen,
@@ -673,6 +690,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
             disable_client_decorations: command_line_arguments_for_closure.disable_client_decorations,
             color_mask_shader: command_line_arguments_for_closure.color_mask_shader,
             animations: !command_line_arguments_for_closure.disable_animations,
+            keyboard_layout: keyboard_layout.as_ref().map(|layout| layout.layout.clone()),
+            keyboard_variant: keyboard_layout.as_ref().and_then(|layout| layout.variant.clone()),
             ..Default::default()
         };
         compositor_widget.set_config(config);
@@ -1027,6 +1046,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
         provider.load_from_data("window { background-color: transparent; } ");
         if let Some(display) = gtk4::gdk::Display::default() {
             gtk4::style_context_add_provider_for_display(&display, &provider, gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+            // Detect keyboard layout
+            if let Some(keyboard_layout) = detect_keyboard_layout() {
+                info!("Detected keyboard layout: {}", keyboard_layout.full_name());
+            } else {
+                info!("Could not detect keyboard layout");
+            }
         }
 
         // Note: size-allocate signal handling is implemented in CompositorWidget

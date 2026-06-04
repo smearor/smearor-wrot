@@ -212,6 +212,8 @@ impl SmearorCompositor {
         initial_width: i32,
         initial_height: i32,
         dma_buf_enabled: bool,
+        keyboard_layout: Option<String>,
+        keyboard_variant: Option<String>,
     ) -> Result<Self> {
         let start_time = Instant::now();
 
@@ -289,9 +291,24 @@ impl SmearorCompositor {
         // A seat typically has a pointer and maintains a keyboard focus and a pointer focus.
         let mut seat: Seat<Self> = seat_state.new_wl_seat(&dh, "winit");
 
+        // Configure keyboard layout if provided
+        let xkb_config = if keyboard_layout.is_some() || keyboard_variant.is_some() {
+            let layout_ref = keyboard_layout.as_deref().unwrap_or("");
+            let variant_ref = keyboard_variant.as_deref().unwrap_or("");
+            debug!("Configuring keyboard with layout: {} variant: {}", layout_ref, variant_ref);
+            XkbConfig {
+                layout: layout_ref,
+                variant: variant_ref,
+                ..Default::default()
+            }
+        } else {
+            debug!("Using default keyboard configuration");
+            XkbConfig::default()
+        };
+
         // Notify clients that we have a keyboard, for the sake of the example we assume that keyboard is always present.
         // You may want to track keyboard hot-plug in real compositor.
-        seat.add_keyboard(Default::default(), 200, 25)
+        seat.add_keyboard(xkb_config, 200, 25)
             .map_err(|e| CoreError::compositor(format!("Failed to add keyboard: {}", e)))?;
 
         // Notify clients that we have a pointer (mouse)

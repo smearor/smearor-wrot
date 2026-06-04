@@ -59,8 +59,10 @@ impl crate::widget::imp::CompositorWidgetImpl {
 
             // Initialize compositor
             let dma_buf_enabled = config.dma_buf_enabled;
+            let keyboard_layout = config.keyboard_layout.clone();
+            let keyboard_variant = config.keyboard_variant.clone();
             let compositor =
-                match SmearorCompositor::new(&mut event_loop, shared_display.clone(), Some(&socket_path), initial_width, initial_height, dma_buf_enabled) {
+                match SmearorCompositor::new(&mut event_loop, shared_display.clone(), Some(&socket_path), initial_width, initial_height, dma_buf_enabled, keyboard_layout, keyboard_variant) {
                     Ok(c) => Arc::new(Mutex::new(c)),
                     Err(e) => {
                         error!("Failed to initialize compositor: {}", e);
