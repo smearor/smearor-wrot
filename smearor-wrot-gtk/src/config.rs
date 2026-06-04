@@ -62,6 +62,8 @@ pub struct CompositorWidgetConfig {
     pub color_mask_shader: bool,
     /// Enable animations for visual effects
     pub animations: bool,
+    /// Maximum frames per second (default: 60)
+    pub max_fps: i64,
     /// Keyboard layout (e.g., "de", "us")
     pub keyboard_layout: Option<String>,
     /// Keyboard variant (e.g., "nodeadkeys")
@@ -126,6 +128,7 @@ impl Default for CompositorWidgetConfig {
             disable_client_decorations: false,
             color_mask_shader: false,
             animations: true,
+            max_fps: 60,
             keyboard_layout: None,
             keyboard_variant: None,
         }

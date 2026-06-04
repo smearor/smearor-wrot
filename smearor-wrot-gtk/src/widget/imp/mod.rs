@@ -364,26 +364,6 @@ void main() {
                     }
                 }
             }
-            // let frame_rate_limit_ms = compositor.frame_rate_limit_ms.load(Ordering::Relaxed);
-            // if frame_rate_limit_ms >= 0 {
-            //     let frame_duration = frame_rate_limit_ms; // ms
-            //     let now_millis = SystemTime::now().duration_since(UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0);
-            //     let last_render_time = widget.imp().last_render_time.load(Ordering::Relaxed);
-            //     if (now_millis - last_render_time) >= frame_duration {
-            //         widget.imp().last_render_time.store(now_millis, Ordering::Relaxed);
-            //         let all_damage = compositor.get_all_surface_damage();
-            //         if !all_damage.is_empty() {
-            //             widget.queue_draw();
-            //             debug!("tick_callback: Queueing draw with {} damage regions", all_damage.len());
-            //             compositor.increment_frame_count();
-            //         }
-            //     }
-            // } else {
-            //     let all_damage = compositor.get_all_surface_damage();
-            //     if !all_damage.is_empty() {
-            //         widget.queue_draw();
-            //     }
-            // }
             ControlFlow::Continue
         });
     }

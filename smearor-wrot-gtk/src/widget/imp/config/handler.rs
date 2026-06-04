@@ -7,6 +7,7 @@ use crate::widget::imp::CompositorWidgetImpl;
 use gtk4::Orientation;
 use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;
 use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;
+use smearor_wrot_core::frame::limit::FrameLimiter;
 use smearor_wrot_core::windows::decoration::ClientDecorationAware;
 use smearor_wrot_model::geometry::size::Size;
 
@@ -33,6 +34,7 @@ impl ConfigHandler for CompositorWidgetImpl {
         guard.set_color_mask_tolerance(config.color_mask_tolerance);
         guard.set_color_mask_shader(config.color_mask_shader);
         guard.set_client_decorations_enabled(config.disable_client_decorations);
+        guard.set_max_fps(config.max_fps);
         Ok(())
     }
 

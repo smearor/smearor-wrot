@@ -690,6 +690,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             disable_client_decorations: command_line_arguments_for_closure.disable_client_decorations,
             color_mask_shader: command_line_arguments_for_closure.color_mask_shader,
             animations: !command_line_arguments_for_closure.disable_animations,
+            max_fps: command_line_arguments_for_closure.max_fps,
             keyboard_layout: keyboard_layout.as_ref().map(|layout| layout.layout.clone()),
             keyboard_variant: keyboard_layout.as_ref().and_then(|layout| layout.variant.clone()),
             ..Default::default()
