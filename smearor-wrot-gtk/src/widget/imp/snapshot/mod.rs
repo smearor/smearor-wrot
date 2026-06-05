@@ -1,5 +1,6 @@
 use crate::color_mask::color_mask_applier::ColorMaskApplier;
 use crate::color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
+use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::imp::snapshot::background_color::SnapshotBackgroundColor;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::SnapshotExt;
@@ -17,7 +18,7 @@ use tracing::debug;
 
 pub mod background_color;
 
-impl crate::widget::imp::CompositorWidgetImpl {
+impl CompositorWidgetImpl {
     pub(crate) fn render_snapshot(&self, snapshot: &gtk4::Snapshot) {
         // Cleanup destroyed DMA-BUF textures from registry
         self.cleanup_dmabuf_registry();
