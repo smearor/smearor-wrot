@@ -65,7 +65,6 @@ use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicI64;
 use std::sync::atomic::AtomicU32;
 use std::sync::mpsc::Sender;
-use std::time::Duration;
 use std::time::Instant;
 use tracing::debug;
 use tracing::info;
@@ -234,7 +233,6 @@ impl SmearorCompositor {
         let xdg_dialog_state = XdgDialogState::new::<Self>(&dh);
         let viewporter_state = ViewporterState::new::<Self>(&dh);
 
-        // TODO: Phase 5 - Ensure XDG-Shell global is advertised
         // The delegate_xdg_shell macro should handle this, but we need to verify
         // Add logging to confirm global creation
         debug!("XDG-Shell state initialized, checking global advertisement");
@@ -253,7 +251,6 @@ impl SmearorCompositor {
         let dma_buf_allocator = DmaBufAllocatorImpl::initialize_dma_buf_allocator();
 
         // Initialize DMA-BUF global with common formats (only if DMA-BUF is enabled)
-        // TODO: Phase 7 - DMA-BUF support for hardware acceleration - Use renderer formats
         debug!("Starting DMA-BUF global initialization (dma_buf_enabled={})", dma_buf_enabled);
         let dmabuf_global = if dma_buf_enabled {
             debug!("Initializing DMA-BUF global with common formats");

@@ -1,5 +1,4 @@
 use glib::subclass::prelude::ObjectSubclassExt;
-use gtk4::prelude::ObjectExt;
 use gtk4::prelude::WidgetExt;
 use smearor_wrot_core::damage::surface::SurfaceDamage;
 use tracing::debug;

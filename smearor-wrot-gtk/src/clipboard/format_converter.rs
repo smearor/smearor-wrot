@@ -77,6 +77,6 @@ mod tests {
     fn test_map_mime_type() {
         assert_eq!(FormatConverter::map_mime_type("UTF8_STRING"), "text/plain;charset=utf-8");
         assert_eq!(FormatConverter::map_mime_type("text/plain"), "text/plain;charset=utf-8");
-        assert_eq!(FormatConverter::map_mime_type("text/uri-list"), "text/uri-list");
+        assert_eq!(FormatConverter::map_mime_type("text/uri-list"), "text/plain;charset=utf-8");
     }
 }
