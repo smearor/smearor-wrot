@@ -48,7 +48,6 @@ use smearor_wrot_gtk::widget::resize::handler::ResizeHandler;
 use smearor_wrot_gtk::widget::shutdown::handler::ShutdownHandler;
 use smearor_wrot_gtk::widget::socket::handler::SocketHandler;
 use smearor_wrot_gtk::widget::window_state::handler::WindowStateHandler;
-use smearor_wrot_model::color::RgbColor;
 use smearor_wrot_model::color::rgba::RgbaColor;
 use smearor_wrot_model::geometry::size::Size;
 use smearor_wrot_model::margin::Margins;
@@ -77,28 +76,6 @@ use tracing::error;
 use tracing::info;
 use tracing::warn;
 use which::which;
-
-/// Parse a hex color string (e.g., "#FF0000" or "FF0000") into RGB values (0.0-1.0 range)
-fn parse_hex_color(hex: &str) -> Result<RgbaColor, String> {
-    let hex = hex.trim_start_matches('#');
-
-    if hex.len() != 6 && hex.len() != 8 {
-        return Err("Hex color must be 6 characters (e.g., #FF0000) or 8 characters with alpha (e.g., #FF000077)".to_string());
-    }
-
-    let r = u8::from_str_radix(&hex[0..2], 16).map_err(|e| format!("Failed to parse red component: {}", e))?;
-    let g = u8::from_str_radix(&hex[2..4], 16).map_err(|e| format!("Failed to parse green component: {}", e))?;
-    let b = u8::from_str_radix(&hex[4..6], 16).map_err(|e| format!("Failed to parse blue component: {}", e))?;
-
-    // Alpha channel is optional, default to 1.0 (fully opaque)
-    let a = if hex.len() == 8 {
-        u8::from_str_radix(&hex[6..8], 16).map_err(|e| format!("Failed to parse alpha component: {}", e))? as f32 / 255.0
-    } else {
-        1.0
-    };
-
-    Ok(RgbaColor::new(RgbColor::new_from_u8(r, g, b), a))
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -741,7 +718,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                 // Parse background color from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.background_color {
-                    if let Ok(rgba_color) = parse_hex_color(hex_color) {
+                    if let Ok(rgba_color) = RgbaColor::parse_hex_with_optional_alpha(hex_color) {
                         let _ = guard.set_background_color(rgba_color);
                     } else {
                         error!("Invalid hex color format: {}", hex_color);
@@ -750,7 +727,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                 // Parse subsurface background color from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.subsurface_background_color {
-                    if let Ok(rgba_color) = parse_hex_color(hex_color) {
+                    if let Ok(rgba_color) = RgbaColor::parse_hex_with_optional_alpha(hex_color) {
                         let _ = guard.set_subsurface_background_color(rgba_color);
                     } else {
                         error!("Invalid hex color format for subsurface background color: {}", hex_color);
@@ -759,7 +736,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                 // Parse color mask from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.color_mask {
-                    if let Ok(rgba_color) = parse_hex_color(hex_color) {
+                    if let Ok(rgba_color) = RgbaColor::parse_hex_with_optional_alpha(hex_color) {
                         let _ = guard.set_color_mask(ColorMask::new(rgba_color.color, command_line_arguments_for_closure.color_mask_tolerance));
                         debug!(
                             "Manual color mask set to {} with tolerance {}",
@@ -781,7 +758,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
                 // Parse subsurface color mask from hex string if provided
                 if let Some(hex_color) = &command_line_arguments_for_closure.subsurface_color_mask {
-                    if let Ok(rgba_color) = parse_hex_color(hex_color) {
+                    if let Ok(rgba_color) = RgbaColor::parse_hex_with_optional_alpha(hex_color) {
                         let _ = guard.set_subsurface_color_mask(ColorMask::new(rgba_color.color, command_line_arguments_for_closure.color_mask_tolerance));
                         debug!(
                             "Manual subsurface color mask set to {} with tolerance {}",

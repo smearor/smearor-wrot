@@ -37,7 +37,12 @@ impl RgbaColor {
             alpha: self.alpha.clamp(0.0, 1.0),
         }
     }
+
+    pub fn parse_hex_with_optional_alpha(hex: &str) -> Result<Self, ParseHexError> {
+        RgbaColor::parse_hex(hex).or_else(|_| RgbColor::parse_hex(hex).map(|rgb| RgbaColor::new(rgb, 1.0)))
+    }
 }
+
 impl ToHex for RgbaColor {
     fn to_hex(&self) -> String {
         RgbaColor24::from(*self).to_hex()
