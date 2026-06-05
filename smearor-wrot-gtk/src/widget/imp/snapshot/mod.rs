@@ -2,6 +2,7 @@ use crate::color_mask::color_mask_applier::ColorMaskApplier;
 use crate::color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
 use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::imp::snapshot::background_color::SnapshotBackgroundColor;
+use crate::widget::imp::snapshot::error_renderer::ErrorRenderer;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::TextureExt;
@@ -17,6 +18,7 @@ use std::sync::atomic::Ordering;
 use tracing::debug;
 
 pub mod background_color;
+pub mod error_renderer;
 
 impl CompositorWidgetImpl {
     pub(crate) fn render_snapshot(&self, snapshot: &gtk4::Snapshot) {
@@ -246,26 +248,25 @@ impl CompositorWidgetImpl {
                 for subsurface_position_data in subsurfaces {
                     debug!("Snapshot: rendering subsurface at position {:?}", subsurface_position_data.position);
                     if let Some(texture) = self.render_subsurface_to_texture(&subsurface_position_data.subsurface, &*compositor) {
-                        let texture_width = texture.width();
-                        let texture_height = texture.height();
-                        debug!("Snapshot: successfully rendered subsurface to texture, size: {}x{}", texture_width, texture_height);
+                        let texture_size = Size::from(&texture);
+                        debug!("Snapshot: successfully rendered subsurface to texture, size: {texture_size}");
 
                         // Calculate absolute subsurface position on screen by recursively tracing
                         // the parent chain up to the root window/popup mapped in space.
                         // If the parent is not mapped or visible, skip rendering this subsurface entirely.
-                        let Some(parent_pos) = self.find_surface_absolute_position(&subsurface_position_data.parent, &*compositor) else {
+                        let Some(parent_pos) = compositor.find_surface_absolute_position(&subsurface_position_data.parent) else {
                             use smithay::reexports::wayland_server::Resource;
-                            debug!("Snapshot: parent of subsurface {:?} is not mapped/visible, skipping rendering", subsurface_position_data.subsurface.id());
+                            debug!(
+                                "Snapshot: parent of subsurface {:?} is not mapped/visible, skipping rendering",
+                                subsurface_position_data.subsurface.id()
+                            );
                             continue;
                         };
-                        let subsurface_x = parent_pos.x() + subsurface_position_data.position.x as f32;
-                        let subsurface_y = parent_pos.y() + subsurface_position_data.position.y as f32;
-                        debug!("Snapshot: recursively calculated subsurface absolute position: ({}, {})", subsurface_x, subsurface_y);
 
-                        let texture_width_as_float = texture_width as f32;
-                        let texture_height_as_float = texture_height as f32;
+                        let subsurface_position = parent_pos + subsurface_position_data.position;
+                        debug!("Snapshot: recursively calculated subsurface absolute position: {}", subsurface_position);
 
-                        let subsurface_bounds = gtk4::graphene::Rect::new(subsurface_x, subsurface_y, texture_width_as_float, texture_height_as_float);
+                        let subsurface_bounds = subsurface_position.rect(texture_size);
 
                         snapshot.append_texture(&texture, &subsurface_bounds);
 
@@ -378,185 +379,5 @@ impl CompositorWidgetImpl {
             };
             compositor.resolve_surface_and_clear_surface_damage();
         }
-    }
-
-    fn render_error_feedback(&self, snapshot: &gtk4::Snapshot, error: &crate::widget::imp::ApplicationError) {
-        use gtk4::prelude::WidgetExt;
-
-        let widget = self.obj();
-        let widget_width = widget.width() as f32;
-        let widget_height = widget.height() as f32;
-
-        // Get program name and error message
-        let (program_name, error_message): (String, &str) = match error {
-            crate::widget::imp::ApplicationError::NotFound(name) => (name.clone(), "not found"),
-            crate::widget::imp::ApplicationError::NotSpecified => ("No program".to_string(), "not specified"),
-        };
-
-        // Render fallback warning icon
-        self.render_fallback_warning_icon(snapshot, widget_width, widget_height);
-
-        // Render text below icon
-        self.render_error_text(snapshot, &program_name, error_message, widget_width, widget_height);
-    }
-
-    fn render_fallback_warning_icon(&self, snapshot: &gtk4::Snapshot, widget_width: f32, widget_height: f32) {
-        // Draw a simple warning triangle with exclamation mark
-        let icon_size = 64.0;
-        let center_x = widget_width / 2.0;
-        let center_y = widget_height / 2.0 - 20.0;
-
-        // Triangle points
-        let top_x = center_x;
-        let top_y = center_y - icon_size / 2.0;
-        let bottom_left_x = center_x - icon_size / 2.0;
-        let bottom_left_y = center_y + icon_size / 2.0;
-        let bottom_right_x = center_x + icon_size / 2.0;
-        let bottom_right_y = center_y + icon_size / 2.0;
-
-        // Draw triangle outline (yellow/orange)
-        let triangle_color = gtk4::gdk::RGBA::new(1.0, 0.8, 0.0, 1.0);
-
-        // Draw triangle using three lines
-        let line_width = 3.0;
-
-        // Top to bottom-left
-        let tl_rect = gtk4::graphene::Rect::new(
-            bottom_left_x.min(top_x),
-            bottom_left_y.min(top_y),
-            (bottom_left_x - top_x).abs().max(line_width),
-            (bottom_left_y - top_y).abs().max(line_width),
-        );
-        snapshot.append_color(&triangle_color, &tl_rect);
-
-        // Top to bottom-right
-        let tr_rect = gtk4::graphene::Rect::new(
-            bottom_right_x.min(top_x),
-            bottom_right_y.min(top_y),
-            (bottom_right_x - top_x).abs().max(line_width),
-            (bottom_right_y - top_y).abs().max(line_width),
-        );
-        snapshot.append_color(&triangle_color, &tr_rect);
-
-        // Bottom-left to bottom-right
-        let bl_rect = gtk4::graphene::Rect::new(
-            bottom_left_x.min(bottom_right_x),
-            bottom_left_y.min(bottom_right_y),
-            (bottom_right_x - bottom_left_x).abs().max(line_width),
-            line_width,
-        );
-        snapshot.append_color(&triangle_color, &bl_rect);
-
-        // Draw exclamation mark in center
-        let exclamation_color = gtk4::gdk::RGBA::new(0.0, 0.0, 0.0, 1.0);
-        let exclamation_width = 6.0;
-        let exclamation_height = 20.0;
-        let exclamation_x = center_x - exclamation_width / 2.0;
-        let exclamation_y = center_y - exclamation_height / 2.0;
-
-        let exclamation_rect = gtk4::graphene::Rect::new(exclamation_x, exclamation_y, exclamation_width, exclamation_height);
-        snapshot.append_color(&exclamation_color, &exclamation_rect);
-
-        // Draw dot below exclamation
-        let dot_size = 6.0;
-        let dot_x = center_x - dot_size / 2.0;
-        let dot_y = center_y + exclamation_height / 2.0 + 5.0;
-        let dot_rect = gtk4::graphene::Rect::new(dot_x, dot_y, dot_size, dot_size);
-        snapshot.append_color(&exclamation_color, &dot_rect);
-    }
-
-    fn render_error_text(&self, snapshot: &gtk4::Snapshot, program_name: &str, error_message: &str, widget_width: f32, widget_height: f32) {
-        use gtk4::prelude::WidgetExt;
-
-        let widget = self.obj();
-        let context = widget.create_pango_context();
-        let layout = gtk4::pango::Layout::new(&context);
-
-        // Configure font
-        let font_description = gtk4::pango::FontDescription::from_string("Sans 14");
-        layout.set_font_description(Some(&font_description));
-
-        // Calculate text positions
-        let icon_size = 64.0;
-        let center_x = widget_width / 2.0;
-        let center_y = widget_height / 2.0;
-
-        // Line 1: program name
-        layout.set_text(program_name);
-        let (line1_width, line1_height) = layout.pixel_size();
-        let line1_x = center_x - (line1_width as f32) / 2.0;
-        let line1_y = center_y + icon_size / 2.0 + 20.0;
-
-        // Render program name
-        let text_color = gtk4::gdk::RGBA::new(1.0, 1.0, 1.0, 1.0);
-        snapshot.translate(&gtk4::graphene::Point::new(line1_x, line1_y));
-        snapshot.append_layout(&layout, &text_color);
-        snapshot.translate(&gtk4::graphene::Point::new(-line1_x, -line1_y));
-
-        // Line 2: error message
-        layout.set_text(error_message);
-        let (line2_width, line2_height) = layout.pixel_size();
-        let line2_x = center_x - (line2_width as f32) / 2.0;
-        let line2_y = line1_y + line1_height as f32 + 5.0;
-
-        // Render error message
-        snapshot.translate(&gtk4::graphene::Point::new(line2_x, line2_y));
-        snapshot.append_layout(&layout, &text_color);
-        snapshot.translate(&gtk4::graphene::Point::new(-line2_x, -line2_y));
-    }
-
-    fn find_surface_absolute_position(
-        &self,
-        surface: &smithay::reexports::wayland_server::protocol::wl_surface::WlSurface,
-        compositor: &smearor_wrot_core::SmearorCompositor,
-    ) -> Option<gtk4::graphene::Point> {
-        // 1. Is it a toplevel window?
-        for window in compositor.space.elements() {
-            if let Some(toplevel) = window.toplevel() {
-                if toplevel.wl_surface() == surface {
-                    if let Some(loc) = compositor.space.element_location(window) {
-                        let geom = window.geometry();
-                        return Some(gtk4::graphene::Point::new(
-                            (loc.x - geom.loc.x) as f32,
-                            (loc.y - geom.loc.y) as f32,
-                        ));
-                    }
-                }
-            }
-        }
-
-        // 2. Is it a popup?
-        for (popup, position) in compositor.get_all_popups() {
-            let popup_surface = match &popup {
-                smithay::desktop::PopupKind::Xdg(xdg) => xdg.wl_surface(),
-                smithay::desktop::PopupKind::InputMethod(_) => continue,
-            };
-            if popup_surface == surface {
-                // Find parent of this popup recursively
-                if let Ok(popup_root) = smithay::desktop::find_popup_root_surface(&popup) {
-                    if let Some(parent_pos) = self.find_surface_absolute_position(&popup_root, compositor) {
-                        return Some(gtk4::graphene::Point::new(
-                            parent_pos.x() + position.x as f32,
-                            parent_pos.y() + position.y as f32,
-                        ));
-                    }
-                }
-            }
-        }
-
-        // 3. Is it a subsurface?
-        for sub in compositor.get_all_subsurfaces() {
-            if &sub.subsurface == surface {
-                // Find parent of this subsurface recursively
-                if let Some(parent_pos) = self.find_surface_absolute_position(&sub.parent, compositor) {
-                    return Some(gtk4::graphene::Point::new(
-                        parent_pos.x() + sub.position.x as f32,
-                        parent_pos.y() + sub.position.y as f32,
-                    ));
-                }
-            }
-        }
-
-        None
     }
 }
