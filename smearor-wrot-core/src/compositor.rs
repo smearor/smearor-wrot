@@ -219,6 +219,7 @@ impl SmearorCompositor {
         dma_buf_enabled: bool,
         keyboard_layout: Option<String>,
         keyboard_variant: Option<String>,
+        max_fps: i64,
     ) -> Result<Self> {
         let start_time = Instant::now();
 

@@ -63,14 +63,24 @@ impl CompositorWidgetImpl {
             let dma_buf_enabled = config.dma_buf_enabled;
             let keyboard_layout = config.keyboard_layout.clone();
             let keyboard_variant = config.keyboard_variant.clone();
-            let compositor =
-                match SmearorCompositor::new(&mut event_loop, shared_display.clone(), Some(&socket_path), initial_width, initial_height, dma_buf_enabled, keyboard_layout, keyboard_variant) {
-                    Ok(c) => Arc::new(Mutex::new(c)),
-                    Err(e) => {
-                        error!("Failed to initialize compositor: {}", e);
-                        return;
-                    }
-                };
+            let max_fps = config.max_fps;
+            let compositor = match SmearorCompositor::new(
+                &mut event_loop,
+                shared_display.clone(),
+                Some(&socket_path),
+                initial_width,
+                initial_height,
+                dma_buf_enabled,
+                keyboard_layout,
+                keyboard_variant,
+                max_fps,
+            ) {
+                Ok(c) => Arc::new(Mutex::new(c)),
+                Err(e) => {
+                    error!("Failed to initialize compositor: {}", e);
+                    return;
+                }
+            };
 
             // Store compositor
             *self.compositor.borrow_mut() = Some(compositor.clone());
@@ -162,8 +172,9 @@ impl CompositorWidgetImpl {
                     return;
                 }
             };
-
-            glib::timeout_add_local(Duration::from_millis(10), move || {
+            let glib_frame_interval = Duration::from_millis(1000 / config.max_fps as u64);
+            debug!("glib_frame_interval {}", glib_frame_interval.as_millis());
+            glib::timeout_add_local(glib_frame_interval, move || {
                 // Dispatch Smithay event loop
                 if let Ok(mut event_loop) = event_loop_shared.lock() {
                     if let Err(e) = event_loop.dispatch(
@@ -219,7 +230,7 @@ impl CompositorWidgetImpl {
                     }
                 }
 
-                glib::ControlFlow::Continue
+                ControlFlow::Continue
             });
 
             debug!("Smithay event loop and Wayland dispatch started in GTK main loop");
@@ -228,25 +239,24 @@ impl CompositorWidgetImpl {
             // size_allocate is not always triggered, so we poll for size changes
             let widget_weak = self.obj().downgrade();
             let mut last_size = Size::new(0, 0);
-            glib::timeout_add_local(Duration::from_millis(16), move || {
-                if let Some(widget) = widget_weak.upgrade() {
-                    let size = widget.widget_size();
-                    if size.width > 0 && size.height > 0 && (size.width != last_size.width || size.height != last_size.height) {
-                        debug!("Size polling detected resize: {last_size} -> {size}");
-                        last_size = size;
-                        // Call update_output_size directly without debounce
-                        if let Some(compositor_mutex) = widget.imp().compositor.borrow().clone() {
-                            if let Ok(mut compositor) = compositor_mutex.lock() {
-                                debug!("Sending configure events to application for size {size}");
-                                compositor.update_output_size(size);
-                            }
+            glib::timeout_add_local(glib_frame_interval, move || {
+                let Some(widget) = widget_weak.upgrade() else {
+                    return ControlFlow::Break;
+                };
+                let size = widget.widget_size();
+                if size.width > 0 && size.height > 0 && (size.width != last_size.width || size.height != last_size.height) {
+                    debug!("Size polling detected resize: {last_size} -> {size}");
+                    last_size = size;
+                    // Call update_output_size directly without debounce
+                    if let Some(compositor_mutex) = widget.imp().compositor.borrow().clone() {
+                        if let Ok(mut compositor) = compositor_mutex.lock() {
+                            debug!("Sending configure events to application for size {size}");
+                            compositor.update_output_size(size);
                         }
-                        widget.request_render();
                     }
-                    glib::ControlFlow::Continue
-                } else {
-                    glib::ControlFlow::Break
+                    widget.request_render();
                 }
+                ControlFlow::Continue
             });
             debug!("Size polling timeout started");
 
