@@ -252,27 +252,29 @@ impl CompositorWidgetImpl {
 
                         // Calculate subsurface position relative to parent window
                         // The position from SubsurfaceCachedState is relative to the parent surface
-                        // We need to add the window position in space to get the final position
-                        let mut subsurface_x = subsurface_position_data.position.x as f32;
-                        let mut subsurface_y = subsurface_position_data.position.y as f32;
-
-                        // Find the parent window and add its position in space
-                        for window in compositor.space.elements() {
-                            if let Some(toplevel) = window.toplevel() {
-                                let toplevel_surface = toplevel.wl_surface();
-                                // Check if this window is the parent of the subsurface
-                                // TODO: Phase 5 - Subsurface Positioning - Implement parent-child relationship detection
-                                // For now, we'll use the first window as a fallback
-                                if let Some(window_location) = compositor.space.element_location(window) {
-                                    let window_geometry = window.geometry();
-                                    // Add window position and subtract geometry offset
-                                    subsurface_x += (window_location.x - window_geometry.loc.x) as f32;
-                                    subsurface_y += (window_location.y - window_geometry.loc.y) as f32;
-                                    debug!("Snapshot: adjusted subsurface position to ({}, {})", subsurface_x, subsurface_y);
-                                    break;
+                        // We need to recursively resolve the parent's absolute position
+                        let (subsurface_x, subsurface_y) = if let Some(parent_pos) = self.find_surface_absolute_position(&subsurface_position_data.parent, &*compositor) {
+                            let x = parent_pos.x() + subsurface_position_data.position.x as f32;
+                            let y = parent_pos.y() + subsurface_position_data.position.y as f32;
+                            debug!("Snapshot: recursively calculated subsurface absolute position: ({}, {})", x, y);
+                            (x, y)
+                        } else {
+                            // Fallback if parent position could not be calculated recursively
+                            let mut x = subsurface_position_data.position.x as f32;
+                            let mut y = subsurface_position_data.position.y as f32;
+                            for window in compositor.space.elements() {
+                                if let Some(toplevel) = window.toplevel() {
+                                    if let Some(window_location) = compositor.space.element_location(window) {
+                                        let window_geometry = window.geometry();
+                                        x += (window_location.x - window_geometry.loc.x) as f32;
+                                        y += (window_location.y - window_geometry.loc.y) as f32;
+                                        debug!("Snapshot: fallback subsurface position to ({}, {})", x, y);
+                                        break;
+                                    }
                                 }
                             }
-                        }
+                            (x, y)
+                        };
 
                         let texture_width_as_float = texture_width as f32;
                         let texture_height_as_float = texture_height as f32;
@@ -515,5 +517,60 @@ impl CompositorWidgetImpl {
         snapshot.translate(&gtk4::graphene::Point::new(line2_x, line2_y));
         snapshot.append_layout(&layout, &text_color);
         snapshot.translate(&gtk4::graphene::Point::new(-line2_x, -line2_y));
+    }
+
+    fn find_surface_absolute_position(
+        &self,
+        surface: &smithay::reexports::wayland_server::protocol::wl_surface::WlSurface,
+        compositor: &smearor_wrot_core::SmearorCompositor,
+    ) -> Option<gtk4::graphene::Point> {
+        // 1. Is it a toplevel window?
+        for window in compositor.space.elements() {
+            if let Some(toplevel) = window.toplevel() {
+                if toplevel.wl_surface() == surface {
+                    if let Some(loc) = compositor.space.element_location(window) {
+                        let geom = window.geometry();
+                        return Some(gtk4::graphene::Point::new(
+                            (loc.x - geom.loc.x) as f32,
+                            (loc.y - geom.loc.y) as f32,
+                        ));
+                    }
+                }
+            }
+        }
+
+        // 2. Is it a popup?
+        for (popup, position) in compositor.get_all_popups() {
+            let popup_surface = match &popup {
+                smithay::desktop::PopupKind::Xdg(xdg) => xdg.wl_surface(),
+                smithay::desktop::PopupKind::InputMethod(_) => continue,
+            };
+            if popup_surface == surface {
+                // Find parent of this popup recursively
+                if let Ok(popup_root) = smithay::desktop::find_popup_root_surface(&popup) {
+                    if let Some(parent_pos) = self.find_surface_absolute_position(&popup_root, compositor) {
+                        return Some(gtk4::graphene::Point::new(
+                            parent_pos.x() + position.x as f32,
+                            parent_pos.y() + position.y as f32,
+                        ));
+                    }
+                }
+            }
+        }
+
+        // 3. Is it a subsurface?
+        for sub in compositor.get_all_subsurfaces() {
+            if &sub.subsurface == surface {
+                // Find parent of this subsurface recursively
+                if let Some(parent_pos) = self.find_surface_absolute_position(&sub.parent, compositor) {
+                    return Some(gtk4::graphene::Point::new(
+                        parent_pos.x() + sub.position.x as f32,
+                        parent_pos.y() + sub.position.y as f32,
+                    ));
+                }
+            }
+        }
+
+        None
     }
 }
