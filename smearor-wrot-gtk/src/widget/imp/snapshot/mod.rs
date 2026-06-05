@@ -321,8 +321,8 @@ impl CompositorWidgetImpl {
 
                     // Get dialog geometry offset (similar to toplevel rendering)
                     let (dialog_offset_x, dialog_offset_y) = {
-                        let mut offset_x = 0;
-                        let mut offset_y = 0;
+                        let offset_x = 0;
+                        let offset_y = 0;
 
                         if let Some(window) = compositor.space.elements().next() {
                             let window_geometry = window.geometry();

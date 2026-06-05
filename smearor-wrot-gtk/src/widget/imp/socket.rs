@@ -73,7 +73,6 @@ impl CompositorWidgetImpl {
                 dma_buf_enabled,
                 keyboard_layout,
                 keyboard_variant,
-                max_fps,
             ) {
                 Ok(c) => Arc::new(Mutex::new(c)),
                 Err(e) => {

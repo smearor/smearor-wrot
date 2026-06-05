@@ -198,7 +198,7 @@ impl ShmRenderNode for CompositorWidgetImpl {
         let size = Size::from((width as i32, height as i32));
 
         // Create GlesRenderbuffer from pixel data
-        let mut renderbuffer = gles_renderer.import_memory(pixel_data, format, size, false).ok()?;
+        let renderbuffer = gles_renderer.import_memory(pixel_data, format, size, false).ok()?;
 
         debug!("Created GlesRenderbuffer from pixel data");
 

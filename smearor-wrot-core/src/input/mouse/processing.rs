@@ -28,11 +28,6 @@ impl MouseInputProcessing for SmearorCompositor {
         };
         debug!("Pointer available, current location: {:?}", pointer.current_location());
 
-        let Some(keyboard) = self.seat.get_keyboard() else {
-            error!("Keyboard not available for GTK mouse press");
-            return;
-        };
-
         let button_event = Self::convert_gtk_mouse_press(button);
         debug!("Converted to Smithay button event: {:?}", button_event);
 

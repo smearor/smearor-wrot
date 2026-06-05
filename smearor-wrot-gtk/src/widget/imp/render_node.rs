@@ -261,7 +261,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
             // Check if buffer data is cached from commit time (fallback)
             if let Some(mut cache_entry) = compositor.texture_cache.get_mut(&surface_id) {
                 debug!("Using cached buffer data for surface: {:?}", surface_id);
-                let mut texture_cache_entry = cache_entry.value_mut();
+                let texture_cache_entry = cache_entry.value_mut();
                 debug!("Cached data dimensions: {texture_cache_entry}");
 
                 // Auto-detect color mask is now handled in Holding Area
@@ -465,7 +465,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
         // Check if buffer data is cached from commit time
         if let Some(mut texture_cache_entry) = compositor.texture_cache.get_mut(&surface_id) {
             debug!("Using cached buffer data for subsurface surface: {:?}", surface_id);
-            let mut texture_cache_entry = texture_cache_entry.value_mut();
+            let texture_cache_entry = texture_cache_entry.value_mut();
             debug!("Cached subsurface data dimensions: {texture_cache_entry}");
 
             // Apply color mask if set and not already applied
@@ -627,7 +627,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
         // Check if buffer data is cached from commit time
         if let Some(mut texture_cache_entry) = compositor.texture_cache.get_mut(&surface_id) {
             debug!("Using cached buffer data for popup surface: {:?}", surface_id);
-            let mut texture_cache_entry = texture_cache_entry.value_mut();
+            let texture_cache_entry = texture_cache_entry.value_mut();
             debug!("Cached popup data dimensions: {texture_cache_entry}");
 
             // Apply color mask if set and not already applied
@@ -783,7 +783,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
 
         // Try to get cached buffer data
         if let Some(mut texture_cache_entry_ref) = compositor.texture_cache.get_mut(&object_id) {
-            let mut texture_cache_entry: &mut TextureCacheEntry<BGRA> = texture_cache_entry_ref.value_mut();
+            let texture_cache_entry: &mut TextureCacheEntry<BGRA> = texture_cache_entry_ref.value_mut();
             debug!("Using cached dialog texture data: {}", texture_cache_entry.buffer_metadata);
 
             // Apply color mask if set and not already applied
