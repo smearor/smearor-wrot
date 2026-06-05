@@ -243,9 +243,9 @@ impl CompositorWidgetImpl {
             let subsurfaces = compositor.get_all_subsurfaces();
             if !subsurfaces.is_empty() {
                 debug!("Snapshot: rendering {} subsurfaces", subsurfaces.len());
-                for (subsurface, position) in subsurfaces {
-                    debug!("Snapshot: rendering subsurface at position {:?}", position);
-                    if let Some(texture) = self.render_subsurface_to_texture(&subsurface, &*compositor) {
+                for subsurface_position_data in subsurfaces {
+                    debug!("Snapshot: rendering subsurface at position {:?}", subsurface_position_data.position);
+                    if let Some(texture) = self.render_subsurface_to_texture(&subsurface_position_data.subsurface, &*compositor) {
                         let texture_width = texture.width();
                         let texture_height = texture.height();
                         debug!("Snapshot: successfully rendered subsurface to texture, size: {}x{}", texture_width, texture_height);
@@ -253,8 +253,8 @@ impl CompositorWidgetImpl {
                         // Calculate subsurface position relative to parent window
                         // The position from SubsurfaceCachedState is relative to the parent surface
                         // We need to add the window position in space to get the final position
-                        let mut subsurface_x = position.x as f32;
-                        let mut subsurface_y = position.y as f32;
+                        let mut subsurface_x = subsurface_position_data.position.x as f32;
+                        let mut subsurface_y = subsurface_position_data.position.y as f32;
 
                         // Find the parent window and add its position in space
                         for window in compositor.space.elements() {
