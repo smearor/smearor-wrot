@@ -1,7 +1,11 @@
 //! Winit backend integration for the compositor
 
-use std::time::Duration;
-
+use crate::compositor::CalloopData;
+use crate::compositor::SmearorCompositor;
+use crate::error::CoreError;
+use crate::error::Result;
+use crate::frame::limit::FrameLimiter;
+use crate::input::InputProcessing;
 use smithay::backend::renderer::damage::OutputDamageTracker;
 use smithay::backend::renderer::element::surface::WaylandSurfaceRenderElement;
 use smithay::backend::renderer::gles::GlesRenderer;
@@ -14,13 +18,8 @@ use smithay::output::Subpixel;
 use smithay::reexports::calloop::EventLoop;
 use smithay::utils::Rectangle;
 use smithay::utils::Transform;
-
-use crate::compositor::CalloopData;
-use crate::compositor::SmearorCompositor;
-use crate::error::CoreError;
-use crate::error::Result;
-use crate::input::InputProcessing;
-
+use std::sync::atomic::Ordering;
+use std::time::Duration;
 use tracing::error;
 
 /// Initialize the winit backend
@@ -101,19 +100,40 @@ pub fn init_winit(event_loop: &mut EventLoop<CalloopData>, data: &mut CalloopDat
                         error!("Failed to submit frame");
                     }
 
-                    state.lock().unwrap().space.elements().for_each(|window| {
-                        window.send_frame(&output, state.lock().unwrap().start_time.elapsed(), Some(Duration::ZERO), |_, _| Some(output.clone()))
-                    });
+                    let elapsed_since_start = state.lock().map(|state| state.elapsed_since_start()).unwrap_or(Duration::ZERO);
+                    let should_send_frame = state.lock().map(|state| state.should_send_frame()).unwrap_or(true);
 
-                    state.lock().unwrap().space.refresh();
-                    state.lock().unwrap().popups.cleanup();
+                    if should_send_frame {
+                        if let Ok(state) = state.lock() {
+                            state
+                                .space
+                                .elements()
+                                .for_each(|window| window.send_frame(&output, elapsed_since_start, Some(Duration::ZERO), |_, _| Some(output.clone())));
+                        }
+                    }
+
+                    if let Ok(mut state) = state.lock() {
+                        state.space.refresh();
+                    }
+                    // state.lock().unwrap().space.refresh();
+                    if let Ok(mut state) = state.lock() {
+                        state.popups.cleanup();
+                    }
+
                     let _ = display.flush_clients();
 
-                    // Ask for redraw to schedule new frame.
-                    backend.window().request_redraw();
+                    let frame_rate_limit_ms = state.lock().ok().map(|state| state.frame_rate_limit_ms.load(Ordering::Relaxed)).unwrap_or(-1);
+                    if frame_rate_limit_ms <= 0 {
+                        // Ask for redraw to schedule new frame.
+                        backend.window().request_redraw();
+                    } else {
+                        // TODO: Add timer to schedule new frame.
+                    }
                 }
                 WinitEvent::CloseRequested => {
-                    state.lock().unwrap().loop_signal.stop();
+                    if let Ok(state) = state.lock() {
+                        state.loop_signal.stop();
+                    }
                 }
                 _ => (),
             };
