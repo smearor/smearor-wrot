@@ -1,6 +1,6 @@
 //! smearor-wrot-wrapper: CLI application providing the complete window solution
 
-pub mod args;
+pub mod cli;
 pub mod config;
 pub mod icon;
 pub mod keyboard_layout;
@@ -8,7 +8,7 @@ pub mod screenshot;
 pub mod settings;
 pub mod socket;
 
-use crate::args::Arguments;
+use crate::cli::args::Arguments;
 use crate::keyboard_layout::KeyboardLayout;
 use crate::keyboard_layout::detect_keyboard_layout;
 use crate::screenshot::ScreenshotManager;
