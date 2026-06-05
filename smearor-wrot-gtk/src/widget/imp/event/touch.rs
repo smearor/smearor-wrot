@@ -39,15 +39,25 @@ impl TouchEventSetup for CompositorWidgetImpl {
                         let id = Self::get_sequence_id(event.event_sequence());
                         if let Some((raw_x, raw_y)) = touch_event.position() {
                             if let Some(native) = widget.native() {
-                                if let Some((x, y)) = native.translate_coordinates(&widget, raw_x, raw_y) {
+                                return if let Some((x, y)) = native.translate_coordinates(&widget, raw_x, raw_y) {
                                     debug!("Touch begin/down (corrected): id={id}, raw_x={raw_x}, raw_y={raw_y}, x={x}, y={y}");
-                                    widget.handle_touch_down(id, x, y);
-                                    return Propagation::Stop;
+                                    match widget.handle_touch_down(id, x, y) {
+                                        Ok(_) => Propagation::Stop,
+                                        Err(e) => {
+                                            debug!("Failed to handle touch down event {e}");
+                                            Propagation::Proceed
+                                        }
+                                    }
                                 } else {
                                     debug!("Touch begin/down (raw): id={id}, raw_x={raw_x}, raw_y={raw_y}");
-                                    widget.handle_touch_down(id, raw_x, raw_y);
-                                    return Propagation::Stop;
-                                }
+                                    match widget.handle_touch_down(id, raw_x, raw_y) {
+                                        Ok(_) => Propagation::Stop,
+                                        Err(e) => {
+                                            debug!("Failed to handle raw touch down event {e}");
+                                            Propagation::Proceed
+                                        }
+                                    }
+                                };
                             }
                         }
                     }
@@ -58,11 +68,23 @@ impl TouchEventSetup for CompositorWidgetImpl {
                         if let Some((raw_x, raw_y)) = touch_event.position() {
                             if let Some(native) = widget.native() {
                                 if let Some((x, y)) = native.translate_coordinates(&widget, raw_x, raw_y) {
-                                    debug!("Touch update/motion (corrected): id={id}, raw_x={raw_x}, raw_y={raw_y}, x={x}, y={y}");
-                                    widget.handle_touch_motion(id, x, y);
+                                    match widget.handle_touch_motion(id, x, y) {
+                                        Ok(_) => {
+                                            debug!("Corrected touch update/motion (corrected): id={id}, raw_x={raw_x}, raw_y={raw_y}, x={x}, y={y}");
+                                        }
+                                        Err(e) => {
+                                            debug!("Failed to handle corrected touch update/motion: id={id}, raw_x={raw_x}, raw_y={raw_y}, x={x}, y={y}: {e}");
+                                        }
+                                    }
                                 } else {
-                                    debug!("Touch update/motion (raw): id={id}, raw_x={raw_x}, raw_y={raw_y}");
-                                    widget.handle_touch_motion(id, raw_x, raw_y);
+                                    match widget.handle_touch_motion(id, raw_x, raw_y) {
+                                        Ok(_) => {
+                                            debug!("Raw touch update/motion: id={id}, raw_x={raw_x}, raw_y={raw_y}");
+                                        }
+                                        Err(e) => {
+                                            debug!("Failed to handle raw Touch update/motion: id={id}, raw_x={raw_x}, raw_y={raw_y}: {e}");
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -71,15 +93,28 @@ impl TouchEventSetup for CompositorWidgetImpl {
                 EventType::TouchEnd => {
                     if let Some(_touch_event) = event.downcast_ref::<TouchEvent>() {
                         let id = Self::get_sequence_id(event.event_sequence());
-                        debug!("Touch end/up {id}");
-                        widget.handle_touch_up(id);
+                        match widget.handle_touch_up(id) {
+                            Ok(_) => {
+                                debug!("Touch end/up {id}");
+                            }
+                            Err(e) => {
+                                debug!("Failed to handle touch end event {id}: {e}");
+                            }
+                        }
                     }
                 }
                 EventType::TouchCancel => {
                     if let Some(_touch_event) = event.downcast_ref::<TouchEvent>() {
                         let id = Self::get_sequence_id(event.event_sequence());
-                        debug!("Touch end/up {id}");
-                        widget.handle_touch_up(id);
+
+                        match widget.handle_touch_up(id) {
+                            Ok(_) => {
+                                debug!("Canceled touch event {id}");
+                            }
+                            Err(e) => {
+                                debug!("Failed to cancel touch event {id}: {e}");
+                            }
+                        }
                     }
                 }
                 EventType::ButtonPress => {

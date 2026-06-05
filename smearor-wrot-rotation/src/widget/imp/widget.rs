@@ -6,7 +6,6 @@ use crate::widget::layout::RotatedLayout;
 use crate::widget::widget::RotationWidget;
 use glib::ControlFlow;
 use glib::object::Cast;
-use glib::subclass::prelude::InstanceStructExt;
 use glib::subclass::prelude::ObjectImpl;
 use glib::subclass::prelude::ObjectImplExt;
 use glib::subclass::prelude::ObjectSubclass;

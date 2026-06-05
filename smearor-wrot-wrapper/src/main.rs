@@ -9,8 +9,8 @@ pub mod settings;
 pub mod socket;
 
 use crate::args::Arguments;
-use crate::keyboard_layout::detect_keyboard_layout;
 use crate::keyboard_layout::KeyboardLayout;
+use crate::keyboard_layout::detect_keyboard_layout;
 use crate::screenshot::ScreenshotManager;
 use crate::socket::build_socket_path;
 use crate::socket::check_socket_exists;
@@ -22,15 +22,12 @@ use gtk4::gio::ApplicationFlags;
 use gtk4::glib;
 use gtk4::glib::ControlFlow;
 use gtk4::prelude::*;
-use gtk4::subclass::prelude::ObjectSubclassIsExt;
 use gtk4_layer_shell::LayerShell;
 use smearor_wrot_core::DEFAULT_WINDOW_HEIGHT;
 use smearor_wrot_core::DEFAULT_WINDOW_WIDTH;
 use smearor_wrot_core::DoubleBuffer;
-use smearor_wrot_core::ObjectId;
 use smearor_wrot_core::background::subsurface::SubsurfaceBackground;
 use smearor_wrot_core::background::toplevel::ToplevelBackground;
-use smearor_wrot_core::callback::commit::CommitCallbackAware;
 use smearor_wrot_core::color_mask::mask::ColorMask;
 use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;
 use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;
@@ -67,7 +64,6 @@ use std::cell::RefCell;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::io::BufRead;
-use std::path::PathBuf;
 use std::process::Command;
 use std::process::Stdio;
 use std::rc::Rc;
@@ -658,20 +654,19 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let initial_width = command_line_arguments_for_closure.width;
         let initial_height = command_line_arguments_for_closure.height;
         info!("Configuring compositor with DMA-BUF enabled: {}", !command_line_arguments_for_closure.disable_dma_buf);
-        
+
         // Use CLI parameters if provided, otherwise detect keyboard layout
-        let keyboard_layout = if command_line_arguments_for_closure.keyboard_layout.is_some() 
-            || command_line_arguments_for_closure.keyboard_variant.is_some() {
+        let keyboard_layout = if command_line_arguments_for_closure.keyboard_layout.is_some() || command_line_arguments_for_closure.keyboard_variant.is_some() {
             info!("Using CLI keyboard layout parameters");
             Some(KeyboardLayout::new(
                 command_line_arguments_for_closure.keyboard_layout.clone().unwrap_or_default(),
-                command_line_arguments_for_closure.keyboard_variant.clone()
+                command_line_arguments_for_closure.keyboard_variant.clone(),
             ))
         } else {
             info!("Detecting keyboard layout automatically");
             detect_keyboard_layout()
         };
-        
+
         let config = smearor_wrot_gtk::CompositorWidgetConfig {
             show_decorations: command_line_arguments_for_closure.decorated,
             fullscreen: command_line_arguments_for_closure.fullscreen,

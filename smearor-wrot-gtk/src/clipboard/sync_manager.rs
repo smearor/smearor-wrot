@@ -80,9 +80,9 @@ impl SyncManager {
                 return Ok(());
             }
             let converted = FormatConverter::gtk_to_wayland_text(&content);
-            self.compositor_widget.set_clipboard_content(Some(converted.clone()));
+            self.compositor_widget.set_clipboard_content(Some(converted.clone()))?;
             // This tells Wayland clients that there's a selection available
-            CompositorWidget::set_selection_from_host(&self.compositor_widget, vec!["text/plain;charset=utf-8".to_string()]);
+            CompositorWidget::set_selection_from_host(&self.compositor_widget, vec!["text/plain;charset=utf-8".to_string()])?;
             debug!("Set selection on seat with mime types: text/plain;charset=utf-8");
         }
         Ok(())
@@ -236,10 +236,20 @@ impl SyncManager {
                                 debug!("Content is not own, syncing to Wayland");
                                 let converted = FormatConverter::gtk_to_wayland_text(&content);
                                 debug!("Converted content: {}", converted);
-                                compositor_widget_clone.set_clipboard_content(Some(converted.clone()));
-                                compositor_widget_clone.set_selection_from_host(vec!["text/plain;charset=utf-8".to_string()]);
-                                debug!("Set selection on seat from automatic sync");
-                                debug!("Successfully set Wayland selection");
+                                match compositor_widget_clone.set_clipboard_content(Some(converted.clone())) {
+                                    Ok(_) => match compositor_widget_clone.set_selection_from_host(vec!["text/plain;charset=utf-8".to_string()]) {
+                                        Ok(_) => {
+                                            debug!("Set selection on seat from automatic sync");
+                                            debug!("Successfully set Wayland selection");
+                                        }
+                                        Err(e) => {
+                                            debug!("Failed to set selection on seat from automatic sync: {e}");
+                                        }
+                                    },
+                                    Err(e) => {
+                                        debug!("Failed to set clipboard content: {e}");
+                                    }
+                                }
                             } else {
                                 debug!("Content is own, skipping sync");
                             }
