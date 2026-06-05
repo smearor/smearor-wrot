@@ -1,6 +1,8 @@
 use crate::opengl_renderer::OpenGLRenderer;
 use crate::widget::config::handler::ConfigHandler;
+use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::size::handler::WidgetSizeHandler;
+use glib::ControlFlow;
 use glib::object::Cast;
 use glib::subclass::prelude::ObjectSubclassExt;
 use glib::subclass::prelude::ObjectSubclassIsExt;
@@ -22,7 +24,7 @@ use tracing::debug;
 use tracing::error;
 use tracing::warn;
 
-impl crate::widget::imp::CompositorWidgetImpl {
+impl CompositorWidgetImpl {
     pub fn initialize_socket_with_path(&self, socket_path: String) {
         debug!("set_socket_path called with: {}", socket_path);
         *self.socket_path.borrow_mut() = Some(socket_path.clone());
@@ -165,7 +167,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
                 // Dispatch Smithay event loop
                 if let Ok(mut event_loop) = event_loop_shared.lock() {
                     if let Err(e) = event_loop.dispatch(
-                        Duration::from_millis(0),
+                        Duration::ZERO,
                         &mut CalloopData {
                             state: compositor_clone.clone(),
                             display_handle: display_handle.clone(),
@@ -195,7 +197,7 @@ impl crate::widget::imp::CompositorWidgetImpl {
                                 Ok(guard) => guard,
                                 Err(_) => {
                                     error!("Failed to lock display");
-                                    return glib::ControlFlow::Continue;
+                                    return ControlFlow::Continue;
                                 }
                             };
                             let mut display_handle = display.handle();
