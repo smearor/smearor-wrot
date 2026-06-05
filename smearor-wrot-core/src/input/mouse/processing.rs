@@ -1,11 +1,10 @@
 use crate::SmearorCompositor;
+use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::mouse::convert::GtkToSmithayMouseEventConverter;
 use crate::surface::SurfaceQuery;
 use smithay::backend::input::Axis;
 use smithay::backend::input::AxisSource;
 use smithay::input::pointer::AxisFrame;
-use smithay::reexports::wayland_server::protocol::wl_surface::WlSurface;
-use smithay::utils::SERIAL_COUNTER;
 use std::sync::Arc;
 use std::sync::Mutex;
 use tracing::debug;
@@ -44,8 +43,6 @@ impl MouseInputProcessing for SmearorCompositor {
 
         debug!("Popup grab active: {}", popup_grab_active);
 
-        let serial = SERIAL_COUNTER.next_serial();
-
         let pointer_location = pointer.current_location();
 
         debug!("GTK mouse press: pointer_location={:?}", pointer_location);
@@ -54,25 +51,10 @@ impl MouseInputProcessing for SmearorCompositor {
             // Normal focus logic only when no popup grab is active
             if let Some((window, _loc)) = self.space.element_under(pointer_location).map(|(w, l)| (w.clone(), l)) {
                 trace!("Window found under pointer: {:?}", window);
-                self.space.raise_element(&window, true);
-                if let Some(toplevel) = window.toplevel() {
-                    trace!("Setting focus to toplevel surface");
-                    keyboard.set_focus(self, Some(toplevel.wl_surface().clone()), serial);
-                }
-                self.space.elements().for_each(|window| {
-                    if let Some(toplevel) = window.toplevel() {
-                        toplevel.send_pending_configure();
-                    }
-                });
+                self.focus_window(&window);
             } else {
                 trace!("No window under pointer, clearing focus");
-                self.space.elements().for_each(|window| {
-                    window.set_activated(false);
-                    if let Some(toplevel) = window.toplevel() {
-                        toplevel.send_pending_configure();
-                    }
-                });
-                keyboard.set_focus(self, Option::<WlSurface>::None, serial);
+                self.clear_focus();
             }
         }
 

@@ -1,9 +1,12 @@
 use crate::SmearorCompositor;
+use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::time::get_time;
 use crate::surface::SurfaceQuery;
 use smithay::input::touch::DownEvent;
 use smithay::input::touch::MotionEvent;
 use smithay::input::touch::UpEvent;
+use smithay::utils::Logical;
+use smithay::utils::Point;
 use smithay::utils::SERIAL_COUNTER;
 use std::sync::Arc;
 use std::sync::Mutex;
@@ -33,12 +36,23 @@ impl TouchInputProcessing for SmearorCompositor {
             debug!("Touch not available for GTK touch down");
             return;
         };
+        let Some(pointer) = self.seat.get_pointer() else {
+            debug!("Pointer not available for GTK touch down");
+            return;
+        };
 
         let touch_slot = self.touch_slot_manager.get_slot_for_sequence(sequence);
-        let location: smithay::utils::Point<f64, smithay::utils::Logical> = (x, y).into();
+        let location: Point<f64, Logical> = (x, y).into();
         let pos = location + output_geo.loc.to_f64();
-        let focus = self.surface_under(pos);
+        let focused_surface = self.surface_under(pos);
 
+        if !pointer.is_grabbed() {
+            if let Some((surface, _loc)) = &focused_surface {
+                if let Some(window) = self.window_for_surface(surface) {
+                    self.focus_window(&window);
+                }
+            }
+        }
         let down_event = DownEvent {
             slot: touch_slot,
             location: pos,
@@ -46,7 +60,7 @@ impl TouchInputProcessing for SmearorCompositor {
             time: get_time(),
         };
 
-        touch.down(self, focus, &down_event);
+        touch.down(self, focused_surface, &down_event);
         touch.frame(self);
     }
 
@@ -92,7 +106,7 @@ impl TouchInputProcessing for SmearorCompositor {
         };
 
         let touch_slot = self.touch_slot_manager.get_slot_for_sequence(sequence);
-        let location: smithay::utils::Point<f64, smithay::utils::Logical> = (x, y).into();
+        let location: Point<f64, Logical> = (x, y).into();
         let pos = location + output_geometry.loc.to_f64();
 
         let motion_event = MotionEvent {
