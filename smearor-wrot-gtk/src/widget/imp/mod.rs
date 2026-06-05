@@ -16,6 +16,7 @@ use gtk4::prelude::WidgetExtManual;
 use smearor_wrot_core::damage::surface::SurfaceDamage;
 use smearor_wrot_core::frame::count::FrameCounter;
 use smearor_wrot_core::frame::limit::FrameLimiter;
+use smearor_wrot_model::Socket;
 use smithay::backend::allocator::Fourcc;
 use smithay::backend::allocator::dmabuf::Dmabuf;
 use std::cell::Ref;
@@ -82,7 +83,7 @@ pub struct CompositorWidgetImpl {
     header_bar_title_label: RefCell<Option<gtk4::Label>>,
     pending_resize: RefCell<Option<Size<i32>>>,
     resize_timeout: RefCell<Option<glib::SourceId>>,
-    socket_path: RefCell<Option<String>>,
+    socket: RefCell<Option<Socket>>,
     auto_resize_handling: RefCell<bool>,
     touch_transform_callback: RefCell<Option<Box<dyn Fn(usize, f64, f64) -> (f64, f64) + 'static>>>,
     pointer_transform_callback: RefCell<Option<Box<dyn Fn(f64, f64) -> (f64, f64) + 'static>>>,
@@ -108,7 +109,7 @@ impl Default for CompositorWidgetImpl {
             header_bar_title_label: RefCell::new(None),
             pending_resize: RefCell::new(None),
             resize_timeout: RefCell::new(None),
-            socket_path: RefCell::new(None),
+            socket: RefCell::new(None),
             auto_resize_handling: RefCell::new(true),
             touch_transform_callback: RefCell::new(None),
             pointer_transform_callback: RefCell::new(None),

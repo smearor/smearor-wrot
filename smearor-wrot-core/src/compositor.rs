@@ -23,6 +23,7 @@ use crate::texture::pixel_data::BGRA;
 use crate::wayland::listener::WaylandListener;
 use dashmap::DashMap;
 use dashmap::DashSet;
+use smearor_wrot_model::Socket;
 use smearor_wrot_model::color::rgba::RgbaColor;
 use smithay::backend::allocator::format::FormatSet;
 use smithay::desktop::PopupManager;
@@ -212,7 +213,7 @@ impl SmearorCompositor {
     pub fn new(
         event_loop: &mut EventLoop<CalloopData>,
         display: Arc<Mutex<Display<Self>>>,
-        custom_socket: Option<&str>,
+        socket: Option<Socket>,
         initial_width: i32,
         initial_height: i32,
         dma_buf_enabled: bool,
@@ -349,7 +350,7 @@ impl SmearorCompositor {
         virtual_output.set_preferred(initial_display_mode);
         space.map_output(&virtual_output, (0, 0));
 
-        let (socket_name, listening_socket) = Self::init_wayland_listener(display.clone(), event_loop, custom_socket)?;
+        let (socket_name, listening_socket) = Self::init_wayland_listener(display.clone(), event_loop, socket)?;
 
         // Get the loop signal, used to stop the event loop
         let loop_signal = event_loop.get_signal();

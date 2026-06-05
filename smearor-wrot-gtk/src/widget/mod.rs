@@ -10,6 +10,7 @@ use gtk4::glib;
 use gtk4::prelude::WidgetExt;
 use gtk4::subclass::prelude::*;
 use smearor_wrot_core::SmearorCompositor;
+use smearor_wrot_model::Socket;
 use smearor_wrot_model::geometry::size::Size;
 
 pub mod buffer;
@@ -38,10 +39,10 @@ impl CompositorWidget {
         glib::Object::builder().build()
     }
 
-    pub fn with_socket(socket: Option<String>) -> Self {
+    pub fn with_socket(socket: Option<Socket>) -> Self {
         let obj: Self = glib::Object::builder().build();
-        if let Some(socket_path) = socket {
-            obj.set_socket_path(socket_path);
+        if let Some(socket) = socket {
+            obj.initialize_socket(socket);
         }
         obj
     }

@@ -9,12 +9,7 @@ pub mod settings;
 pub mod socket;
 
 use crate::cli::args::Arguments;
-use crate::keyboard_layout::KeyboardLayout;
-use crate::keyboard_layout::detect_keyboard_layout;
 use crate::screenshot::ScreenshotManager;
-use crate::socket::build_socket_path;
-use crate::socket::check_socket_exists;
-use crate::socket::generate_unique_socket_name;
 use clap::Parser;
 use gtk4::gdk::Display;
 use gtk4::gdk::Toplevel;
@@ -23,6 +18,10 @@ use gtk4::glib;
 use gtk4::glib::ControlFlow;
 use gtk4::prelude::*;
 use gtk4_layer_shell::LayerShell;
+use smearor_wrot_application::KeyboardLayout;
+use smearor_wrot_application::SmearorWrotApplication;
+use smearor_wrot_application::socket::builder::SocketBuilder;
+use smearor_wrot_application::socket::manager::SocketManager;
 use smearor_wrot_core::DEFAULT_WINDOW_HEIGHT;
 use smearor_wrot_core::DEFAULT_WINDOW_WIDTH;
 use smearor_wrot_core::DoubleBuffer;
@@ -48,6 +47,7 @@ use smearor_wrot_gtk::widget::resize::handler::ResizeHandler;
 use smearor_wrot_gtk::widget::shutdown::handler::ShutdownHandler;
 use smearor_wrot_gtk::widget::socket::handler::SocketHandler;
 use smearor_wrot_gtk::widget::window_state::handler::WindowStateHandler;
+use smearor_wrot_model::Socket;
 use smearor_wrot_model::color::rgba::RgbaColor;
 use smearor_wrot_model::geometry::size::Size;
 use smearor_wrot_model::margin::Margins;
@@ -86,28 +86,34 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let mut command_line_arguments = Arc::new(Arguments::parse());
 
-    // Determine the socket name
-    let socket_name = if let Some(ref socket) = command_line_arguments.socket {
-        // User specified a socket explicitly
-        check_socket_exists(socket)?;
-        socket.clone()
-    } else {
-        // Generate a unique socket name automatically
-        generate_unique_socket_name("smearor-wrot")?
-    };
+    let socket = SocketBuilder::build(&command_line_arguments.socket)?;
+    let socket_manager = Arc::new(SocketManager::new(socket));
 
-    // Build the full socket path from the relative name in XDG_RUNTIME_DIR
-    let socket_path = build_socket_path(&socket_name)?;
-    let socket_path_str = socket_path.to_string_lossy().to_string();
+    let smearor_wrot_application = SmearorWrotApplication::builder().socket_manager(socket_manager).build();
+    let smearor_wrot_application = Arc::new(smearor_wrot_application);
 
-    // Update command_line_arguments with the full socket path for compositor initialization
-    let mut args = (*command_line_arguments).clone();
-    args.socket = Some(socket_path_str.clone());
-    command_line_arguments = Arc::new(args);
+    // // Determine the socket name
+    // let socket_name = if let Some(ref socket) = command_line_arguments.socket {
+    //     // User specified a socket explicitly
+    //     check_socket_exists(socket)?;
+    //     socket.clone()
+    // } else {
+    //     // Generate a unique socket name automatically
+    //     generate_unique_socket_name("smearor-wrot")?
+    // };
+    //
+    // // Build the full socket path from the relative name in XDG_RUNTIME_DIR
+    // let socket_path = build_socket_path(&socket_name)?;
+    // let socket_path_str = socket_path.to_string_lossy().to_string();
+
+    // // Update command_line_arguments with the full socket path for compositor initialization
+    // let mut args = (*command_line_arguments).clone();
+    // args.socket = Some(socket_path_str.clone());
+    // command_line_arguments = Arc::new(args);
 
     // Store the full socket path for WAYLAND_DISPLAY environment variable
     // This is necessary for confined environments like Snap which have different XDG_RUNTIME_DIR
-    let socket_name_for_env = socket_path_str.clone();
+    // let socket_name_for_env = socket_path_str.clone();
 
     // Load configuration file if provided
     if let Some(config_path) = &command_line_arguments.config {
@@ -641,7 +647,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             ))
         } else {
             info!("Detecting keyboard layout automatically");
-            detect_keyboard_layout()
+            KeyboardLayout::detect()
         };
 
         let config = smearor_wrot_gtk::CompositorWidgetConfig {
@@ -672,13 +678,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
         debug!("Compositor widget configured with initial size {}x{}", initial_width, initial_height);
 
         // Set the socket path (this initializes the compositor)
-        if let Some(ref socket) = command_line_arguments_for_closure.socket {
-            compositor_widget.set_socket_path(socket.clone());
-            debug!("Set socket path to: {}", socket);
-        } else {
-            error!("Socket path not set");
-            return;
-        }
+        let socket = smearor_wrot_application.socket_manager().socket();
+        debug!("Set socket path to: {socket}");
+        compositor_widget.initialize_socket(socket);
+        // if let Some(ref socket) = command_line_arguments_for_closure.socket {
+        // } else {
+        //     error!("Socket path not set");
+        //     return;
+        // }
 
         // Apply config to compositor after it has been initialized
         let _ = compositor_widget.apply_config_to_compositor();
@@ -806,6 +813,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let rotation_widget_clone = rotation_widget.clone();
         let command_line_arguments_clone = command_line_arguments_for_closure.clone();
         let application_id_clone = application_id.clone();
+        let smearor_wrot_application_clone = smearor_wrot_application.clone();
 
         glib::timeout_add_local(Duration::from_millis(16), move || {
             if let Ok(message) = compositor_message_receiver.try_recv() {
@@ -846,7 +854,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
                     CompositorMessage::AppIdChanged(app_id) => {
                         info!("Received AppIdChanged message from compositor core: {:?}", app_id);
                         app_clone.set_application_id(Some(&app_id));
-                        // window_clone.set_icon_name(Some(&icon_name));
                     }
                     CompositorMessage::WindowMapped => {
                         info!("Received WindowMapped message from compositor core");
@@ -1017,11 +1024,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // Make window background transparent using CSS
         let provider = gtk4::CssProvider::new();
         provider.load_from_data("window { background-color: transparent; } ");
-        if let Some(display) = gtk4::gdk::Display::default() {
+        if let Some(display) = Display::default() {
             gtk4::style_context_add_provider_for_display(&display, &provider, gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             // Detect keyboard layout
-            if let Some(keyboard_layout) = detect_keyboard_layout() {
+            if let Some(keyboard_layout) = KeyboardLayout::detect() {
                 info!("Detected keyboard layout: {}", keyboard_layout.full_name());
             } else {
                 info!("Could not detect keyboard layout");
@@ -1123,7 +1130,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         // Launch the specified application if command arguments are provided
         // Launch after compositor is initialized so the socket is ready
         if !command_line_arguments_for_closure.command_arguments.is_empty() {
-            let socket_clone = socket_name_for_env.clone();
+            let socket = smearor_wrot_application_clone.socket_manager().socket();
+            // let socket_clone = socket_name_for_env.clone();
             let command_arguments_clone = command_line_arguments_for_closure.command_arguments.clone();
             let shell_clone = command_line_arguments_for_closure.shell;
             let wayland_debug_clone = command_line_arguments_for_closure.wayland_debug;
@@ -1139,10 +1147,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
             // });
             thread::spawn(move || {
                 debug!("Launching child application in background thread");
-                debug!("Setting WAYLAND_DISPLAY environment variable in child process: {}", socket_clone);
+                debug!("Setting WAYLAND_DISPLAY environment variable in child process: {}", socket);
                 // Set environment variables in the current thread before launching
                 unsafe {
-                    std::env::set_var("WAYLAND_DISPLAY", &socket_clone);
+                    std::env::set_var("WAYLAND_DISPLAY", &socket);
                     std::env::set_var("GDK_BACKEND", "wayland");
                     if wayland_debug_clone {
                         std::env::set_var("WAYLAND_DEBUG", "1");
@@ -1151,7 +1159,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                         std::env::set_var("GSK_RENDERER", "gl");
                     }
                 }
-                if let Err(e) = launch_application(&socket_clone, &command_arguments_clone, shell_clone, wayland_debug_clone, gsk_renderer_gl_clone) {
+                if let Err(e) = launch_application(&socket, &command_arguments_clone, shell_clone, wayland_debug_clone, gsk_renderer_gl_clone) {
                     error!("Failed to launch child application: {}", e);
                     // Send error through channel
                     let _ = error_sender.send(program_name);
@@ -1191,7 +1199,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
 /// * `wayland_debug` - Whether to enable WAYLAND_DEBUG=1
 /// * `gsk_renderer_gl` - Whether to enable GSK_RENDERER=gl
 fn launch_application(
-    socket: &str,
+    socket: &Socket,
     command_arguments: &[std::ffi::OsString],
     shell: bool,
     wayland_debug: bool,

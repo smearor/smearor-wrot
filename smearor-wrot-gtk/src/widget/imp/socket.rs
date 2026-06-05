@@ -2,6 +2,8 @@ use crate::opengl_renderer::OpenGLRenderer;
 use crate::widget::config::handler::ConfigHandler;
 use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::size::handler::WidgetSizeHandler;
+use crate::widget::socket::error::SocketInitializationError;
+use crate::widget::socket::handler::SocketHandler;
 use glib::ControlFlow;
 use glib::object::Cast;
 use glib::subclass::prelude::ObjectSubclassExt;
@@ -14,6 +16,7 @@ use smearor_wrot_core::DmaBufAllocator;
 use smearor_wrot_core::OutputGeometry;
 use smearor_wrot_core::SmearorCompositor;
 use smearor_wrot_core::WindowSizeCallbackAware;
+use smearor_wrot_model::Socket;
 use smearor_wrot_model::geometry::size::Size;
 use smithay::reexports::calloop::EventLoop;
 use smithay::reexports::wayland_server::Display;
@@ -24,21 +27,25 @@ use tracing::debug;
 use tracing::error;
 use tracing::warn;
 
-impl CompositorWidgetImpl {
-    pub fn initialize_socket_with_path(&self, socket_path: String) {
-        debug!("set_socket_path called with: {}", socket_path);
-        *self.socket_path.borrow_mut() = Some(socket_path.clone());
+impl SocketHandler for CompositorWidgetImpl {
+    fn socket(&self) -> Option<Socket> {
+        self.socket.borrow().clone()
+    }
+
+    fn initialize_socket(&self, socket: Socket) -> Result<(), SocketInitializationError> {
+        debug!("initialize_socket {socket}");
+        *self.socket.borrow_mut() = Some(socket.clone());
 
         // Initialize compositor if not already initialized
         if self.compositor.borrow().is_none() {
-            debug!("Initializing compositor with socket: {}", socket_path);
+            debug!("Initializing compositor with socket: {}", socket);
 
             // Create Smithay event loop
             let mut event_loop = match EventLoop::try_new() {
                 Ok(el) => el,
                 Err(e) => {
                     error!("Failed to create Smithay event loop: {}", e);
-                    return;
+                    return Err(SocketInitializationError::FailedToCreateEventLoop);
                 }
             };
 
@@ -47,7 +54,7 @@ impl CompositorWidgetImpl {
                 Ok(d) => d,
                 Err(e) => {
                     error!("Failed to create Smithay display: {}", e);
-                    return;
+                    return Err(SocketInitializationError::FailedToCreateDisplay);
                 }
             };
 
@@ -67,7 +74,7 @@ impl CompositorWidgetImpl {
             let compositor = match SmearorCompositor::new(
                 &mut event_loop,
                 shared_display.clone(),
-                Some(&socket_path),
+                Some(socket),
                 initial_width,
                 initial_height,
                 dma_buf_enabled,
@@ -76,8 +83,7 @@ impl CompositorWidgetImpl {
             ) {
                 Ok(c) => Arc::new(Mutex::new(c)),
                 Err(e) => {
-                    error!("Failed to initialize compositor: {}", e);
-                    return;
+                    return Err(e.into());
                 }
             };
 
@@ -114,7 +120,7 @@ impl CompositorWidgetImpl {
                 Ok(guard) => guard.dma_buf_allocator.as_ref().and_then(|allocator| allocator.gbm_device()),
                 Err(_) => {
                     error!("Failed to lock compositor for OpenGL renderer initialization");
-                    return;
+                    return Err(SocketInitializationError::FailedToLockCompositor);
                 }
             };
 
@@ -142,7 +148,7 @@ impl CompositorWidgetImpl {
                 Ok(mut guard) => guard.listening_socket.take(),
                 Err(_) => {
                     error!("Failed to lock compositor");
-                    return;
+                    return Err(SocketInitializationError::FailedToLockCompositor);
                 }
             };
 
@@ -150,7 +156,7 @@ impl CompositorWidgetImpl {
                 Some(socket) => socket,
                 None => {
                     error!("Listening socket not found in compositor");
-                    return;
+                    return Err(SocketInitializationError::FailedToGetListeningSocket);
                 }
             };
 
@@ -168,7 +174,7 @@ impl CompositorWidgetImpl {
                 Ok(guard) => guard.handle(),
                 Err(_) => {
                     error!("Failed to lock display");
-                    return;
+                    return Err(SocketInitializationError::FailedToLockDisplay);
                 }
             };
             let glib_frame_interval = Duration::from_millis(1000 / config.max_fps as u64);
@@ -270,9 +276,6 @@ impl CompositorWidgetImpl {
         } else {
             debug!("Compositor already initialized, skipping");
         }
-    }
-
-    pub fn socket_path(&self) -> Option<String> {
-        self.socket_path.borrow().clone()
+        Ok(())
     }
 }

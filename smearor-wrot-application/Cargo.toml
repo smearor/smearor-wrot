@@ -1,0 +1,18 @@
+[package]
+name = "smearor-wrot-application"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+regex = { workspace = true }
+serde = { workspace = true }
+smearor-wrot-model = { path = "../smearor-wrot-model" }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+typed-builder = { workspace = true }
