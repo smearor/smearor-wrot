@@ -56,6 +56,8 @@ pub enum ApplicationError {
 
 pub struct CompositorWidgetImpl {
     pub(crate) compositor: RefCell<Option<Arc<Mutex<SmearorCompositor>>>>,
+    pub(crate) debug_overlay: DebugOverlayManager,
+    // TODO
     pub(crate) config: Mutex<CompositorWidgetConfig>,
     pub(crate) header_bar: RefCell<Option<gtk4::HeaderBar>>,
     pub(crate) header_bar_title_label: RefCell<Option<gtk4::Label>>,
@@ -69,7 +71,6 @@ pub struct CompositorWidgetImpl {
     pub(crate) opengl_renderer: RefCell<Option<OpenGLRenderer>>,
     pub(crate) dmabuf_registry: DashMap<gtk4::gdk::Texture, Dmabuf>,
     pub(crate) supported_gtk_formats: DashSet<(Fourcc, u64)>,
-    pub(crate) debug_overlay: DebugOverlayManager,
     pub(crate) application_error: RefCell<Option<ApplicationError>>,
     pub(crate) color_mask_shader: RefCell<Option<gtk4::gsk::GLShader>>,
     pub(crate) dma_buf_color_mask_applier: RefCell<Option<DmaBufColorMaskApplier>>,
@@ -81,6 +82,8 @@ impl Default for CompositorWidgetImpl {
     fn default() -> Self {
         Self {
             compositor: RefCell::new(None),
+            debug_overlay: Default::default(),
+            // TODO
             config: Mutex::new(CompositorWidgetConfig::default()),
             header_bar: RefCell::new(None),
             header_bar_title_label: RefCell::new(None),
@@ -94,7 +97,6 @@ impl Default for CompositorWidgetImpl {
             opengl_renderer: RefCell::new(None),
             dmabuf_registry: DashMap::new(),
             supported_gtk_formats: DashSet::new(),
-            debug_overlay: Default::default(),
             application_error: RefCell::new(None),
             color_mask_shader: RefCell::new(None),
             dma_buf_color_mask_applier: RefCell::new(None),
