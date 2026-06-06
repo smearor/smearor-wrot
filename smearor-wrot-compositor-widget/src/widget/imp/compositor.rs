@@ -5,7 +5,6 @@ use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::config::handler::ConfigHandler;
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use crate::widget::size::handler::WidgetSizeHandler;
-use crate::widget::socket::error::SocketInitializationError;
 use glib::ControlFlow;
 use glib::object::Cast;
 use glib::subclass::prelude::ObjectSubclassExt;
