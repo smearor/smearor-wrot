@@ -1,13 +1,13 @@
 use gtk4::Window;
 use gtk4::glib;
 use gtk4::prelude::*;
-use smearor_wrot_gtk::CompositorWidget;
-use smearor_wrot_gtk::widget::color_mask::handler::ColorMaskHandler;
-use smearor_wrot_gtk::widget::commit::CommitHandler;
-use smearor_wrot_gtk::widget::config::handler::ConfigHandler;
-use smearor_wrot_gtk::widget::debug_overlay::handler::DebugOverlayHandler;
-use smearor_wrot_gtk::widget::dmabuf::handler::DmabufHandler;
-use smearor_wrot_gtk::widget::shm::handler::ShmHandler;
+use smearor_wrot_compositor_widget::CompositorWidget;
+use smearor_wrot_compositor_widget::widget::color_mask::handler::ColorMaskHandler;
+use smearor_wrot_compositor_widget::widget::commit::CommitHandler;
+use smearor_wrot_compositor_widget::widget::config::handler::ConfigHandler;
+use smearor_wrot_compositor_widget::widget::debug_overlay::handler::DebugOverlayHandler;
+use smearor_wrot_compositor_widget::widget::dmabuf::handler::DmabufHandler;
+use smearor_wrot_compositor_widget::widget::shm::handler::ShmHandler;
 use smearor_wrot_rotation::RotationWidget;
 use tracing::debug;
 

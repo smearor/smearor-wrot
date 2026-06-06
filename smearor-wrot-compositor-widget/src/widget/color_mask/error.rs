@@ -6,5 +6,5 @@ pub enum ColorMaskError {
     #[error(transparent)]
     CompositorError(#[from] CompositorError),
     #[error(transparent)]
-    ColorMaskError(#[from] smearor_wrot_core::color_mask::error::ColorMaskError),
+    ColorMaskError(#[from] smearor_wrot_compositor::color_mask::error::ColorMaskError),
 }

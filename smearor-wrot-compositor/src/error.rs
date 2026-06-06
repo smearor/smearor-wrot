@@ -1,6 +1,6 @@
 //! Core error types
 //!
-//! This module defines error types used throughout the smearor-wrot-core crate.
+//! This module defines error types used throughout the smearor-wrot-compositor crate.
 //! It uses `thiserror` for error derivation and `miette` for user-friendly error reporting.
 
 use miette::Diagnostic;

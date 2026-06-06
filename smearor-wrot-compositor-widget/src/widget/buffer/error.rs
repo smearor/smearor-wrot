@@ -1,5 +1,5 @@
 use crate::widget::compositor::error::CompositorError;
-use smearor_wrot_core::texture::pixel_data::PixelDataSaveError;
+use smearor_wrot_compositor::texture::pixel_data::PixelDataSaveError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

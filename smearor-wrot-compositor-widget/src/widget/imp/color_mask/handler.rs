@@ -5,8 +5,8 @@ use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::WidgetExt;
-use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;
-use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;
+use smearor_wrot_compositor::color_mask::subsurface::SubSurfaceColorMask;
+use smearor_wrot_compositor::color_mask::toplevel::TopLevelColorMask;
 use tracing::debug;
 
 impl ColorMaskHandler for CompositorWidgetImpl {

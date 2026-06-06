@@ -1,5 +1,5 @@
 [package]
-name = "smearor-wrot-gtk"
+name = "smearor-wrot-compositor-widget"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -19,7 +19,7 @@ glow = { workspace = true }
 image = { workspace = true }
 khronos-egl = { workspace = true }
 miette = { workspace = true }
-smearor-wrot-core = { path = "../smearor-wrot-compositor" }
+smearor-wrot-compositor = { path = "../smearor-wrot-compositor" }
 smearor-wrot-model = { path = "../smearor-wrot-model", features = ["gtk4", "smithay"] }
 smithay = { workspace = true, features = ["backend_winit", "backend_egl", "desktop", "wayland_frontend", "renderer_gl", "renderer_glow", "use_system_lib"] }
 thiserror = { workspace = true }

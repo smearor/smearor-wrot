@@ -10,12 +10,12 @@ use glib::subclass::prelude::ObjectSubclassExt;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use gtk4::prelude::GtkWindowExt;
 use gtk4::prelude::WidgetExt;
-use smearor_wrot_core::CalloopData;
-use smearor_wrot_core::CommitCallbackAware;
-use smearor_wrot_core::DmaBufAllocator;
-use smearor_wrot_core::OutputGeometry;
-use smearor_wrot_core::SmearorCompositor;
-use smearor_wrot_core::WindowSizeCallbackAware;
+use smearor_wrot_compositor::CalloopData;
+use smearor_wrot_compositor::CommitCallbackAware;
+use smearor_wrot_compositor::DmaBufAllocator;
+use smearor_wrot_compositor::OutputGeometry;
+use smearor_wrot_compositor::SmearorCompositor;
+use smearor_wrot_compositor::WindowSizeCallbackAware;
 use smearor_wrot_model::Socket;
 use smearor_wrot_model::geometry::size::Size;
 use smithay::reexports::calloop::EventLoop;
@@ -217,7 +217,7 @@ impl SocketHandler for CompositorWidgetImpl {
                                 }
                             };
                             let mut display_handle = display.handle();
-                            match display_handle.insert_client(client_stream, Arc::new(smearor_wrot_core::state::client::ClientState::default())) {
+                            match display_handle.insert_client(client_stream, Arc::new(smearor_wrot_compositor::state::client::ClientState::default())) {
                                 Ok(_) => {
                                     debug!("Client inserted successfully");
                                 }

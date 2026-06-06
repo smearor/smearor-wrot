@@ -1,5 +1,5 @@
 [package]
-name = "smearor-wrot-core"
+name = "smearor-wrot-compositor"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

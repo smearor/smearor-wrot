@@ -1,9 +1,9 @@
 use directories::UserDirs;
 use gtk4::Application;
 use gtk4::prelude::ApplicationExt;
-use smearor_wrot_gtk::CompositorWidget;
-use smearor_wrot_gtk::widget::buffer::error::SaveBufferError;
-use smearor_wrot_gtk::widget::buffer::handler::BufferHandler;
+use smearor_wrot_compositor_widget::CompositorWidget;
+use smearor_wrot_compositor_widget::widget::buffer::error::SaveBufferError;
+use smearor_wrot_compositor_widget::widget::buffer::handler::BufferHandler;
 use std::path::PathBuf;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;

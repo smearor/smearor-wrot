@@ -16,7 +16,7 @@ use tracing_subscriber::EnvFilter;
 /// # Examples
 ///
 /// ```no_run
-/// use smearor_wrot_core::init_logging;
+/// use smearor_wrot_compositor::init_logging;
 ///
 /// fn main() {
 ///     init_logging();
@@ -51,7 +51,7 @@ pub fn init_logging() {
 /// # Examples
 ///
 /// ```no_run
-/// use smearor_wrot_core::init_logging_with_level;
+/// use smearor_wrot_compositor::init_logging_with_level;
 /// use tracing::Level;
 ///
 /// fn main() {

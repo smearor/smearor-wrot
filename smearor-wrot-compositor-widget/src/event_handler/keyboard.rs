@@ -3,7 +3,7 @@ use crate::event_handler::error::KeyboardInputEventError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
 use gtk4::gdk;
-use smearor_wrot_core::input::keyboard::processing::KeyboardInputProcessing;
+use smearor_wrot_compositor::input::keyboard::processing::KeyboardInputProcessing;
 
 /// Trait for handling GTK keyboard input events
 pub trait KeyboardInputEventHandler {

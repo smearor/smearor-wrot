@@ -1,7 +1,7 @@
 use crate::widget::commit::CommitHandler;
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::imp::widget::CompositorWidgetImpl;
-use smearor_wrot_core::commit::count::CommitCount;
+use smearor_wrot_compositor::commit::count::CommitCount;
 
 impl CommitHandler for CompositorWidgetImpl {
     fn get_first_toplevel_commit_count(&self) -> u32 {

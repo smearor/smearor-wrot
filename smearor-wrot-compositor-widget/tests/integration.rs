@@ -1,11 +1,11 @@
-//! Integration tests for smearor-wrot-gtk
+//! Integration tests for smearor-wrot-compositor-widget
 //!
 //! These tests verify the integration between the GTK widget and the Smithay compositor.
 
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use smearor_wrot_gtk::CompositorWidgetConfig;
+use smearor_wrot_compositor_widget::CompositorWidgetConfig;
 
 /// Mock compositor for runtime integration testing
 #[derive(Debug, Default)]

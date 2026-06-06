@@ -1,7 +1,7 @@
 use crate::CompositorError;
 use crate::CompositorWidget;
 use glib::subclass::prelude::ObjectSubclassIsExt;
-use smearor_wrot_core::SmearorCompositor;
+use smearor_wrot_compositor::SmearorCompositor;
 use std::sync::Arc;
 use std::sync::Mutex;
 

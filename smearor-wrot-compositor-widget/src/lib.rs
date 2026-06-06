@@ -1,4 +1,4 @@
-//! smearor-wrot-gtk: GTK4 widget for compositor rendering
+//! smearor-wrot-compositor-widget: GTK4 widget for compositor rendering
 
 pub mod background;
 pub mod clipboard;

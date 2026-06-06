@@ -9,7 +9,7 @@
 use gtk4::Snapshot;
 use gtk4::gdk;
 use gtk4::graphene::Rect;
-use smearor_wrot_core::color_mask::mask::ColorMask;
+use smearor_wrot_compositor::color_mask::mask::ColorMask;
 
 /// Trait for applying color masks to textures
 ///

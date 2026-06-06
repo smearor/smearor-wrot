@@ -7,7 +7,7 @@ use crate::clipboard::error::ClipboardSyncError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
 use glib;
-use smearor_wrot_core::clipboard::handler::ClipboardSelectionHandler;
+use smearor_wrot_compositor::clipboard::handler::ClipboardSelectionHandler;
 use std::io::Read;
 use std::os::unix::io::FromRawFd;
 use std::sync::Arc;

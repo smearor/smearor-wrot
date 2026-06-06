@@ -3,7 +3,7 @@ use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::object::ObjectExt;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use gtk4::prelude::WidgetExt;
-use smearor_wrot_core::windows::WindowFocus;
+use smearor_wrot_compositor::windows::WindowFocus;
 
 impl CompositorWidgetImpl {
     pub(crate) fn setup_focus_synchronization(&self, obj: &CompositorWidget) {

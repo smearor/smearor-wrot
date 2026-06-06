@@ -1,6 +1,6 @@
 use crate::clipboard::host_clipboard::HostClipboardError;
 use crate::widget::compositor::error::CompositorError;
-use smearor_wrot_core::clipboard::error::CompositorSelectionError;
+use smearor_wrot_compositor::clipboard::error::CompositorSelectionError;
 use thiserror::Error;
 
 #[derive(Debug, Clone, Error)]

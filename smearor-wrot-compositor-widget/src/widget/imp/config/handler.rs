@@ -5,10 +5,10 @@ use crate::widget::config::error::ConfigError;
 use crate::widget::config::handler::ConfigHandler;
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::Orientation;
-use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;
-use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;
-use smearor_wrot_core::frame::limit::FrameLimiter;
-use smearor_wrot_core::windows::decoration::ClientDecorationAware;
+use smearor_wrot_compositor::color_mask::subsurface::SubSurfaceColorMask;
+use smearor_wrot_compositor::color_mask::toplevel::TopLevelColorMask;
+use smearor_wrot_compositor::frame::limit::FrameLimiter;
+use smearor_wrot_compositor::windows::decoration::ClientDecorationAware;
 use smearor_wrot_model::geometry::size::Size;
 
 impl ConfigHandler for CompositorWidgetImpl {

@@ -1,8 +1,8 @@
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::Snapshot;
 use gtk4::prelude::SnapshotExt;
-use smearor_wrot_core::SmearorCompositor;
-use smearor_wrot_core::background::toplevel::ToplevelBackground;
+use smearor_wrot_compositor::SmearorCompositor;
+use smearor_wrot_compositor::background::toplevel::ToplevelBackground;
 use smearor_wrot_model::geometry::size::Size;
 use std::sync::MutexGuard;
 use tracing::debug;

@@ -22,8 +22,8 @@ interact with applications oriented toward their position.
 
 ```mermaid
 graph TD
-    A[Wayland Application<br/>e.g., Firefox, Terminal] --> B[smearor-wrot-core<br/>Wayland Compositor]
-    B --> C[smearor-wrot-gtk<br/>GTK4 Widget]
+    A[Wayland Application<br/>e.g., Firefox, Terminal] --> B[smearor-wrot-compositor<br/>Wayland Compositor]
+    B --> C[smearor-wrot-compositor-widget<br/>GTK4 Widget]
     C --> D[smearor-wrot-rotation<br/>Input/Output Transformation]
     D --> E[Final Rotated Window<br/>With Transformed Input]
     style A color: #000000, fill: #04e762

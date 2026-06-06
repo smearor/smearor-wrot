@@ -1,4 +1,4 @@
-//! smearor-wrot-core: Compositor functionality for process rendering
+//! smearor-wrot-compositor: Compositor functionality for process rendering
 
 pub mod background;
 pub mod buffer;

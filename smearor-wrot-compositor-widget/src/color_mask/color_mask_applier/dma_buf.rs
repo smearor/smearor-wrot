@@ -8,7 +8,7 @@ use gtk4::gsk::GLShaderNode;
 use gtk4::gsk::TextureNode;
 use gtk4::prelude::IsRenderNode;
 use gtk4::prelude::SnapshotExt;
-use smearor_wrot_core::color_mask::mask::ColorMask;
+use smearor_wrot_compositor::color_mask::mask::ColorMask;
 use smearor_wrot_model::color::hex::ToHex;
 use tracing::debug;
 

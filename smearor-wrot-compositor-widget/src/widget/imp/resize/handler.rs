@@ -3,7 +3,7 @@ use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use gtk4::prelude::WidgetExt;
-use smearor_wrot_core::OutputGeometry;
+use smearor_wrot_compositor::OutputGeometry;
 use smearor_wrot_model::geometry::size::Size;
 use std::time::Duration;
 use tracing::debug;

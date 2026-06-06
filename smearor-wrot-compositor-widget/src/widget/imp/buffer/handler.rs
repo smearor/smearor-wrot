@@ -4,9 +4,9 @@ use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::imp::holding_area::BufferHoldingArea;
 use crate::widget::imp::widget::CompositorWidgetImpl;
-use smearor_wrot_core::surface::SurfaceQuery;
-use smearor_wrot_core::texture::pixel_data::BGRA;
-use smearor_wrot_core::texture::pixel_data::PixelData;
+use smearor_wrot_compositor::surface::SurfaceQuery;
+use smearor_wrot_compositor::texture::pixel_data::BGRA;
+use smearor_wrot_compositor::texture::pixel_data::PixelData;
 use smearor_wrot_model::geometry::size::Size;
 use std::path::PathBuf;
 

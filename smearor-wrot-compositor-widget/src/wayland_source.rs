@@ -3,7 +3,7 @@
 use glib::ControlFlow;
 use glib::IOCondition;
 use glib::MainContext;
-use smearor_wrot_core::compositor::SmearorCompositor;
+use smearor_wrot_compositor::compositor::SmearorCompositor;
 use smithay::reexports::wayland_server::Display;
 use smithay::reexports::wayland_server::ListeningSocket;
 use std::os::unix::io::AsRawFd;
@@ -132,7 +132,7 @@ impl WaylandSource {
                 Ok(listening_socket) => match listening_socket.accept() {
                     Ok(Some(client_stream)) => {
                         debug!("Client connection accepted, inserting into display");
-                        if let Err(e) = display_handle.insert_client(client_stream, Arc::new(smearor_wrot_core::state::client::ClientState::default())) {
+                        if let Err(e) = display_handle.insert_client(client_stream, Arc::new(smearor_wrot_compositor::state::client::ClientState::default())) {
                             error!("Failed to insert client: {}", e);
                         } else {
                             debug!("Client inserted successfully");

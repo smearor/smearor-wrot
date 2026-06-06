@@ -2,7 +2,7 @@ use crate::clipboard::error::CompositorClipboardError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::imp::widget::CompositorWidgetImpl;
-use smearor_wrot_core::clipboard::handler::ClipboardSelectionHandler;
+use smearor_wrot_compositor::clipboard::handler::ClipboardSelectionHandler;
 
 pub trait ClipboardHandler {
     fn set_clipboard_content(&self, content: Option<String>) -> Result<(), CompositorClipboardError>;

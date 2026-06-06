@@ -6,7 +6,7 @@ use gtk4::graphene::Rect;
 use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::TextureExt;
 use gtk4::prelude::TextureExtManual;
-use smearor_wrot_core::color_mask::mask::ColorMask;
+use smearor_wrot_compositor::color_mask::mask::ColorMask;
 use smearor_wrot_model::color::hex::ToHex;
 use tracing::debug;
 

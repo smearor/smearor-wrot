@@ -8,16 +8,16 @@ use gtk4::gdk;
 use gtk4::gdk::DmabufTextureBuilder;
 use gtk4::gdk::Texture;
 use gtk4::prelude::TextureExt;
-use smearor_wrot_core::DmaBuffer;
-use smearor_wrot_core::SmearorCompositor;
-use smearor_wrot_core::buffer::metadata::BufferMetadata;
-use smearor_wrot_core::color_mask::mask::ColorMask;
-use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;
-use smearor_wrot_core::commit::count::CommitCount;
-use smearor_wrot_core::dma::count::DmaBufRenderCount;
-use smearor_wrot_core::texture::cache::TextureCacheEntry;
-use smearor_wrot_core::texture::pixel_data::BGRA;
-use smearor_wrot_core::texture::pixel_data::PixelData;
+use smearor_wrot_compositor::DmaBuffer;
+use smearor_wrot_compositor::SmearorCompositor;
+use smearor_wrot_compositor::buffer::metadata::BufferMetadata;
+use smearor_wrot_compositor::color_mask::mask::ColorMask;
+use smearor_wrot_compositor::color_mask::toplevel::TopLevelColorMask;
+use smearor_wrot_compositor::commit::count::CommitCount;
+use smearor_wrot_compositor::dma::count::DmaBufRenderCount;
+use smearor_wrot_compositor::texture::cache::TextureCacheEntry;
+use smearor_wrot_compositor::texture::pixel_data::BGRA;
+use smearor_wrot_compositor::texture::pixel_data::PixelData;
 use smearor_wrot_model::color::rgba::RgbaColor;
 use smithay::backend::allocator::Buffer;
 use smithay::backend::allocator::Fourcc;
@@ -352,7 +352,7 @@ impl DmaBufRenderNode for CompositorWidgetImpl {
 
         // Create BufferMetadata from texture dimensions
         let stride = width * 4; // BGRA = 4 bytes per pixel
-        let buffer_metadata = smearor_wrot_core::buffer::metadata::BufferMetadata::new(width as i32, height as i32, stride as i32);
+        let buffer_metadata = smearor_wrot_compositor::buffer::metadata::BufferMetadata::new(width as i32, height as i32, stride as i32);
 
         // Convert pixel data back to GDK texture
         let masked_pixel_data_bgra = PixelData::<BGRA>::from_slice(&masked_pixel_data);

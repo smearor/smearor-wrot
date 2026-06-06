@@ -28,7 +28,7 @@ use smithay::utils::Transform;
 use std::fs::File;
 use tracing::debug;
 
-use smearor_wrot_core::dma::buffer::DmaBufBuffer;
+use smearor_wrot_compositor::dma::buffer::DmaBufBuffer;
 
 use gtk4::gdk;
 use smithay::backend::renderer::gles::ffi::Gles2;
