@@ -7,6 +7,8 @@ pub mod settings;
 pub mod socket;
 pub mod window;
 
+pub use application::app::CompositorApplication;
+pub use application::config::CompositorApplicationConfig;
 pub use application::app::SmearorWrotApplication;
 pub use icon::set_program_icon;
 pub use keyboard::layout::KeyboardLayout;
