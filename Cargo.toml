@@ -2,8 +2,8 @@
 resolver = "3"
 
 members = [
-    "smearor-wrot-core",
-    "smearor-wrot-gtk",
+    "smearor-wrot-compositor",
+    "smearor-wrot-compositor-widget",
     "smearor-wrot-model",
     "smearor-wrot-pie-menu",
     "smearor-wrot-application",

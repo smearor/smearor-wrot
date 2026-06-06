@@ -17,7 +17,7 @@ gtk4 = { workspace = true }
 gtk4-layer-shell = { workspace = true }
 miette = { workspace = true }
 serde = { workspace = true }
-smearor-wrot-core = { path = "../smearor-wrot-core" }
+smearor-wrot-core = { path = "../smearor-wrot-compositor" }
 smearor-wrot-model = { path = "../smearor-wrot-model", features = ["gtk4"] }
 thiserror = { workspace = true }
 tracing = { workspace = true }
