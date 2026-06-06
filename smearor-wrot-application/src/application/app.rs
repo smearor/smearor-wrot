@@ -1,10 +1,10 @@
 use crate::KeyboardLayout;
 use crate::ScreenshotManager;
+use crate::SettingsHandler;
 use crate::SocketBuilder;
 use crate::SocketManager;
 use crate::application::config::CompositorApplicationConfig;
 use crate::set_program_icon;
-use crate::show_settings_dialog;
 use gtk4::ApplicationWindow;
 use gtk4::Box as GtkBox;
 use gtk4::Button;
@@ -129,7 +129,15 @@ impl CompositorApplication {
             // 5. Wrap inside rotation widget
             let rotation_widget = application_ref.setup_rotation_widget(&compositor_widget);
 
-            // 6. Connect window actions & buttons (build HeaderBar)
+            // 6. Create settings handler
+            let settings_handler = Arc::new(Mutex::new(SettingsHandler::new(
+                &window,
+                &compositor_widget,
+                &rotation_widget,
+                application_ref.config.disable_dma_buf,
+            )));
+
+            // 7. Connect window actions & buttons (build HeaderBar)
             let sync_manager = Arc::new(Mutex::new(None));
             let header_bar = application_ref.setup_header_bar(
                 app,
@@ -137,31 +145,32 @@ impl CompositorApplication {
                 &compositor_widget,
                 &rotation_widget,
                 &sync_manager,
+                &settings_handler,
             );
             window.set_titlebar(Some(&header_bar));
 
-            // 7. Setup screenshot manager
+            // 8. Setup screenshot manager
             let screenshot_manager = Arc::new(ScreenshotManager::new(app.clone(), compositor_widget.clone()));
 
-            // 8. Setup pie menu overlay
+            // 9. Setup pie menu overlay
             let pie_menu_widget = application_ref.setup_pie_menu_overlay(&rotation_widget, pie_menu_sender);
 
-            // 9. Sync rotation between RotationWidget and PieMenuOverlayWidget
+            // 10. Sync rotation between RotationWidget and PieMenuOverlayWidget
             application_ref.setup_rotation_sync(&rotation_widget, &pie_menu_widget);
 
             window.set_child(Some(&pie_menu_widget));
 
-            // 10. Configure and initialize the compositor core
+            // 11. Configure and initialize the compositor core
             application_ref.initialize_compositor_core(
                 &compositor_widget,
                 compositor_message_sender,
                 &sync_manager,
             );
 
-            // 11. Connect event controllers (Keyboard, etc.)
+            // 12. Connect event controllers (Keyboard, etc.)
             application_ref.setup_event_forwarding(&window, &compositor_widget);
 
-            // 12. Run the message checking loops
+            // 13. Run the message checking loops
             application_ref.setup_message_loops(
                 app,
                 &window,
@@ -172,16 +181,17 @@ impl CompositorApplication {
                 pie_menu_receiver,
                 &screenshot_manager,
                 &sync_manager,
+                &settings_handler,
             );
 
-            // 13. Synchronize window/header title
+            // 14. Synchronize window/header title
             application_ref.setup_title_sync(&window, &compositor_widget, &header_bar);
 
-            // 14. Present the window (before launching child process, as in original code)
+            // 15. Present the window (before launching child process, as in original code)
             window.set_opacity(0.0);
             window.present();
 
-            // 15. Launch child process if specified
+            // 16. Launch child process if specified
             application_ref.launch_child_process(&socket_manager.socket());
         });
 
@@ -358,6 +368,7 @@ impl CompositorApplication {
         compositor_widget: &CompositorWidget,
         rotation_widget: &Widget,
         sync_manager: &Arc<Mutex<Option<Arc<SyncManager>>>>,
+        settings_handler: &Arc<Mutex<SettingsHandler>>,
     ) -> HeaderBar {
         let header_bar = HeaderBar::builder().show_title_buttons(true).build();
 
@@ -564,17 +575,11 @@ impl CompositorApplication {
             let _ = screenshot_manager.screenshot();
         });
 
-        let compositor_widget_for_settings = compositor_widget.clone();
-        let window_for_settings = window.clone();
-        let rotation_widget_for_settings = rotation_widget.clone();
-        let disable_dma_buf = self.config.disable_dma_buf;
+        let settings_handler_clone = settings_handler.clone();
         settings_button.connect_clicked(move |_| {
-            show_settings_dialog(
-                (&window_for_settings).as_ref(),
-                &compositor_widget_for_settings,
-                &rotation_widget_for_settings,
-                disable_dma_buf,
-            );
+            if let Ok(mut handler) = settings_handler_clone.lock() {
+                handler.open_settings_dialog();
+            }
         });
 
         header_bar
@@ -767,6 +772,7 @@ impl CompositorApplication {
         pie_menu_receiver: mpsc::Receiver<PieMenuMessage>,
         screenshot_manager: &Arc<ScreenshotManager>,
         sync_manager: &Arc<Mutex<Option<Arc<SyncManager>>>>,
+        settings_handler: &Arc<Mutex<SettingsHandler>>,
     ) {
         let app_clone = app.clone();
         let window_clone = window.clone();
@@ -774,6 +780,7 @@ impl CompositorApplication {
         let rotation_widget_clone = rotation_widget.clone();
         let sync_manager_clone = sync_manager.clone();
         let screenshot_manager_clone = screenshot_manager.clone();
+        let settings_handler_clone = settings_handler.clone();
         let initial_window_opacity = self.config.window_opacity as f64;
         let config_disable_dma_buf = self.config.disable_dma_buf;
 
@@ -904,12 +911,9 @@ impl CompositorApplication {
                             }
                             PieMenuMessage::Settings => {
                                 info!("Received Settings message from pie menu");
-                                show_settings_dialog(
-                                    window_clone.as_ref(),
-                                    &compositor_widget_clone,
-                                    &rotation_widget_clone,
-                                    config_disable_dma_buf,
-                                );
+                                if let Ok(mut handler) = settings_handler_clone.lock() {
+                                    handler.open_settings_dialog();
+                                }
                             }
                             PieMenuMessage::Screenshot => {
                                 info!("Received Screenshot message from pie menu");

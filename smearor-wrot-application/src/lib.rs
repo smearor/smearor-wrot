@@ -13,7 +13,7 @@ pub use application::app::SmearorWrotApplication;
 pub use icon::set_program_icon;
 pub use keyboard::layout::KeyboardLayout;
 pub use screenshot::ScreenshotManager;
-pub use settings::show_settings_dialog;
+pub use settings::SettingsHandler;
 pub use socket::builder::SocketBuilder;
 pub use socket::error::SocketBuilderError;
 pub use socket::manager::SocketManager;
