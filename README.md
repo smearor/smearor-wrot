@@ -26,12 +26,43 @@ graph TD
     B --> C[smearor-wrot-compositor-widget<br/>GTK4 Widget]
     C --> D[smearor-wrot-rotation<br/>Input/Output Transformation]
     D --> E[Final Rotated Window<br/>With Transformed Input]
+    
+    F[smearor-wrot-wrapper<br/>CLI Binary] --> G[smearor-wrot-application<br/>GTK4 Application Library]
+    G --> C
+    G --> H[CompositorApplication<br/>Modular Window Management]
+    
     style A color: #000000, fill: #04e762
     style B color: #000000, fill: #f5b700
     style C color: #000000, fill: #00a1e4
     style D color: #000000, fill: #dc0073
     style E color: #000000, fill: #89fc00
+    style F color: #000000, fill: #ff6b6b
+    style G color: #000000, fill: #4ecdc4
+    style H color: #000000, fill: #ffe66d
 ```
+
+#### Crate Structure
+
+The project is organized into two main crates:
+
+- **`smearor-wrot-wrapper`** (Binary)
+  - Thin CLI entry point for command-line argument parsing
+  - Configuration file loading and merging
+  - Delegates to `smearor-wrot-application` for all GUI logic
+
+- **`smearor-wrot-application`** (Library)
+  - Modular `CompositorApplication` for GTK4 window lifecycle management
+  - Integration of compositor widget, rotation widget, and pie menu
+  - Settings dialog, screenshot functionality, and clipboard synchronization
+  - Clean separation of concerns with builder pattern
+
+#### Supporting Crates
+
+- **`smearor-wrot-compositor`**: Smithay-based Wayland compositor core
+- **`smearor-wrot-compositor-widget`**: GTK4 widget for compositor rendering
+- **`smearor-wrot-rotation`**: Input/output transformation for window rotation
+- **`smearor-wrot-pie-menu`**: Pie menu overlay for quick actions
+- **`smearor-wrot-model`**: Shared data models and types
 
 ## Quick Start
 
