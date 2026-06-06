@@ -1,7 +1,7 @@
 use clap::Parser;
-use smearor_wrot_compositor::DEFAULT_WINDOW_HEIGHT;
-use smearor_wrot_compositor::DEFAULT_WINDOW_WIDTH;
-use smearor_wrot_rotation::layer::SmearorLayer;
+use smearor_wrot_application::DEFAULT_WINDOW_HEIGHT;
+use smearor_wrot_application::DEFAULT_WINDOW_WIDTH;
+use smearor_wrot_application::SmearorLayer;
 use std::ffi::OsString;
 
 /// Smearor WROT

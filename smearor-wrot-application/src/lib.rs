@@ -17,3 +17,7 @@ pub use settings::show_settings_dialog;
 pub use socket::builder::SocketBuilder;
 pub use socket::error::SocketBuilderError;
 pub use socket::manager::SocketManager;
+pub use smearor_wrot_compositor::DEFAULT_WINDOW_HEIGHT;
+pub use smearor_wrot_compositor::DEFAULT_WINDOW_WIDTH;
+pub use smearor_wrot_compositor::init_logging;
+pub use smearor_wrot_rotation::layer::SmearorLayer;

@@ -2989,20 +2989,11 @@ name = "smearor-wrot-wrapper"
 version = "0.1.0"
 dependencies = [
  "clap",
- "directories",
- "gtk4",
- "gtk4-layer-shell",
  "serde",
  "smearor-wrot-application",
- "smearor-wrot-compositor",
- "smearor-wrot-compositor-widget",
- "smearor-wrot-model",
- "smearor-wrot-pie-menu",
- "smearor-wrot-rotation",
  "tokio",
  "toml",
  "tracing",
- "which",
 ]
 
 [[package]]
