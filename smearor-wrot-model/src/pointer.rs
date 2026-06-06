@@ -1,10 +1,12 @@
 use crate::RgbaColor;
 use crate::geometry::position::Position;
+#[cfg(feature = "gtk4")]
 use gtk4::Snapshot;
 #[cfg(feature = "gtk4")]
 use gtk4::gdk::RGBA;
 #[cfg(feature = "gtk4")]
 use gtk4::graphene::Rect;
+#[cfg(feature = "gtk4")]
 use gtk4::prelude::SnapshotExt;
 use std::fmt::Debug;
 
