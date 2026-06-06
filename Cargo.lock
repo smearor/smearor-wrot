@@ -2991,6 +2991,7 @@ dependencies = [
  "clap",
  "serde",
  "smearor-wrot-application",
+ "thiserror 2.0.18",
  "tokio",
  "toml",
  "tracing",
