@@ -39,10 +39,13 @@ use smearor_wrot_core::message::sender::CompositorMessageSender;
 use smearor_wrot_core::windows::decoration::ClientDecorationAware;
 use smearor_wrot_core::windows::title::WindowTitle;
 use smearor_wrot_gtk::CompositorWidget;
+use smearor_wrot_gtk::CompositorWidgetConfig;
 use smearor_wrot_gtk::clipboard::sync_manager::SyncManager;
 use smearor_wrot_gtk::event_handler::keyboard::KeyboardInputEventHandler;
 use smearor_wrot_gtk::widget::compositor::handler::CompositorHandler;
 use smearor_wrot_gtk::widget::config::handler::ConfigHandler;
+use smearor_wrot_gtk::widget::debug_overlay::config::DebugOverlayConfig;
+use smearor_wrot_gtk::widget::debug_overlay::handler::DebugOverlayHandler;
 use smearor_wrot_gtk::widget::resize::handler::ResizeHandler;
 use smearor_wrot_gtk::widget::shutdown::handler::ShutdownHandler;
 use smearor_wrot_gtk::widget::socket::handler::SocketHandler;
@@ -453,21 +456,21 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
             // Set touch transform callback
             let rotation_widget_clone = rotation_widget.clone();
-            compositor_widget.set_touch_transform_callback(move |_sequence, x, y| {
+            compositor_widget.set_touch_transform_callback(move |_sequence, position| {
                 if let Some(rotation_widget) = rotation_widget_clone.downcast_ref::<RotationWidget>() {
-                    rotation_widget.input_transform(x, y)
+                    rotation_widget.input_transform(position.x, position.y).into()
                 } else {
-                    (x, y)
+                    position
                 }
             });
 
             // Set pointer transform callback
             let rotation_widget_clone = rotation_widget.clone();
-            compositor_widget.set_pointer_transform_callback(move |x, y| {
+            compositor_widget.set_pointer_transform_callback(move |position| {
                 if let Some(rotation_widget) = rotation_widget_clone.downcast_ref::<RotationWidget>() {
-                    rotation_widget.input_transform(x, y)
+                    rotation_widget.input_transform(position.x, position.y).into()
                 } else {
-                    (x, y)
+                    position
                 }
             });
 
@@ -650,7 +653,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             KeyboardLayout::detect()
         };
 
-        let config = smearor_wrot_gtk::CompositorWidgetConfig {
+        let config = CompositorWidgetConfig {
             show_decorations: command_line_arguments_for_closure.decorated,
             fullscreen: command_line_arguments_for_closure.fullscreen,
             initial_width,
@@ -659,8 +662,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
             dma_buf_enabled: !command_line_arguments_for_closure.disable_dma_buf,
             min_width: command_line_arguments_for_closure.min_width.unwrap_or(100),
             min_height: command_line_arguments_for_closure.min_height.unwrap_or(100),
-            debug_touch: command_line_arguments_for_closure.debug_touch,
-            debug_pointer: command_line_arguments_for_closure.debug_pointer,
             auto_color_mask: command_line_arguments_for_closure.auto_color_mask,
             auto_subsurface_color_mask: command_line_arguments_for_closure.auto_subsurface_color_mask,
             color_mask_tolerance: command_line_arguments_for_closure.color_mask_tolerance,
@@ -674,8 +675,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
             ..Default::default()
         };
         compositor_widget.set_config(config);
-
         debug!("Compositor widget configured with initial size {}x{}", initial_width, initial_height);
+
+        let debug_overlay_config = DebugOverlayConfig {
+            debug_pointer: command_line_arguments_for_closure.debug_pointer,
+            debug_touch: command_line_arguments_for_closure.debug_touch,
+        };
+        compositor_widget.set_debug_overlay_config(debug_overlay_config);
 
         // Set the socket path (this initializes the compositor)
         let socket = smearor_wrot_application.socket_manager().socket();

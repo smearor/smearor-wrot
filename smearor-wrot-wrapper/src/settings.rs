@@ -5,6 +5,7 @@ use smearor_wrot_gtk::CompositorWidget;
 use smearor_wrot_gtk::widget::color_mask::handler::ColorMaskHandler;
 use smearor_wrot_gtk::widget::commit::CommitHandler;
 use smearor_wrot_gtk::widget::config::handler::ConfigHandler;
+use smearor_wrot_gtk::widget::debug_overlay::handler::DebugOverlayHandler;
 use smearor_wrot_gtk::widget::dmabuf::handler::DmabufHandler;
 use smearor_wrot_gtk::widget::shm::handler::ShmHandler;
 use smearor_wrot_rotation::RotationWidget;
@@ -21,8 +22,6 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
 
     // Get current debug settings from compositor widget
     let config = compositor_widget.config();
-    let current_debug_pointer = config.debug_pointer;
-    let current_debug_touch = config.debug_touch;
     let current_auto_color_mask = config.auto_color_mask;
     let current_auto_subsurface_color_mask = config.auto_subsurface_color_mask;
     let current_resizable = config.resizable;
@@ -31,6 +30,10 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
     let current_disable_dma_buf = disable_dma_buf;
     let current_color_mask_shader = config.color_mask_shader;
     let current_animations = config.animations;
+
+    let debug_overlay_config = compositor_widget.debug_overlay_config();
+    let current_debug_pointer = debug_overlay_config.debug_pointer;
+    let current_debug_touch = debug_overlay_config.debug_touch;
 
     // Create content box
     let content_box = gtk4::Box::builder()
@@ -207,17 +210,17 @@ pub fn show_settings_dialog(parent_window: &Window, compositor_widget: &Composit
     // Connect toggle changes to update compositor widget
     let compositor_widget_clone = compositor_widget.clone();
     debug_pointer_toggle.connect_state_set(move |_, is_active| {
-        let mut config = compositor_widget_clone.config();
+        let mut config = compositor_widget_clone.debug_overlay_config();
         config.debug_pointer = is_active;
-        compositor_widget_clone.set_config(config);
+        compositor_widget_clone.set_debug_overlay_config(config);
         glib::Propagation::Proceed
     });
 
     let compositor_widget_clone = compositor_widget.clone();
     debug_touch_toggle.connect_state_set(move |_, is_active| {
-        let mut config = compositor_widget_clone.config();
+        let mut config = compositor_widget_clone.debug_overlay_config();
         config.debug_touch = is_active;
-        compositor_widget_clone.set_config(config);
+        compositor_widget_clone.set_debug_overlay_config(config);
         glib::Propagation::Proceed
     });
 

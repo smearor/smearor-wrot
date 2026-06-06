@@ -4,6 +4,8 @@ use crate::color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
 use crate::opengl_renderer::OpenGLRenderer;
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::config::handler::ConfigHandler;
+use crate::widget::imp::debug_overlay::manager::DebugOverlayManager;
+use crate::widget::imp::debug_overlay::renderer::DebugOverlayRenderer;
 use crate::widget::imp::dmabuf::formats::DmabufFormats;
 use crate::widget::imp::event::touch::TouchEventSetup;
 use crate::widget::imp::holding_area::BufferHoldingArea;
@@ -17,9 +19,8 @@ use glib::subclass::prelude::ObjectImplExt;
 use glib::subclass::prelude::ObjectSubclass;
 use glib::subclass::prelude::ObjectSubclassExt;
 use glib::subclass::prelude::ObjectSubclassIsExt;
+use gtk4::Snapshot;
 use gtk4::Widget;
-use gtk4::graphene::Rect;
-use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::WidgetExt;
 use gtk4::prelude::WidgetExtManual;
 use gtk4::subclass::prelude::WidgetImpl;
@@ -28,6 +29,7 @@ use smearor_wrot_core::SmearorCompositor;
 use smearor_wrot_core::damage::surface::SurfaceDamage;
 use smearor_wrot_core::frame::count::FrameCounter;
 use smearor_wrot_core::frame::limit::FrameLimiter;
+use smearor_wrot_model::Position;
 use smearor_wrot_model::Size;
 use smearor_wrot_model::Socket;
 use smithay::backend::allocator::Fourcc;
@@ -47,22 +49,6 @@ use tracing::error;
 use tracing::warn;
 
 #[derive(Clone, Debug)]
-pub struct TouchPoint {
-    pub gtk_x: f64,
-    pub gtk_y: f64,
-    pub app_x: f64,
-    pub app_y: f64,
-}
-
-#[derive(Clone, Debug)]
-pub struct PointerPoint {
-    pub gtk_x: f64,
-    pub gtk_y: f64,
-    pub app_x: f64,
-    pub app_y: f64,
-}
-
-#[derive(Clone, Debug)]
 pub enum ApplicationError {
     NotFound(String),
     NotSpecified,
@@ -77,14 +63,13 @@ pub struct CompositorWidgetImpl {
     pub(crate) resize_timeout: RefCell<Option<glib::SourceId>>,
     pub(crate) socket: RefCell<Option<Socket>>,
     pub(crate) auto_resize_handling: RefCell<bool>,
-    pub(crate) touch_transform_callback: RefCell<Option<Box<dyn Fn(usize, f64, f64) -> (f64, f64) + 'static>>>,
-    pub(crate) pointer_transform_callback: RefCell<Option<Box<dyn Fn(f64, f64) -> (f64, f64) + 'static>>>,
+    pub(crate) touch_transform_callback: RefCell<Option<Box<dyn Fn(usize, Position<f64>) -> Position<f64> + 'static>>>,
+    pub(crate) pointer_transform_callback: RefCell<Option<Box<dyn Fn(Position<f64>) -> Position<f64> + 'static>>>,
     pub(crate) last_render_time: Arc<AtomicI64>,
     pub(crate) opengl_renderer: RefCell<Option<OpenGLRenderer>>,
     pub(crate) dmabuf_registry: DashMap<gtk4::gdk::Texture, Dmabuf>,
     pub(crate) supported_gtk_formats: DashSet<(Fourcc, u64)>,
-    pub(crate) touch_points: DashMap<usize, TouchPoint>,
-    pub(crate) pointer_point: RefCell<Option<PointerPoint>>,
+    pub(crate) debug_overlay: DebugOverlayManager,
     pub(crate) application_error: RefCell<Option<ApplicationError>>,
     pub(crate) color_mask_shader: RefCell<Option<gtk4::gsk::GLShader>>,
     pub(crate) dma_buf_color_mask_applier: RefCell<Option<DmaBufColorMaskApplier>>,
@@ -109,8 +94,7 @@ impl Default for CompositorWidgetImpl {
             opengl_renderer: RefCell::new(None),
             dmabuf_registry: DashMap::new(),
             supported_gtk_formats: DashSet::new(),
-            touch_points: DashMap::new(),
-            pointer_point: RefCell::new(None),
+            debug_overlay: Default::default(),
             application_error: RefCell::new(None),
             color_mask_shader: RefCell::new(None),
             dma_buf_color_mask_applier: RefCell::new(None),
@@ -407,76 +391,10 @@ impl WidgetImpl for CompositorWidgetImpl {
         }
     }
 
-    fn snapshot(&self, snapshot: &gtk4::Snapshot) {
+    fn snapshot(&self, snapshot: &Snapshot) {
         self.render_snapshot(snapshot);
+        self.debug_overlay.snapshot(snapshot);
 
-        // Draw touch points for visual debugging only if debug_touch is enabled
-        let config = self.config.lock();
-        let Ok(config) = config.as_ref() else {
-            return;
-        };
-
-        if config.debug_touch {
-            for touch_point in self.touch_points.iter() {
-                // Draw red filled rectangle for GTK coordinates
-                let gtk_color = gtk4::gdk::RGBA::new(1.0, 0.0, 0.0, 1.0);
-                let gtk_bounds = Rect::new(touch_point.gtk_x as f32 - 20.0, touch_point.gtk_y as f32 - 20.0, 40.0, 40.0);
-                snapshot.append_color(&gtk_color, &gtk_bounds);
-
-                // Draw green unfilled rectangle (border only) for app coordinates
-                let app_color = gtk4::gdk::RGBA::new(0.0, 1.0, 0.0, 1.0);
-                let app_bounds = Rect::new(touch_point.app_x as f32 - 20.0, touch_point.app_y as f32 - 20.0, 40.0, 40.0);
-                let border_width = 2.0;
-
-                // Top border
-                let top_bounds = Rect::new(app_bounds.x(), app_bounds.y(), app_bounds.width(), border_width);
-                snapshot.append_color(&app_color, &top_bounds);
-
-                // Bottom border
-                let bottom_bounds = Rect::new(app_bounds.x(), app_bounds.y() + app_bounds.height() - border_width, app_bounds.width(), border_width);
-                snapshot.append_color(&app_color, &bottom_bounds);
-
-                // Left border
-                let left_bounds = Rect::new(app_bounds.x(), app_bounds.y(), border_width, app_bounds.height());
-                snapshot.append_color(&app_color, &left_bounds);
-
-                // Right border
-                let right_bounds = Rect::new(app_bounds.x() + app_bounds.width() - border_width, app_bounds.y(), border_width, app_bounds.height());
-                snapshot.append_color(&app_color, &right_bounds);
-            }
-        }
-
-        // Draw pointer for visual debugging only if debug_pointer is enabled
-        if config.debug_pointer {
-            let pointer_point = self.pointer_point.borrow();
-            if let Some(pointer) = pointer_point.as_ref() {
-                // Draw blue filled rectangle for GTK coordinates
-                let gtk_color = gtk4::gdk::RGBA::new(0.0, 0.0, 1.0, 1.0);
-                let gtk_bounds = Rect::new(pointer.gtk_x as f32 - 20.0, pointer.gtk_y as f32 - 20.0, 40.0, 40.0);
-                snapshot.append_color(&gtk_color, &gtk_bounds);
-
-                // Draw magenta unfilled rectangle (border only) for app coordinates
-                let app_color = gtk4::gdk::RGBA::new(1.0, 0.0, 1.0, 1.0);
-                let app_bounds = Rect::new(pointer.app_x as f32 - 20.0, pointer.app_y as f32 - 20.0, 40.0, 40.0);
-                let border_width = 2.0;
-
-                // Top border
-                let top_bounds = Rect::new(app_bounds.x(), app_bounds.y(), app_bounds.width(), border_width);
-                snapshot.append_color(&app_color, &top_bounds);
-
-                // Bottom border
-                let bottom_bounds = Rect::new(app_bounds.x(), app_bounds.y() + app_bounds.height() - border_width, app_bounds.width(), border_width);
-                snapshot.append_color(&app_color, &bottom_bounds);
-
-                // Left border
-                let left_bounds = Rect::new(app_bounds.x(), app_bounds.y(), border_width, app_bounds.height());
-                snapshot.append_color(&app_color, &left_bounds);
-
-                // Right border
-                let right_bounds = Rect::new(app_bounds.x() + app_bounds.width() - border_width, app_bounds.y(), border_width, app_bounds.height());
-                snapshot.append_color(&app_color, &right_bounds);
-            }
-        }
         let Ok(compositor) = self.compositor() else {
             return;
         };
@@ -494,59 +412,32 @@ impl CompositorWidgetImpl {
 
     pub fn set_touch_transform_callback<F>(&self, callback: F)
     where
-        F: Fn(usize, f64, f64) -> (f64, f64) + 'static,
+        F: Fn(usize, Position<f64>) -> Position<f64> + 'static,
     {
         *self.touch_transform_callback.borrow_mut() = Some(Box::new(callback));
     }
 
     pub fn set_pointer_transform_callback<F>(&self, callback: F)
     where
-        F: Fn(f64, f64) -> (f64, f64) + 'static,
+        F: Fn(Position<f64>) -> Position<f64> + 'static,
     {
         *self.pointer_transform_callback.borrow_mut() = Some(Box::new(callback));
     }
 
-    pub fn apply_touch_transform(&self, sequence: usize, x: f64, y: f64) -> (f64, f64) {
+    pub fn apply_touch_transform(&self, sequence: usize, position: Position<f64>) -> Position<f64> {
         if let Some(callback) = self.touch_transform_callback.borrow().as_ref() {
-            callback(sequence, x, y)
+            callback(sequence, position)
         } else {
-            (x, y)
+            position
         }
     }
 
-    pub fn apply_pointer_transform(&self, x: f64, y: f64) -> (f64, f64) {
+    pub fn apply_pointer_transform(&self, position: Position<f64>) -> Position<f64> {
         if let Some(callback) = self.pointer_transform_callback.borrow().as_ref() {
-            callback(x, y)
+            callback(position)
         } else {
-            (x, y)
+            position
         }
-    }
-
-    pub fn show_touch_overlay(&self) {
-        // Touch points are always rendered in snapshot when available
-    }
-
-    pub fn hide_touch_overlay(&self) {
-        // Clear all touch points
-        self.touch_points.clear();
-    }
-
-    pub fn update_touch_point(&self, sequence: usize, gtk_x: f64, gtk_y: f64, app_x: f64, app_y: f64) {
-        let touch_point = TouchPoint { gtk_x, gtk_y, app_x, app_y };
-        self.touch_points.insert(sequence, touch_point);
-    }
-
-    pub fn remove_touch_point(&self, sequence: usize) {
-        self.touch_points.remove(&sequence);
-    }
-
-    pub fn update_pointer_point(&self, gtk_x: f64, gtk_y: f64, app_x: f64, app_y: f64) {
-        let pointer_point = PointerPoint { gtk_x, gtk_y, app_x, app_y };
-        self.pointer_point.borrow_mut().replace(pointer_point);
-    }
-
-    pub fn clear_pointer_point(&self) {
-        self.pointer_point.borrow_mut().take();
     }
 
     pub fn set_application_error(&self, error: Option<ApplicationError>) {

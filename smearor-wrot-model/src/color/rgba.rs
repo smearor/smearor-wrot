@@ -16,11 +16,11 @@ pub struct RgbaColor {
 }
 
 impl RgbaColor {
-    pub fn new(color: RgbColor, alpha: f32) -> Self {
+    pub const fn new(color: RgbColor, alpha: f32) -> Self {
         Self { color, alpha }
     }
 
-    pub fn with_rgb(red: f32, green: f32, blue: f32, alpha: f32) -> Self {
+    pub const fn with_rgb(red: f32, green: f32, blue: f32, alpha: f32) -> Self {
         Self {
             color: RgbColor::new(red, green, blue),
             alpha,

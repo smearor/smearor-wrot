@@ -9,6 +9,7 @@ use gtk4::gdk::ButtonEvent;
 use gtk4::gdk::EventType;
 use gtk4::gdk::TouchEvent;
 use gtk4::prelude::WidgetExt;
+use smearor_wrot_model::Position;
 use tracing::debug;
 
 pub trait TouchEventSetup {
@@ -42,7 +43,7 @@ impl TouchEventSetup for CompositorWidgetImpl {
                             if let Some(native) = widget.native() {
                                 return if let Some((x, y)) = native.translate_coordinates(&widget, raw_x, raw_y) {
                                     debug!("Touch begin/down (corrected): id={id}, raw_x={raw_x}, raw_y={raw_y}, x={x}, y={y}");
-                                    match widget.handle_touch_down(id, x, y) {
+                                    match widget.handle_touch_down(id, Position::new(x, y)) {
                                         Ok(_) => Propagation::Stop,
                                         Err(e) => {
                                             debug!("Failed to handle touch down event {e}");
@@ -51,7 +52,7 @@ impl TouchEventSetup for CompositorWidgetImpl {
                                     }
                                 } else {
                                     debug!("Touch begin/down (raw): id={id}, raw_x={raw_x}, raw_y={raw_y}");
-                                    match widget.handle_touch_down(id, raw_x, raw_y) {
+                                    match widget.handle_touch_down(id, Position::new(raw_x, raw_y)) {
                                         Ok(_) => Propagation::Stop,
                                         Err(e) => {
                                             debug!("Failed to handle raw touch down event {e}");
@@ -69,7 +70,7 @@ impl TouchEventSetup for CompositorWidgetImpl {
                         if let Some((raw_x, raw_y)) = touch_event.position() {
                             if let Some(native) = widget.native() {
                                 if let Some((x, y)) = native.translate_coordinates(&widget, raw_x, raw_y) {
-                                    match widget.handle_touch_motion(id, x, y) {
+                                    match widget.handle_touch_motion(id, Position::new(x, y)) {
                                         Ok(_) => {
                                             debug!("Corrected touch update/motion (corrected): id={id}, raw_x={raw_x}, raw_y={raw_y}, x={x}, y={y}");
                                         }
@@ -78,7 +79,7 @@ impl TouchEventSetup for CompositorWidgetImpl {
                                         }
                                     }
                                 } else {
-                                    match widget.handle_touch_motion(id, raw_x, raw_y) {
+                                    match widget.handle_touch_motion(id, Position::new(raw_x, raw_y)) {
                                         Ok(_) => {
                                             debug!("Raw touch update/motion: id={id}, raw_x={raw_x}, raw_y={raw_y}");
                                         }

@@ -44,10 +44,6 @@ pub struct CompositorWidgetConfig {
     pub title: Option<String>,
     /// Enable DMA-BUF hardware acceleration
     pub dma_buf_enabled: bool,
-    /// Enable visual debugging of touch points
-    pub debug_touch: bool,
-    /// Enable visual debugging of pointer
-    pub debug_pointer: bool,
     /// Enable automatic background color detection for color mask
     pub auto_color_mask: bool,
     /// Enable automatic background color detection for subsurface color mask
@@ -119,8 +115,6 @@ impl Default for CompositorWidgetConfig {
             initial_height: 1080,
             title: None,
             dma_buf_enabled: true,
-            debug_touch: false,
-            debug_pointer: false,
             auto_color_mask: false,
             auto_subsurface_color_mask: false,
             color_mask_tolerance: 0.1,

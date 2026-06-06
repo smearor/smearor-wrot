@@ -14,6 +14,7 @@ use gtk4::prelude::EventControllerExt;
 use gtk4::prelude::GestureExt;
 use gtk4::prelude::GestureSingleExt;
 use gtk4::prelude::WidgetExt;
+use smearor_wrot_model::Position;
 use tracing::debug;
 
 impl CompositorWidgetImpl {
@@ -61,7 +62,7 @@ impl CompositorWidgetImpl {
             if widget.is_input_blocked() {
                 return;
             }
-            widget.handle_mouse_motion(x, y);
+            widget.handle_mouse_motion(Position::new(x, y));
         });
         obj.add_controller(motion_controller);
 

@@ -2,6 +2,7 @@ use crate::SmearorCompositor;
 use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::time::get_time;
 use crate::surface::SurfaceQuery;
+use smearor_wrot_model::Position;
 use smithay::input::touch::DownEvent;
 use smithay::input::touch::MotionEvent;
 use smithay::input::touch::UpEvent;
@@ -13,14 +14,14 @@ use std::sync::Mutex;
 use tracing::debug;
 
 pub trait TouchInputProcessing {
-    fn process_gtk_touch_down(&mut self, sequence: usize, x: f64, y: f64);
+    fn process_gtk_touch_down(&mut self, sequence: usize, position: Position<f64>);
     fn process_gtk_touch_up(&mut self, sequence: usize);
-    fn process_gtk_touch_motion(&mut self, sequence: usize, x: f64, y: f64);
+    fn process_gtk_touch_motion(&mut self, sequence: usize, position: Position<f64>);
 }
 
 impl TouchInputProcessing for SmearorCompositor {
-    fn process_gtk_touch_down(&mut self, sequence: usize, x: f64, y: f64) {
-        debug!("Processing GTK touch down: sequence={}, x={}, y={}", sequence, x, y);
+    fn process_gtk_touch_down(&mut self, sequence: usize, position: Position<f64>) {
+        debug!("Processing GTK touch down: sequence={sequence}, position={position}");
 
         let Some(output) = self.space.outputs().next() else {
             debug!("No output available for GTK touch down");
@@ -42,9 +43,9 @@ impl TouchInputProcessing for SmearorCompositor {
         };
 
         let touch_slot = self.touch_slot_manager.get_slot_for_sequence(sequence);
-        let location: Point<f64, Logical> = (x, y).into();
-        let pos = location + output_geo.loc.to_f64();
-        let focused_surface = self.surface_under(pos);
+        let location: Point<f64, Logical> = position.into();
+        let final_position = location + output_geo.loc.to_f64();
+        let focused_surface = self.surface_under(final_position);
 
         if !pointer.is_grabbed() {
             if let Some((surface, _loc)) = &focused_surface {
@@ -55,7 +56,7 @@ impl TouchInputProcessing for SmearorCompositor {
         }
         let down_event = DownEvent {
             slot: touch_slot,
-            location: pos,
+            location: final_position,
             serial: SERIAL_COUNTER.next_serial(),
             time: get_time(),
         };
@@ -87,8 +88,8 @@ impl TouchInputProcessing for SmearorCompositor {
         self.touch_slot_manager.remove_slot_for_sequence(sequence);
     }
 
-    fn process_gtk_touch_motion(&mut self, sequence: usize, x: f64, y: f64) {
-        debug!("Processing GTK touch motion: sequence={}, x={}, y={}", sequence, x, y);
+    fn process_gtk_touch_motion(&mut self, sequence: usize, position: Position<f64>) {
+        debug!("Processing GTK touch motion: sequence={sequence}, positionx={position}");
 
         let Some(output) = self.space.outputs().next() else {
             debug!("No output available for GTK touch motion");
@@ -106,16 +107,16 @@ impl TouchInputProcessing for SmearorCompositor {
         };
 
         let touch_slot = self.touch_slot_manager.get_slot_for_sequence(sequence);
-        let location: Point<f64, Logical> = (x, y).into();
-        let pos = location + output_geometry.loc.to_f64();
+        let location: Point<f64, Logical> = position.into();
+        let final_position = location + output_geometry.loc.to_f64();
 
         let motion_event = MotionEvent {
             slot: touch_slot,
-            location: pos,
+            location: final_position,
             time: get_time(),
         };
 
-        let focus = self.surface_under(pos);
+        let focus = self.surface_under(final_position);
 
         touch.motion(self, focus, &motion_event);
         touch.frame(self);
@@ -123,9 +124,9 @@ impl TouchInputProcessing for SmearorCompositor {
 }
 
 impl TouchInputProcessing for Arc<Mutex<SmearorCompositor>> {
-    fn process_gtk_touch_down(&mut self, sequence: usize, x: f64, y: f64) {
+    fn process_gtk_touch_down(&mut self, sequence: usize, position: Position<f64>) {
         if let Ok(mut guard) = self.lock() {
-            SmearorCompositor::process_gtk_touch_down(&mut *guard, sequence, x, y);
+            SmearorCompositor::process_gtk_touch_down(&mut *guard, sequence, position);
         }
     }
 
@@ -135,9 +136,9 @@ impl TouchInputProcessing for Arc<Mutex<SmearorCompositor>> {
         }
     }
 
-    fn process_gtk_touch_motion(&mut self, sequence: usize, x: f64, y: f64) {
+    fn process_gtk_touch_motion(&mut self, sequence: usize, position: Position<f64>) {
         if let Ok(mut guard) = self.lock() {
-            SmearorCompositor::process_gtk_touch_motion(&mut *guard, sequence, x, y);
+            SmearorCompositor::process_gtk_touch_motion(&mut *guard, sequence, position);
         }
     }
 }

@@ -2,6 +2,7 @@ use crate::SmearorCompositor;
 use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::mouse::convert::GtkToSmithayMouseEventConverter;
 use crate::surface::SurfaceQuery;
+use smearor_wrot_model::Position;
 use smithay::backend::input::Axis;
 use smithay::backend::input::AxisSource;
 use smithay::input::pointer::AxisFrame;
@@ -14,7 +15,7 @@ use tracing::trace;
 pub trait MouseInputProcessing {
     fn process_gtk_mouse_press(&mut self, button: u32);
     fn process_gtk_mouse_release(&mut self, button: u32);
-    fn process_gtk_mouse_motion(&mut self, x: f64, y: f64);
+    fn process_gtk_mouse_motion(&mut self, position: Position<f64>);
     fn process_gtk_mouse_wheel(&mut self, dx: f64, dy: f64);
 }
 
@@ -69,7 +70,7 @@ impl MouseInputProcessing for SmearorCompositor {
         pointer.frame(self);
     }
 
-    fn process_gtk_mouse_motion(&mut self, x: f64, y: f64) {
+    fn process_gtk_mouse_motion(&mut self, position: Position<f64>) {
         let Some(output) = self.space.outputs().next() else {
             error!("No output available for GTK mouse motion");
             return;
@@ -82,10 +83,10 @@ impl MouseInputProcessing for SmearorCompositor {
             error!("Pointer not available for GTK mouse motion");
             return;
         };
-        let mut motion_event = Self::convert_gtk_mouse_motion(x, y);
-        let position = motion_event.location + output_geometry.loc.to_f64();
+        let mut motion_event = Self::convert_gtk_mouse_motion(position);
+        let final_position = motion_event.location + output_geometry.loc.to_f64();
 
-        debug!("GTK mouse motion: x={}, y={}, final_position={:?}", x, y, position);
+        debug!("GTK mouse motion: {position}, final_position={:?}", final_position);
 
         // Check if a popup grab is active
         // Smithay's PopupManager manages grabs automatically
@@ -94,7 +95,7 @@ impl MouseInputProcessing for SmearorCompositor {
 
         debug!("Popup grab active: {}", popup_grab_active);
 
-        let under = self.surface_under(position);
+        let under = self.surface_under(final_position);
 
         // Dialog logic only when no popup grab is active
         if !popup_grab_active {
@@ -324,9 +325,9 @@ impl MouseInputProcessing for Arc<Mutex<SmearorCompositor>> {
         }
     }
 
-    fn process_gtk_mouse_motion(&mut self, x: f64, y: f64) {
+    fn process_gtk_mouse_motion(&mut self, position: Position<f64>) {
         if let Ok(mut guard) = self.lock() {
-            SmearorCompositor::process_gtk_mouse_motion(&mut *guard, x, y);
+            SmearorCompositor::process_gtk_mouse_motion(&mut *guard, position);
         }
     }
 

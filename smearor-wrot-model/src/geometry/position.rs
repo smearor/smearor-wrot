@@ -40,7 +40,7 @@ impl Position<i32> {
 
 impl From<Position<i32>> for Position<f32> {
     fn from(position: Position<i32>) -> Self {
-        Position::<f32> {
+        Position {
             x: position.x as f32,
             y: position.y as f32,
         }
@@ -49,7 +49,7 @@ impl From<Position<i32>> for Position<f32> {
 
 impl From<Position<i32>> for Position<u32> {
     fn from(position: Position<i32>) -> Self {
-        Position::<u32> {
+        Position {
             x: position.x as u32,
             y: position.y as u32,
         }
@@ -58,10 +58,26 @@ impl From<Position<i32>> for Position<u32> {
 
 impl From<Position<u32>> for Position<i32> {
     fn from(position: Position<u32>) -> Self {
-        Position::<i32> {
+        Position {
             x: position.x as i32,
             y: position.y as i32,
         }
+    }
+}
+
+impl From<Position<f64>> for Position<f32> {
+    fn from(position: Position<f64>) -> Self {
+        Position {
+            x: position.x as f32,
+            y: position.y as f32,
+        }
+    }
+}
+
+impl<T: Debug + Clone + Copy> From<(T, T)> for Position<T> {
+    fn from(position: (T, T)) -> Self {
+        let (x, y) = position;
+        Position { x, y }
     }
 }
 
@@ -159,6 +175,20 @@ impl<K> From<Position<i32>> for Point<i32, K> {
 #[cfg(feature = "smithay")]
 impl<K> From<&Position<i32>> for Point<i32, K> {
     fn from(position: &Position<i32>) -> Self {
+        Self::new(position.x, position.y)
+    }
+}
+
+#[cfg(feature = "smithay")]
+impl<K> From<Position<f64>> for Point<f64, K> {
+    fn from(position: Position<f64>) -> Self {
+        Self::new(position.x, position.y)
+    }
+}
+
+#[cfg(feature = "smithay")]
+impl<K> From<&Position<f64>> for Point<f64, K> {
+    fn from(position: &Position<f64>) -> Self {
         Self::new(position.x, position.y)
     }
 }

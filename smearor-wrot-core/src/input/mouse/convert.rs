@@ -1,5 +1,6 @@
 use crate::SmearorCompositor;
 use crate::input::time::get_time;
+use smearor_wrot_model::Position;
 use smithay::backend::input::ButtonState;
 use smithay::input::pointer::ButtonEvent;
 use smithay::input::pointer::MotionEvent;
@@ -8,7 +9,7 @@ use smithay::utils::SERIAL_COUNTER;
 /// GTK to Smithay mouse event conversion
 pub trait GtkToSmithayMouseEventConverter {
     /// Convert GTK mouse motion event data to Smithay motion event data
-    fn convert_gtk_mouse_motion(x: f64, y: f64) -> MotionEvent;
+    fn convert_gtk_mouse_motion(position: Position<f64>) -> MotionEvent;
 
     /// Convert GTK mouse press event data to Smithay button event data
     fn convert_gtk_mouse_press(gtk_button_code: u32) -> ButtonEvent;
@@ -21,9 +22,9 @@ pub trait GtkToSmithayMouseEventConverter {
 }
 
 impl GtkToSmithayMouseEventConverter for SmearorCompositor {
-    fn convert_gtk_mouse_motion(x: f64, y: f64) -> MotionEvent {
+    fn convert_gtk_mouse_motion(position: Position<f64>) -> MotionEvent {
         MotionEvent {
-            location: (x, y).into(),
+            location: position.into(),
             serial: SERIAL_COUNTER.next_serial(),
             time: get_time(),
         }
