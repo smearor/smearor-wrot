@@ -2884,12 +2884,21 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 name = "smearor-wrot-application"
 version = "0.1.0"
 dependencies = [
+ "directories",
+ "gtk4",
+ "gtk4-layer-shell",
  "regex",
  "serde",
+ "smearor-wrot-compositor",
+ "smearor-wrot-compositor-widget",
  "smearor-wrot-model",
+ "smearor-wrot-pie-menu",
+ "smearor-wrot-rotation",
  "thiserror 2.0.18",
+ "tokio",
  "tracing",
  "typed-builder",
+ "which",
 ]
 
 [[package]]

@@ -10,9 +10,18 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+directories = { workspace = true }
+gtk4 = { workspace = true }
+gtk4-layer-shell = { workspace = true }
 regex = { workspace = true }
-serde = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+smearor-wrot-compositor = { path = "../smearor-wrot-compositor" }
+smearor-wrot-compositor-widget = { path = "../smearor-wrot-compositor-widget" }
 smearor-wrot-model = { path = "../smearor-wrot-model" }
+smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
+smearor-wrot-rotation = { workspace = true }
 thiserror = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true }
 typed-builder = { workspace = true }
+which = { workspace = true }
