@@ -1,4 +1,5 @@
 use crate::extract_pixel_data_from_texture;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::gdk::Texture;
 use smearor_wrot_core::SmearorCompositor;
 use smearor_wrot_core::color_mask::mask::ColorMask;
@@ -12,7 +13,7 @@ pub trait DmaBufColorMask {
     fn detect_color_mask(&self, compositor: &SmearorCompositor, texture: &Texture);
 }
 
-impl DmaBufColorMask for crate::widget::imp::CompositorWidgetImpl {
+impl DmaBufColorMask for CompositorWidgetImpl {
     // color mask if enabled and not yet detected
     fn detect_color_mask(&self, compositor: &SmearorCompositor, texture: &Texture) {
         if !compositor.get_auto_color_mask() || compositor.is_color_mask_detected() {

@@ -1,6 +1,6 @@
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use crate::widget::window_state::WindowStateHandler;
 use crate::widget::window_state::error::ChangeWindowStateError;
 use smearor_wrot_core::windows::WindowState;

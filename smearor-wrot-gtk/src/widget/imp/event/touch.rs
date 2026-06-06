@@ -1,7 +1,8 @@
+use crate::CompositorWidget;
 use crate::event_handler::mouse::MouseInputEventHandler;
 use crate::event_handler::touch::TouchInputEventHandler;
 use crate::widget::event::handler::InputEventHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::Propagation;
 use glib::object::ObjectExt;
 use gtk4::gdk::ButtonEvent;
@@ -11,7 +12,7 @@ use gtk4::prelude::WidgetExt;
 use tracing::debug;
 
 pub trait TouchEventSetup {
-    fn setup_touch_events(&self, obj: &crate::widget::CompositorWidget);
+    fn setup_touch_events(&self, obj: &CompositorWidget);
 }
 
 impl CompositorWidgetImpl {
@@ -21,7 +22,7 @@ impl CompositorWidgetImpl {
 }
 
 impl TouchEventSetup for CompositorWidgetImpl {
-    fn setup_touch_events(&self, obj: &crate::widget::CompositorWidget) {
+    fn setup_touch_events(&self, obj: &CompositorWidget) {
         let touch_controller = gtk4::EventControllerLegacy::new();
         let widget_weak = obj.downgrade();
         touch_controller.connect_event(move |_controller, event| {

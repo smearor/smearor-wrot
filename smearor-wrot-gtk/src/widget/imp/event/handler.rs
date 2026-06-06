@@ -1,5 +1,5 @@
 use crate::widget::event::handler::InputEventHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use std::sync::atomic::Ordering;
 
 impl InputEventHandler for CompositorWidgetImpl {

@@ -1,4 +1,5 @@
 use crate::widget::config::handler::ConfigHandler;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use gtk4::prelude::WidgetExt;
@@ -11,7 +12,7 @@ pub trait CompositorWidgetResize {
     fn handle_resize_debounced(&self, requested_size: Size<i32>);
 }
 
-impl CompositorWidgetResize for crate::widget::imp::CompositorWidgetImpl {
+impl CompositorWidgetResize for CompositorWidgetImpl {
     fn handle_resize_debounced(&self, requested_size: Size<i32>) {
         // Clamp dimensions to prevent negative values
         let min_size = self.min_size();

@@ -1,6 +1,6 @@
 use crate::CompositorWidget;
 use crate::event_handler::keyboard::KeyboardInputEventHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::Propagation;
 use glib::object::ObjectExt;
 use gtk4::EventControllerKey;

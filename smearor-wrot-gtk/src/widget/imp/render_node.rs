@@ -5,6 +5,7 @@ use crate::widget::imp::dmabuf::render_node::DmaBufRenderNode;
 use crate::widget::imp::holding_area::BufferHoldingArea;
 use crate::widget::imp::shm::texture::create_memory_texture_bgra;
 use crate::widget::imp::shm::texture::create_memory_texture_from_pixel_data_bgra;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::gdk;
 use gtk4::glib::Bytes;
 use gtk4::prelude::Cast;
@@ -40,7 +41,7 @@ use smithay::wayland::shm::with_buffer_contents;
 use tracing::debug;
 use tracing::info;
 
-impl crate::widget::imp::CompositorWidgetImpl {
+impl CompositorWidgetImpl {
     /// Render a Smithay window's current buffer into an offscreen FBO using OpenGL renderer
     ///
     /// This function uses hardware-accelerated OpenGL rendering to render Wayland buffers

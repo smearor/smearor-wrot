@@ -1,4 +1,4 @@
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use crate::widget::size::handler::WidgetSizeHandler;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::WidgetExt;

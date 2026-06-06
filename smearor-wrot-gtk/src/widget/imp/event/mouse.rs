@@ -1,6 +1,7 @@
+use crate::CompositorWidget;
 use crate::event_handler::mouse::MouseInputEventHandler;
 use crate::widget::event::handler::InputEventHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::Propagation;
 use glib::object::ObjectExt;
 use gtk4::EventControllerMotion;
@@ -16,7 +17,7 @@ use gtk4::prelude::WidgetExt;
 use tracing::debug;
 
 impl CompositorWidgetImpl {
-    pub(crate) fn setup_mouse_events(&self, obj: &crate::widget::CompositorWidget) {
+    pub(crate) fn setup_mouse_events(&self, obj: &CompositorWidget) {
         let gesture_click = GestureClick::new();
         // Use all buttons (without only the primary mouse button would be propagated)
         gesture_click.set_button(0);

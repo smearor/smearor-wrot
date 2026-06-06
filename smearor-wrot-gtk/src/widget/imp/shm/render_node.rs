@@ -1,6 +1,6 @@
 use crate::opengl_renderer::OpenGLRenderer;
-use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::imp::shm::texture::create_memory_texture_bgra;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::prelude::Cast;
 use gtk4::gdk::Texture;
 use smearor_wrot_core::SmearorCompositor;

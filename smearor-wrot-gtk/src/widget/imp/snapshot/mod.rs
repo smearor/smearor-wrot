@@ -1,8 +1,8 @@
 use crate::color_mask::color_mask_applier::ColorMaskApplier;
 use crate::color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
-use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::imp::snapshot::background_color::SnapshotBackgroundColor;
 use crate::widget::imp::snapshot::error_renderer::ErrorRenderer;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::TextureExt;

@@ -3,7 +3,7 @@ use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::config::error::ConfigError;
 use crate::widget::config::handler::ConfigHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::Orientation;
 use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;
 use smearor_wrot_core::color_mask::toplevel::TopLevelColorMask;

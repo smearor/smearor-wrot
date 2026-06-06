@@ -1,4 +1,4 @@
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use dashmap::DashSet;
 use gtk4::gdk::Display;
 use smithay::backend::allocator::Fourcc;

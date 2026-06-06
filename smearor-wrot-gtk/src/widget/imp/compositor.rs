@@ -1,6 +1,6 @@
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_core::SmearorCompositor;
 use std::sync::Arc;
 use std::sync::Mutex;

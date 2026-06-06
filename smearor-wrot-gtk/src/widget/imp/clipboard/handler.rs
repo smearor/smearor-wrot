@@ -1,7 +1,7 @@
 use crate::clipboard::error::CompositorClipboardError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_core::clipboard::handler::ClipboardSelectionHandler;
 
 pub trait ClipboardHandler {

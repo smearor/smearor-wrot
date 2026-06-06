@@ -1,9 +1,10 @@
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::WidgetExt;
 use smearor_wrot_core::damage::surface::SurfaceDamage;
 use tracing::debug;
 
-impl crate::widget::imp::CompositorWidgetImpl {
+impl CompositorWidgetImpl {
     pub fn request_render(&self) {
         self.request_render_internal(false);
     }

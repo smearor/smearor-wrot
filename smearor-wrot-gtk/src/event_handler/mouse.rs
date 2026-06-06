@@ -1,7 +1,7 @@
 use crate::event_handler::error::MouseInputEventError;
-use crate::widget::CompositorWidget;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
+use crate::widget::widget::CompositorWidget;
 use smearor_wrot_core::input::mouse::processing::MouseInputProcessing;
 
 /// Trait for handling GTK mouse input events

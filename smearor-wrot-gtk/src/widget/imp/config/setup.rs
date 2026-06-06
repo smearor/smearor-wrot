@@ -1,6 +1,6 @@
 use crate::CompositorWidget;
 use crate::widget::config::handler::ConfigHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::prelude::WidgetExt;
 
 impl CompositorWidgetImpl {

@@ -1,10 +1,12 @@
+use crate::CompositorWidget;
 use crate::widget::config::handler::ConfigHandler;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::HeaderBar;
 use gtk4::Label;
 use gtk4::prelude::WidgetExt;
 
-impl crate::widget::imp::CompositorWidgetImpl {
-    pub(crate) fn setup_header_bar(&self, obj: &crate::widget::CompositorWidget) {
+impl CompositorWidgetImpl {
+    pub(crate) fn setup_header_bar(&self, obj: &CompositorWidget) {
         let config = self.config();
         if config.show_decorations {
             let header_bar = HeaderBar::builder().show_title_buttons(true).build();

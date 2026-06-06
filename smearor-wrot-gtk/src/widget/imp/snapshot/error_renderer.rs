@@ -1,5 +1,5 @@
-use crate::widget::imp::ApplicationError;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::ApplicationError;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::Snapshot;
 use gtk4::gdk::RGBA;

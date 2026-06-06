@@ -2,6 +2,7 @@ use crate::opengl_renderer::OpenGLRenderer;
 use crate::texture::extract_pixel_data_from_texture;
 use crate::widget::imp::shm::texture::create_memory_texture_bgra;
 use crate::widget::imp::shm::texture::create_memory_texture_from_pixel_data_bgra;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::prelude::Cast;
 use gtk4::gdk;
 use gtk4::gdk::DmabufTextureBuilder;
@@ -73,7 +74,7 @@ pub trait DmaBufRenderNode {
     fn apply_color_mask_shader_to_texture(&self, texture: &Texture, renderer: &mut OpenGLRenderer, mask_color: ColorMask, tolerance: f32) -> Option<Texture>;
 }
 
-impl DmaBufRenderNode for crate::widget::imp::CompositorWidgetImpl {
+impl DmaBufRenderNode for CompositorWidgetImpl {
     fn dma_buf_render_window_to_texture(&self, compositor: &SmearorCompositor, surface_id: &ObjectId, buffer: &WlBuffer) -> Option<Texture> {
         // Check if buffer is DMA-BUF (hardware-accelerated)
         let Ok(_dma_buf) = get_dmabuf(buffer) else {

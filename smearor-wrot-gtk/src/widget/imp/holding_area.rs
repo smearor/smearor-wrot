@@ -1,8 +1,8 @@
 use crate::extract_pixel_data_from_texture;
 use crate::widget::buffer::error::SaveBufferError;
-use crate::widget::imp::CompositorWidgetImpl;
 use crate::widget::imp::dmabuf::render_node::DmaBufRenderNode;
 use crate::widget::imp::shm::render_node::ShmRenderNode;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::gdk::Texture;
 use smearor_wrot_core::SmearorCompositor;
 use smearor_wrot_core::color_mask::mask::ColorMask;

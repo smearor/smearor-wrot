@@ -1,4 +1,4 @@
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::Snapshot;
 use gtk4::prelude::SnapshotExt;
 use smearor_wrot_core::SmearorCompositor;

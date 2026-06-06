@@ -1,5 +1,5 @@
-use crate::widget::CompositorWidget;
-use crate::widget::compositor::error::CompositorError;
+use crate::CompositorError;
+use crate::CompositorWidget;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use smearor_wrot_core::SmearorCompositor;
 use std::sync::Arc;

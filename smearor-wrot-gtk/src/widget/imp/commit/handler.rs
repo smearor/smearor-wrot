@@ -1,6 +1,6 @@
 use crate::widget::commit::CommitHandler;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_core::commit::count::CommitCount;
 
 impl CommitHandler for CompositorWidgetImpl {

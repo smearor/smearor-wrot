@@ -2,7 +2,7 @@ use crate::widget::color_mask::error::ColorMaskError;
 use crate::widget::color_mask::handler::ColorMaskHandler;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use glib::subclass::prelude::ObjectSubclassExt;
 use gtk4::prelude::WidgetExt;
 use smearor_wrot_core::color_mask::subsurface::SubSurfaceColorMask;

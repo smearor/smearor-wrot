@@ -1,6 +1,6 @@
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::dmabuf::handler::DmabufHandler;
-use crate::widget::imp::CompositorWidgetImpl;
+use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_core::dma::count::DmaBufRenderCount;
 
 impl DmabufHandler for CompositorWidgetImpl {
