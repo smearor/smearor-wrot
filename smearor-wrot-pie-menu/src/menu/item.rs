@@ -40,17 +40,12 @@ impl MenuItem {
 impl Hash for MenuItem {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id.hash(state);
-        // self.label.hash(state);
-        // self.icon_name.hash(state);
-        // // f32 zu Bits umwandeln, um es hashbar zu machen
-        // self.angle.to_bits().hash(state);
     }
 }
 
 impl PartialEq for MenuItem {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
-        // && self.label == other.label && self.icon_name == other.icon_name && self.angle.to_bits() == other.angle.to_bits()
     }
 }
 
