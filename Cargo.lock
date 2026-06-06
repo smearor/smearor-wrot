@@ -716,21 +716,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "drm"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a41816e58f47f49acfd956651055ddcf137c4882c2098c30c448817af21183a"
-dependencies = [
- "bitflags 2.11.1",
- "bytemuck",
- "bytemuck_derive",
- "drm-ffi",
- "drm-fourcc",
- "libc",
- "rustix 1.1.4",
-]
-
-[[package]]
 name = "drm-ffi"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -971,7 +956,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce852e998d3ca5e4a97014fb31c940dc5ef344ec7d364984525fd11e8a547e6a"
 dependencies = [
  "bitflags 2.11.1",
- "drm 0.14.1",
+ "drm",
  "drm-fourcc",
  "gbm-sys",
  "libc",
@@ -1638,15 +1623,6 @@ dependencies = [
  "futures-util",
  "once_cell",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "khronos-egl"
-version = "6.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6aae1df220ece3c0ada96b8153459b67eebe9ae9212258bb0134ae60416fdf76"
-dependencies = [
- "libc",
 ]
 
 [[package]]
@@ -2921,7 +2897,6 @@ name = "smearor-wrot-compositor"
 version = "0.1.0"
 dependencies = [
  "dashmap",
- "drm 0.15.0",
  "gbm",
  "image",
  "input-event-codes",
@@ -2930,10 +2905,8 @@ dependencies = [
  "smearor-wrot-model",
  "smithay",
  "thiserror 2.0.18",
- "tokio",
  "tracing",
  "tracing-subscriber",
- "xkbcommon",
  "xkeysym",
 ]
 
@@ -2942,14 +2915,10 @@ name = "smearor-wrot-compositor-widget"
 version = "0.1.0"
 dependencies = [
  "dashmap",
- "gl",
  "glib",
  "glib-unix",
  "glow",
  "gtk4",
- "image",
- "khronos-egl",
- "miette",
  "smearor-wrot-compositor",
  "smearor-wrot-model",
  "smithay",
@@ -2977,10 +2946,6 @@ dependencies = [
  "dashmap",
  "glib",
  "gtk4",
- "gtk4-layer-shell",
- "miette",
- "serde",
- "smearor-wrot-compositor",
  "smearor-wrot-model",
  "thiserror 2.0.18",
  "tracing",
@@ -3006,10 +2971,8 @@ version = "0.1.0"
 dependencies = [
  "libc",
  "miette",
- "tokio",
  "wayland-client",
  "wayland-protocols",
- "wayland-protocols-wlr",
 ]
 
 [[package]]
@@ -3020,7 +2983,6 @@ dependencies = [
  "directories",
  "gtk4",
  "gtk4-layer-shell",
- "miette",
  "serde",
  "smearor-wrot-application",
  "smearor-wrot-compositor",
@@ -3031,7 +2993,6 @@ dependencies = [
  "tokio",
  "toml",
  "tracing",
- "tracing-subscriber",
  "which",
 ]
 
@@ -3051,7 +3012,7 @@ dependencies = [
  "cgmath",
  "cursor-icon",
  "downcast-rs",
- "drm 0.14.1",
+ "drm",
  "drm-ffi",
  "drm-fourcc",
  "encoding_rs",

@@ -16,7 +16,5 @@ path = "src/main.rs"
 [dependencies]
 libc = "0.2"
 miette = { workspace = true }
-tokio = { workspace = true }
 wayland-client = { workspace = true }
 wayland-protocols = { workspace = true, features = ["client", "staging"] }
-wayland-protocols-wlr = { workspace = true, features = ["client"] }

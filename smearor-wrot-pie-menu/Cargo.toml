@@ -14,10 +14,6 @@ atomic_float = { workspace = true }
 dashmap = { workspace = true }
 glib = { workspace = true }
 gtk4 = { workspace = true }
-gtk4-layer-shell = { workspace = true }
-miette = { workspace = true }
-serde = { workspace = true }
-smearor-wrot-compositor = { path = "../smearor-wrot-compositor" }
 smearor-wrot-model = { path = "../smearor-wrot-model", features = ["gtk4"] }
 thiserror = { workspace = true }
 tracing = { workspace = true }
