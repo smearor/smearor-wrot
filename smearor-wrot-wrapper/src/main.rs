@@ -2,14 +2,12 @@
 
 pub mod cli;
 pub mod config;
-pub mod icon;
 pub mod keyboard_layout;
-pub mod screenshot;
-pub mod settings;
 pub mod socket;
 
 use crate::cli::args::Arguments;
-use crate::screenshot::ScreenshotManager;
+use smearor_wrot_application::ScreenshotManager;
+use smearor_wrot_application::show_settings_dialog;
 use clap::Parser;
 use gtk4::gdk::Display;
 use gtk4::gdk::Toplevel;
@@ -604,7 +602,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let command_line_arguments_for_settings = command_line_arguments_for_closure.clone();
         let rotation_widget_for_settings = rotation_widget.clone();
         settings_button.connect_clicked(move |_| {
-            settings::show_settings_dialog(
+            show_settings_dialog(
                 (&window_for_settings).as_ref(),
                 &compositor_widget_for_settings,
                 &rotation_widget_for_settings,
@@ -924,7 +922,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             }
                             PieMenuMessage::Settings => {
                                 info!("Received Settings message from pie menu");
-                                settings::show_settings_dialog(
+                                show_settings_dialog(
                                     window_clone.as_ref(),
                                     &compositor_widget_clone,
                                     &rotation_widget_clone,
