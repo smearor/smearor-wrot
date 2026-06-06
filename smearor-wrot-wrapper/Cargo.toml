@@ -25,7 +25,7 @@ smearor-wrot-application = { path = "../smearor-wrot-application" }
 smearor-wrot-gtk = { path = "../smearor-wrot-gtk" }
 smearor-wrot-model = { path = "../smearor-wrot-model" }
 smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
-smearor-wrot-rotation = { path = "../smearor-wrot-rotation" }
+smearor-wrot-rotation = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }
 tracing = { workspace = true }
