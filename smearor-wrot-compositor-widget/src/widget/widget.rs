@@ -1,6 +1,7 @@
 //! GTK4 compositor widget
 
 use crate::clipboard::error::CompositorClipboardError;
+use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::imp::clipboard::handler::ClipboardHandler;
 use crate::widget::imp::widget::ApplicationError;
 use crate::widget::imp::widget::CompositorWidgetImpl;
@@ -32,6 +33,7 @@ impl CompositorWidget {
         let obj = Self::new();
         if let Some(socket) = socket {
             obj.initialize_socket(socket);
+            obj.initialize_compositor();
         }
         obj
     }

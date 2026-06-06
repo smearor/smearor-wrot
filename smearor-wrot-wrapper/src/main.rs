@@ -95,29 +95,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let smearor_wrot_application = SmearorWrotApplication::builder().socket_manager(socket_manager).build();
     let smearor_wrot_application = Arc::new(smearor_wrot_application);
 
-    // // Determine the socket name
-    // let socket_name = if let Some(ref socket) = command_line_arguments.socket {
-    //     // User specified a socket explicitly
-    //     check_socket_exists(socket)?;
-    //     socket.clone()
-    // } else {
-    //     // Generate a unique socket name automatically
-    //     generate_unique_socket_name("smearor-wrot")?
-    // };
-    //
-    // // Build the full socket path from the relative name in XDG_RUNTIME_DIR
-    // let socket_path = build_socket_path(&socket_name)?;
-    // let socket_path_str = socket_path.to_string_lossy().to_string();
-
-    // // Update command_line_arguments with the full socket path for compositor initialization
-    // let mut args = (*command_line_arguments).clone();
-    // args.socket = Some(socket_path_str.clone());
-    // command_line_arguments = Arc::new(args);
-
-    // Store the full socket path for WAYLAND_DISPLAY environment variable
-    // This is necessary for confined environments like Snap which have different XDG_RUNTIME_DIR
-    // let socket_name_for_env = socket_path_str.clone();
-
     // Load configuration file if provided
     if let Some(config_path) = &command_line_arguments.config {
         match config::load_config(config_path) {
@@ -687,11 +664,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let socket = smearor_wrot_application.socket_manager().socket();
         debug!("Set socket path to: {socket}");
         compositor_widget.initialize_socket(socket);
-        // if let Some(ref socket) = command_line_arguments_for_closure.socket {
-        // } else {
-        //     error!("Socket path not set");
-        //     return;
-        // }
+        compositor_widget.initialize_compositor();
 
         // Apply config to compositor after it has been initialized
         let _ = compositor_widget.apply_config_to_compositor();
