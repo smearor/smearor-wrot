@@ -87,9 +87,7 @@ pub struct CompositorApplication {
 impl CompositorApplication {
     pub fn run(self) -> Result<(), Box<dyn Error>> {
         let app_config = self.config.clone();
-        let application_id = app_config.id.clone().unwrap_or_else(|| {
-            format!("io.smearor.wrot.p{}", std::process::id())
-        });
+        let application_id = app_config.id.clone().unwrap_or_else(|| format!("io.smearor.wrot.p{}", std::process::id()));
 
         debug!("Starting smearor-wrot GTK4 application with application id {application_id}");
 
@@ -139,14 +137,7 @@ impl CompositorApplication {
 
             // 7. Connect window actions & buttons (build HeaderBar)
             let sync_manager = Arc::new(Mutex::new(None));
-            let header_bar = application_ref.setup_header_bar(
-                app,
-                &window,
-                &compositor_widget,
-                &rotation_widget,
-                &sync_manager,
-                &settings_handler,
-            );
+            let header_bar = application_ref.setup_header_bar(app, &window, &compositor_widget, &rotation_widget, &sync_manager, &settings_handler);
             window.set_titlebar(Some(&header_bar));
 
             // 8. Setup screenshot manager
@@ -161,11 +152,7 @@ impl CompositorApplication {
             window.set_child(Some(&pie_menu_widget));
 
             // 11. Configure and initialize the compositor core
-            application_ref.initialize_compositor_core(
-                &compositor_widget,
-                compositor_message_sender,
-                &sync_manager,
-            );
+            application_ref.initialize_compositor_core(&compositor_widget, compositor_message_sender, &sync_manager);
 
             // 12. Connect event controllers (Keyboard, etc.)
             application_ref.setup_event_forwarding(&window, &compositor_widget);
@@ -258,11 +245,7 @@ impl CompositorApplication {
         let provider = CssProvider::new();
         provider.load_from_data("window { background-color: transparent; } ");
         if let Some(display) = Display::default() {
-            gtk4::style_context_add_provider_for_display(
-                &display,
-                &provider,
-                gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION,
-            );
+            gtk4::style_context_add_provider_for_display(&display, &provider, gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION);
 
             if let Some(keyboard_layout) = KeyboardLayout::detect() {
                 info!("Detected keyboard layout: {}", keyboard_layout.full_name());
@@ -406,32 +389,18 @@ impl CompositorApplication {
             .css_classes(["large-button"])
             .build();
 
-        let rotate_box = GtkBox::builder()
-            .orientation(Orientation::Horizontal)
-            .spacing(4)
-            .build();
+        let rotate_box = GtkBox::builder().orientation(Orientation::Horizontal).spacing(4).build();
         rotate_box.append(&rotate_counter_clockwise_button);
         rotate_box.append(&rotate_clockwise_button);
         rotate_box.append(&reset_rotation_button);
 
-        let separator = Separator::builder()
-            .orientation(Orientation::Horizontal)
-            .margin_start(8)
-            .margin_end(8)
-            .build();
+        let separator = Separator::builder().orientation(Orientation::Horizontal).margin_start(8).margin_end(8).build();
 
-        let clipboard_box = GtkBox::builder()
-            .orientation(Orientation::Horizontal)
-            .spacing(4)
-            .build();
+        let clipboard_box = GtkBox::builder().orientation(Orientation::Horizontal).spacing(4).build();
         clipboard_box.append(&paste_button);
         clipboard_box.append(&copy_button);
 
-        let settings_separator = Separator::builder()
-            .orientation(Orientation::Horizontal)
-            .margin_start(8)
-            .margin_end(8)
-            .build();
+        let settings_separator = Separator::builder().orientation(Orientation::Horizontal).margin_start(8).margin_end(8).build();
 
         let settings_button = Button::builder()
             .icon_name("preferences-system-symbolic")
@@ -585,11 +554,7 @@ impl CompositorApplication {
         header_bar
     }
 
-    fn setup_pie_menu_overlay(
-        &self,
-        rotation_widget: &Widget,
-        pie_menu_sender: mpsc::Sender<PieMenuMessage>,
-    ) -> PieMenuOverlayWidget {
+    fn setup_pie_menu_overlay(&self, rotation_widget: &Widget, pie_menu_sender: mpsc::Sender<PieMenuMessage>) -> PieMenuOverlayWidget {
         let pie_menu_widget = PieMenuOverlayWidget::new(Some(rotation_widget));
         pie_menu_widget.set_message_sender(pie_menu_sender);
         pie_menu_widget.set_rotation(self.config.rotation);
@@ -632,12 +597,7 @@ impl CompositorApplication {
                 let (margin_left, margin_right, margin_top, margin_bottom) = if let Some(margin) = self.config.margin {
                     (margin, margin, margin, margin)
                 } else {
-                    (
-                        self.config.margin_left,
-                        self.config.margin_right,
-                        self.config.margin_top,
-                        self.config.margin_bottom,
-                    )
+                    (self.config.margin_left, self.config.margin_right, self.config.margin_top, self.config.margin_bottom)
                 };
 
                 guard.set_margins(
@@ -989,13 +949,7 @@ impl CompositorApplication {
                         std::env::set_var("GSK_RENDERER", "gl");
                     }
                 }
-                if let Err(e) = launch_application(
-                    &socket_clone,
-                    &command_arguments_clone,
-                    shell_clone,
-                    wayland_debug_clone,
-                    gsk_renderer_gl_clone,
-                ) {
+                if let Err(e) = launch_application(&socket_clone, &command_arguments_clone, shell_clone, wayland_debug_clone, gsk_renderer_gl_clone) {
                     error!("Failed to launch child application: {}", e);
                 }
             });
@@ -1003,13 +957,7 @@ impl CompositorApplication {
     }
 }
 
-fn launch_application(
-    socket: &Socket,
-    command_arguments: &[OsString],
-    shell: bool,
-    wayland_debug: bool,
-    gsk_renderer_gl: bool,
-) -> Result<(), Box<dyn Error>> {
+fn launch_application(socket: &Socket, command_arguments: &[OsString], shell: bool, wayland_debug: bool, gsk_renderer_gl: bool) -> Result<(), Box<dyn Error>> {
     debug!("Launching application with arguments: {:?}", command_arguments);
     debug!("Setting WAYLAND_DISPLAY to: {}", socket);
 

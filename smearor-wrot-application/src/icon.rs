@@ -6,7 +6,7 @@ use tracing::error;
 const ICON_DATA: &[u8] = include_bytes!("../assets/icon.svg");
 
 pub fn set_program_icon(window: &gtk4::ApplicationWindow) {
-    let bytes = Bytes::from_static(ICON_DATA);
+    let _bytes = Bytes::from_static(ICON_DATA);
     let Some(display) = gdk::Display::default() else {
         error!("Failed to get default display");
         return;
