@@ -1,6 +1,8 @@
-use crate::geometry::size::Size;
+#[cfg(feature = "gtk4")]
+use crate::Size;
 #[cfg(feature = "gtk4")]
 use gtk4::graphene::Rect;
+#[cfg(feature = "smithay")]
 use smithay::utils::Point;
 use std::fmt::Debug;
 use std::fmt::Display;
@@ -204,5 +206,157 @@ impl<K> From<Point<i32, K>> for Position<i32> {
 impl<K> From<&Point<i32, K>> for Position<i32> {
     fn from(position: &Point<i32, K>) -> Self {
         Self::new(position.x, position.y)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_position_new() {
+        let pos = Position::new(10, 20);
+        assert_eq!(pos.x, 10);
+        assert_eq!(pos.y, 20);
+    }
+
+    #[test]
+    fn test_position_f32_new_from_u32() {
+        let pos = Position::<f32>::new_from_u32(100, 200);
+        assert_eq!(pos.x, 100.0);
+        assert_eq!(pos.y, 200.0);
+    }
+
+    #[test]
+    fn test_position_f32_new_from_i32() {
+        let pos = Position::<f32>::new_from_i32(-50, 100);
+        assert_eq!(pos.x, -50.0);
+        assert_eq!(pos.y, 100.0);
+    }
+
+    #[test]
+    fn test_position_i32_max() {
+        let pos1 = Position::new(10, 20);
+        let pos2 = Position::new(5, 30);
+        let result = pos1.max(&pos2);
+        assert_eq!(result.x, 10);
+        assert_eq!(result.y, 30);
+    }
+
+    #[test]
+    fn test_position_from_i32_to_f32() {
+        let pos_i32 = Position::new(10, 20);
+        let pos_f32: Position<f32> = pos_i32.into();
+        assert_eq!(pos_f32.x, 10.0);
+        assert_eq!(pos_f32.y, 20.0);
+    }
+
+    #[test]
+    fn test_position_from_i32_to_u32() {
+        let pos_i32 = Position::new(10, 20);
+        let pos_u32: Position<u32> = pos_i32.into();
+        assert_eq!(pos_u32.x, 10);
+        assert_eq!(pos_u32.y, 20);
+    }
+
+    #[test]
+    fn test_position_from_u32_to_i32() {
+        let pos_u32 = Position::new(10, 20);
+        let pos_i32: Position<i32> = pos_u32.into();
+        assert_eq!(pos_i32.x, 10);
+        assert_eq!(pos_i32.y, 20);
+    }
+
+    #[test]
+    fn test_position_from_f64_to_f32() {
+        let pos_f64 = Position::new(10.5, 20.7);
+        let pos_f32: Position<f32> = pos_f64.into();
+        assert!((pos_f32.x - 10.5).abs() < 0.01);
+        assert!((pos_f32.y - 20.7).abs() < 0.01);
+    }
+
+    #[test]
+    fn test_position_from_tuple() {
+        let pos: Position<i32> = (10, 20).into();
+        assert_eq!(pos.x, 10);
+        assert_eq!(pos.y, 20);
+    }
+
+    #[test]
+    fn test_position_default() {
+        let pos: Position<i32> = Position::default();
+        assert_eq!(pos.x, 0);
+        assert_eq!(pos.y, 0);
+    }
+
+    #[test]
+    fn test_position_display() {
+        let pos = Position::new(10, 20);
+        assert_eq!(format!("{}", pos), "(10,20)");
+    }
+
+    #[test]
+    fn test_position_add() {
+        let pos1 = Position::new(10, 20);
+        let pos2 = Position::new(5, 15);
+        let result = pos1 + pos2;
+        assert_eq!(result.x, 15);
+        assert_eq!(result.y, 35);
+    }
+
+    #[test]
+    fn test_position_add_assign() {
+        let mut pos = Position::new(10, 20);
+        pos += Position::new(5, 15);
+        assert_eq!(pos.x, 15);
+        assert_eq!(pos.y, 35);
+    }
+
+    #[test]
+    fn test_position_sub() {
+        let pos1 = Position::new(10, 20);
+        let pos2 = Position::new(5, 15);
+        let result = pos1 - pos2;
+        assert_eq!(result.x, 5);
+        assert_eq!(result.y, 5);
+    }
+
+    #[test]
+    fn test_position_sub_assign() {
+        let mut pos = Position::new(10, 20);
+        pos -= Position::new(5, 15);
+        assert_eq!(pos.x, 5);
+        assert_eq!(pos.y, 5);
+    }
+
+    #[test]
+    fn test_position_eq() {
+        let pos1 = Position::new(10, 20);
+        let pos2 = Position::new(10, 20);
+        let pos3 = Position::new(5, 15);
+        assert_eq!(pos1, pos2);
+        assert_ne!(pos1, pos3);
+    }
+
+    #[test]
+    fn test_position_clone() {
+        let pos1 = Position::new(10, 20);
+        let pos2 = pos1;
+        assert_eq!(pos1, pos2);
+    }
+
+    #[test]
+    fn test_position_copy() {
+        let pos1 = Position::new(10, 20);
+        let pos2 = pos1;
+        assert_eq!(pos1.x, 10);
+        assert_eq!(pos2.x, 10);
+    }
+
+    #[test]
+    fn test_position_debug() {
+        let pos = Position::new(10, 20);
+        let debug_str = format!("{:?}", pos);
+        assert!(debug_str.contains("Position"));
     }
 }

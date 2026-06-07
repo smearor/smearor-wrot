@@ -163,3 +163,140 @@ impl<K> From<&Size<i32>> for smithay::utils::Size<i32, K> {
         Self::new(size.width, size.height)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_size_new() {
+        let size = Size::new(100, 200);
+        assert_eq!(size.width, 100);
+        assert_eq!(size.height, 200);
+    }
+
+    #[test]
+    fn test_size_f32_new_from_u32() {
+        let size = Size::<f32>::new_from_u32(100, 200);
+        assert_eq!(size.width, 100.0);
+        assert_eq!(size.height, 200.0);
+    }
+
+    #[test]
+    fn test_size_f32_new_from_i32() {
+        let size = Size::<f32>::new_from_i32(-50, 100);
+        assert_eq!(size.width, -50.0);
+        assert_eq!(size.height, 100.0);
+    }
+
+    #[test]
+    fn test_size_i32_max() {
+        let size1 = Size::new(100, 200);
+        let size2 = Size::new(50, 300);
+        let result = size1.max(&size2);
+        assert_eq!(result.width, 100);
+        assert_eq!(result.height, 300);
+    }
+
+    #[test]
+    fn test_size_from_i32_to_f32() {
+        let size_i32 = Size::new(100, 200);
+        let size_f32: Size<f32> = size_i32.into();
+        assert_eq!(size_f32.width, 100.0);
+        assert_eq!(size_f32.height, 200.0);
+    }
+
+    #[test]
+    fn test_size_from_i32_to_u32() {
+        let size_i32 = Size::new(100, 200);
+        let size_u32: Size<u32> = size_i32.into();
+        assert_eq!(size_u32.width, 100);
+        assert_eq!(size_u32.height, 200);
+    }
+
+    #[test]
+    fn test_size_from_u32_to_i32() {
+        let size_u32 = Size::new(100, 200);
+        let size_i32: Size<i32> = size_u32.into();
+        assert_eq!(size_i32.width, 100);
+        assert_eq!(size_i32.height, 200);
+    }
+
+    #[test]
+    fn test_size_default() {
+        let size: Size<i32> = Size::default();
+        assert_eq!(size.width, 0);
+        assert_eq!(size.height, 0);
+    }
+
+    #[test]
+    fn test_size_display() {
+        let size = Size::new(100, 200);
+        assert_eq!(format!("{}", size), "100x200");
+    }
+
+    #[test]
+    fn test_size_add() {
+        let size1 = Size::new(100, 200);
+        let size2 = Size::new(50, 150);
+        let result = size1 + size2;
+        assert_eq!(result.width, 150);
+        assert_eq!(result.height, 350);
+    }
+
+    #[test]
+    fn test_size_add_assign() {
+        let mut size = Size::new(100, 200);
+        size += Size::new(50, 150);
+        assert_eq!(size.width, 150);
+        assert_eq!(size.height, 350);
+    }
+
+    #[test]
+    fn test_size_sub() {
+        let size1 = Size::new(100, 200);
+        let size2 = Size::new(50, 150);
+        let result = size1 - size2;
+        assert_eq!(result.width, 50);
+        assert_eq!(result.height, 50);
+    }
+
+    #[test]
+    fn test_size_sub_assign() {
+        let mut size = Size::new(100, 200);
+        size -= Size::new(50, 150);
+        assert_eq!(size.width, 50);
+        assert_eq!(size.height, 50);
+    }
+
+    #[test]
+    fn test_size_eq() {
+        let size1 = Size::new(100, 200);
+        let size2 = Size::new(100, 200);
+        let size3 = Size::new(50, 150);
+        assert_eq!(size1, size2);
+        assert_ne!(size1, size3);
+    }
+
+    #[test]
+    fn test_size_clone() {
+        let size1 = Size::new(100, 200);
+        let size2 = size1;
+        assert_eq!(size1, size2);
+    }
+
+    #[test]
+    fn test_size_copy() {
+        let size1 = Size::new(100, 200);
+        let size2 = size1;
+        assert_eq!(size1.width, 100);
+        assert_eq!(size2.width, 100);
+    }
+
+    #[test]
+    fn test_size_debug() {
+        let size = Size::new(100, 200);
+        let debug_str = format!("{:?}", size);
+        assert!(debug_str.contains("Size"));
+    }
+}
