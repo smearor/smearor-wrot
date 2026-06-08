@@ -1,6 +1,6 @@
 use crate::SmearorCompositor;
-use crate::color_mask::error::ColorMaskError;
-use crate::color_mask::mask::ColorMask;
+use smearor_wrot_color_mask::ColorMask;
+use smearor_wrot_color_mask::ColorMaskError;
 use std::sync::atomic::Ordering;
 use tracing::debug;
 

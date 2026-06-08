@@ -2884,21 +2884,62 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 name = "smearor-wrot-application"
 version = "0.1.0"
 dependencies = [
+ "atomic_float",
+ "dashmap",
  "directories",
  "gtk4",
  "gtk4-layer-shell",
  "regex",
  "serde",
+ "smearor-wrot-child-process",
+ "smearor-wrot-color-mask",
  "smearor-wrot-compositor",
  "smearor-wrot-compositor-widget",
- "smearor-wrot-model",
+ "smearor-wrot-debug-overlay",
+ "smearor-wrot-geometry",
+ "smearor-wrot-keyboard",
+ "smearor-wrot-layer",
  "smearor-wrot-pie-menu",
  "smearor-wrot-rotation",
+ "smearor-wrot-settings",
+ "smearor-wrot-window",
  "thiserror 2.0.18",
  "tokio",
  "tracing",
  "typed-builder",
  "which",
+]
+
+[[package]]
+name = "smearor-wrot-child-process"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "smithay",
+ "thiserror 2.0.18",
+ "tracing",
+ "typed-builder",
+ "which",
+]
+
+[[package]]
+name = "smearor-wrot-color"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "gtk4",
+ "thiserror 2.0.18",
+ "typed-builder",
+]
+
+[[package]]
+name = "smearor-wrot-color-mask"
+version = "0.1.0"
+dependencies = [
+ "atomic_float",
+ "smearor-wrot-color",
+ "thiserror 2.0.18",
+ "typed-builder",
 ]
 
 [[package]]
@@ -2911,7 +2952,10 @@ dependencies = [
  "input-event-codes",
  "miette",
  "nix",
- "smearor-wrot-model",
+ "smearor-wrot-child-process",
+ "smearor-wrot-color",
+ "smearor-wrot-color-mask",
+ "smearor-wrot-geometry",
  "smithay",
  "thiserror 2.0.18",
  "tracing",
@@ -2928,8 +2972,12 @@ dependencies = [
  "glib-unix",
  "glow",
  "gtk4",
+ "smearor-wrot-child-process",
+ "smearor-wrot-color",
+ "smearor-wrot-color-mask",
  "smearor-wrot-compositor",
- "smearor-wrot-model",
+ "smearor-wrot-debug-overlay",
+ "smearor-wrot-geometry",
  "smithay",
  "thiserror 2.0.18",
  "tokio",
@@ -2937,12 +2985,41 @@ dependencies = [
 ]
 
 [[package]]
-name = "smearor-wrot-model"
+name = "smearor-wrot-debug-overlay"
 version = "0.1.0"
 dependencies = [
  "dashmap",
  "gtk4",
+ "smearor-wrot-color",
+ "smearor-wrot-geometry",
+ "thiserror 2.0.18",
+ "typed-builder",
+]
+
+[[package]]
+name = "smearor-wrot-geometry"
+version = "0.1.0"
+dependencies = [
+ "gtk4",
  "smithay",
+ "typed-builder",
+]
+
+[[package]]
+name = "smearor-wrot-keyboard"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "thiserror 2.0.18",
+ "typed-builder",
+]
+
+[[package]]
+name = "smearor-wrot-layer"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "smearor-wrot-rotation",
  "thiserror 2.0.18",
  "typed-builder",
 ]
@@ -2955,7 +3032,7 @@ dependencies = [
  "dashmap",
  "glib",
  "gtk4",
- "smearor-wrot-model",
+ "smearor-wrot-color",
  "thiserror 2.0.18",
  "tracing",
  "typed-builder",
@@ -2975,6 +3052,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "smearor-wrot-settings"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "gtk4",
+ "smearor-wrot-compositor-widget",
+ "smearor-wrot-debug-overlay",
+ "smearor-wrot-rotation",
+ "smearor-wrot-window",
+ "thiserror 2.0.18",
+ "tracing",
+ "typed-builder",
+]
+
+[[package]]
 name = "smearor-wrot-test-client"
 version = "0.1.0"
 dependencies = [
@@ -2985,10 +3077,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "smearor-wrot-window"
+version = "0.1.0"
+dependencies = [
+ "atomic_float",
+ "gtk4",
+ "smearor-wrot-geometry",
+ "smearor-wrot-layer",
+ "typed-builder",
+]
+
+[[package]]
 name = "smearor-wrot-wrapper"
 version = "0.1.0"
 dependencies = [
+ "atomic_float",
  "clap",
+ "miette",
  "serde",
  "smearor-wrot-application",
  "thiserror 2.0.18",

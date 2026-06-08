@@ -15,8 +15,12 @@ glib = { workspace = true }
 gtk4 = { workspace = true }
 glib-unix = { workspace = true }
 glow = { workspace = true }
+smearor-wrot-color = { path = "../smearor-wrot-color" }
+smearor-wrot-color-mask = { path = "../smearor-wrot-color-mask" }
 smearor-wrot-compositor = { path = "../smearor-wrot-compositor" }
-smearor-wrot-model = { path = "../smearor-wrot-model", features = ["gtk4", "smithay"] }
+smearor-wrot-child-process = { path = "../smearor-wrot-child-process" }
+smearor-wrot-debug-overlay = { path = "../smearor-wrot-debug-overlay" }
+smearor-wrot-geometry = { path = "../smearor-wrot-geometry" }
 smithay = { workspace = true, features = ["backend_winit", "backend_egl", "desktop", "wayland_frontend", "renderer_gl", "renderer_glow", "use_system_lib"] }
 thiserror = { workspace = true }
 tokio = { workspace = true }

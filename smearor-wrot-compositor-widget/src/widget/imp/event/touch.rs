@@ -9,7 +9,7 @@ use gtk4::gdk::ButtonEvent;
 use gtk4::gdk::EventType;
 use gtk4::gdk::TouchEvent;
 use gtk4::prelude::WidgetExt;
-use smearor_wrot_model::Position;
+use smearor_wrot_geometry::Position;
 use tracing::debug;
 
 pub trait TouchEventSetup {

@@ -1,4 +1,3 @@
-use smearor_wrot_compositor::CoreError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

@@ -51,9 +51,9 @@ pub fn init_winit(event_loop: &mut EventLoop<CalloopData>, data: &mut CalloopDat
 
     let mut damage_tracker = OutputDamageTracker::from_output(&output);
 
-    unsafe {
-        std::env::set_var("WAYLAND_DISPLAY", &state.lock().unwrap().socket_name);
-    }
+    // unsafe {
+    //     std::env::set_var("WAYLAND_DISPLAY", &state.lock().unwrap().socket_name);
+    // }
 
     event_loop
         .handle()

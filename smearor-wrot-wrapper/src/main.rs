@@ -3,26 +3,32 @@
 pub mod cli;
 pub mod config_file;
 
-use crate::cli::args::SmearorWindowRotationArguments;
+use crate::cli::args::ApplicationArguments;
 use clap::Parser;
-use smearor_wrot_application::CompositorApplication;
+use miette::IntoDiagnostic;
+use smearor_wrot_application::Application;
+use smearor_wrot_application::ApplicationConfig;
 use smearor_wrot_application::init_logging;
 use std::error::Error;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
-    // Note: GSK_RENDERER is not set here to allow users to set it via environment variable
-    // If GSK_RENDERER is set in the parent process, it will be inherited by child processes
-
+async fn main() -> Result<(), miette::Error> {
     init_logging();
 
     // Parse command line arguments
-    let args = SmearorWindowRotationArguments::parse();
+    let args = ApplicationArguments::parse();
 
     // Load configuration file if provided
     let args = args.load_and_merge_config()?;
 
-    let application = CompositorApplication::builder().config(args.into()).build();
+    // Convert arguments to configuration
+    let config: ApplicationConfig = args.into();
+
+    // Instantiate application with configuration
+    let application = Application::new(config).into_diagnostic()?;
+
+    // Run application
     application.run()?;
+
     Ok(())
 }

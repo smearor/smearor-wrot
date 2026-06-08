@@ -1,4 +1,4 @@
-use smearor_wrot_model::geometry::position::Position;
+use smearor_wrot_geometry::Position;
 use smithay::reexports::wayland_server::protocol::wl_surface::WlSurface;
 
 pub struct SubsurfaceData {

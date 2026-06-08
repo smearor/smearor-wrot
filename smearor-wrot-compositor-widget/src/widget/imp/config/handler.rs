@@ -9,7 +9,7 @@ use smearor_wrot_compositor::color_mask::subsurface::SubSurfaceColorMask;
 use smearor_wrot_compositor::color_mask::toplevel::TopLevelColorMask;
 use smearor_wrot_compositor::frame::limit::FrameLimiter;
 use smearor_wrot_compositor::windows::decoration::ClientDecorationAware;
-use smearor_wrot_model::geometry::size::Size;
+use smearor_wrot_geometry::Size;
 
 impl ConfigHandler for CompositorWidgetImpl {
     fn set_config(&self, config: CompositorWidgetConfig) {

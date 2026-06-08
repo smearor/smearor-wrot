@@ -1,10 +1,10 @@
 use crate::event_handler::error::MouseInputEventError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::debug_overlay::handler::DebugOverlayHandler;
 use crate::widget::widget::CompositorWidget;
 use smearor_wrot_compositor::input::mouse::processing::MouseInputProcessing;
-use smearor_wrot_model::Position;
+use smearor_wrot_debug_overlay::DebugOverlayHandler;
+use smearor_wrot_geometry::Position;
 
 /// Trait for handling GTK mouse input events
 pub trait MouseInputEventHandler {

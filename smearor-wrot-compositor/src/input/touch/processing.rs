@@ -2,7 +2,7 @@ use crate::SmearorCompositor;
 use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::time::get_time;
 use crate::surface::SurfaceQuery;
-use smearor_wrot_model::Position;
+use smearor_wrot_geometry::Position;
 use smithay::input::touch::DownEvent;
 use smithay::input::touch::MotionEvent;
 use smithay::input::touch::UpEvent;

@@ -3,7 +3,7 @@ use gtk4::Snapshot;
 use gtk4::prelude::SnapshotExt;
 use smearor_wrot_compositor::SmearorCompositor;
 use smearor_wrot_compositor::background::toplevel::ToplevelBackground;
-use smearor_wrot_model::geometry::size::Size;
+use smearor_wrot_geometry::Size;
 use std::sync::MutexGuard;
 use tracing::debug;
 

@@ -118,12 +118,12 @@ impl ChildProcessConfig {
             }
         };
 
-        /// Sets the environment variables
+        // Sets the environment variables
         for (env_var, value) in &self.env_variables {
             command.env(env_var, value);
         }
 
-        /// Sets the stdin, stdout and stderr
+        // Sets the stdin, stdout and stderr
         command.stdin(Stdio::from(&self.stdin));
         command.stdout(Stdio::from(&self.stdout));
         command.stderr(Stdio::from(&self.stderr));

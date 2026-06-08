@@ -25,7 +25,7 @@ pub mod state;
 pub mod subsurface;
 pub mod surface;
 pub mod texture;
-pub mod wayland;
+// pub mod wayland;
 pub mod windows;
 pub mod winit;
 

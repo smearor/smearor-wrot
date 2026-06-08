@@ -2,9 +2,9 @@ use crate::CompositorWidget;
 use crate::event_handler::error::TouchInputEventError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::debug_overlay::handler::DebugOverlayHandler;
 use smearor_wrot_compositor::input::touch::processing::TouchInputProcessing;
-use smearor_wrot_model::Position;
+use smearor_wrot_debug_overlay::DebugOverlayHandler;
+use smearor_wrot_geometry::Position;
 use tracing::debug;
 
 /// Trait for handling GTK touch input events

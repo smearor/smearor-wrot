@@ -1,6 +1,6 @@
 use crate::SmearorCompositor;
 use crate::background::error::BackgroundColorError;
-use smearor_wrot_model::color::rgba::RgbaColor;
+use smearor_wrot_color::RgbaColor;
 use tracing::debug;
 
 pub trait SubsurfaceBackground {

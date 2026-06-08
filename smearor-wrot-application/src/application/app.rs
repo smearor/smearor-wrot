@@ -1,9 +1,7 @@
+use crate::ApplicationConfig;
 use crate::KeyboardLayout;
 use crate::ScreenshotManager;
-use crate::SettingsHandler;
-use crate::SocketBuilder;
-use crate::SocketManager;
-use crate::application::config::CompositorApplicationConfig;
+use crate::application::env_initializer::EnvInitializer;
 use crate::set_program_icon;
 use gtk4::ApplicationWindow;
 use gtk4::Box as GtkBox;
@@ -22,10 +20,14 @@ use gtk4::glib;
 use gtk4::glib::ControlFlow;
 use gtk4::prelude::*;
 use gtk4_layer_shell::LayerShell;
+use smearor_wrot_application_window::manager::WindowManager;
+use smearor_wrot_child_process::SocketBuilder;
+use smearor_wrot_child_process::SocketManager;
+use smearor_wrot_child_process::child_process::config::GDK_BACKEND;
+use smearor_wrot_child_process::child_process::config::GDK_BACKEND_WAYLAND;
 use smearor_wrot_compositor::DoubleBuffer;
 use smearor_wrot_compositor::background::subsurface::SubsurfaceBackground;
 use smearor_wrot_compositor::background::toplevel::ToplevelBackground;
-use smearor_wrot_compositor::color_mask::mask::ColorMask;
 use smearor_wrot_compositor::color_mask::subsurface::SubSurfaceColorMask;
 use smearor_wrot_compositor::color_mask::toplevel::TopLevelColorMask;
 use smearor_wrot_compositor::dma::buffer::DmaBuffer;
@@ -41,16 +43,12 @@ use smearor_wrot_compositor_widget::clipboard::sync_manager::SyncManager;
 use smearor_wrot_compositor_widget::event_handler::keyboard::KeyboardInputEventHandler;
 use smearor_wrot_compositor_widget::widget::compositor::handler::CompositorHandler;
 use smearor_wrot_compositor_widget::widget::config::handler::ConfigHandler;
-use smearor_wrot_compositor_widget::widget::debug_overlay::config::DebugOverlayConfig;
-use smearor_wrot_compositor_widget::widget::debug_overlay::handler::DebugOverlayHandler;
 use smearor_wrot_compositor_widget::widget::resize::handler::ResizeHandler;
 use smearor_wrot_compositor_widget::widget::shutdown::handler::ShutdownHandler;
 use smearor_wrot_compositor_widget::widget::socket::handler::SocketHandler;
 use smearor_wrot_compositor_widget::widget::window_state::handler::WindowStateHandler;
-use smearor_wrot_model::Socket;
-use smearor_wrot_model::color::rgba::RgbaColor;
-use smearor_wrot_model::geometry::size::Size;
-use smearor_wrot_model::margin::Margins;
+use smearor_wrot_debug_overlay::DebugOverlayConfig;
+use smearor_wrot_debug_overlay::DebugOverlayManager;
 use smearor_wrot_pie_menu::PieMenuMessage;
 use smearor_wrot_pie_menu::PieMenuOverlayWidget;
 use smearor_wrot_pie_menu::RotationHandler;
@@ -58,33 +56,75 @@ use smearor_wrot_pie_menu::overlay_widget::message::handler::PieMenuMessageSende
 use smearor_wrot_rotation::RotationControlHandler;
 use smearor_wrot_rotation::RotationWidget;
 use smearor_wrot_rotation::SmearorRotation;
-use smearor_wrot_rotation::layer::SmearorLayer;
+use smearor_wrot_settings::SettingsManager;
 use std::cell::RefCell;
 use std::error::Error;
-use std::ffi::OsStr;
-use std::ffi::OsString;
-use std::io::BufRead;
-use std::process::Command;
-use std::process::Stdio;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::Mutex;
 use std::sync::mpsc;
-use std::thread;
 use std::time::Duration;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
 use tracing::warn;
 use typed_builder::TypedBuilder;
-use which::which;
 
 #[derive(Debug, Clone, TypedBuilder)]
-pub struct CompositorApplication {
-    pub config: CompositorApplicationConfig,
+pub struct Application {
+    config: Arc<ApplicationConfig>,
+    socket_manager: Arc<SocketManager>,
+    debug_overlay_manager: Arc<DebugOverlayManager>,
+    settings_manager: Arc<SettingsManager>,
 }
 
-impl CompositorApplication {
+impl Application {
+    pub fn config(&self) -> Arc<ApplicationConfig> {
+        self.config.clone()
+    }
+
+    pub fn socket_manager(&self) -> Arc<SocketManager> {
+        self.socket_manager.clone()
+    }
+
+    pub fn debug_overlay_manager(&self) -> Arc<DebugOverlayManager> {
+        self.debug_overlay_manager.clone()
+    }
+
+    pub fn settings_manager(&self) -> Arc<SettingsManager> {
+        self.settings_manager.clone()
+    }
+}
+
+impl Application {
+    pub fn new(config: ApplicationConfig) -> Result<Self, ()> {
+        let config = Arc::new(config);
+        EnvInitializer::init_env_vars(&config.env_vars);
+        let socket = SocketBuilder::build(&config.socket)?;
+        let socket_manager = Arc::new(SocketManager::new(socket));
+        let debug_overlay_manager = Arc::new(DebugOverlayManager::default());
+        let application_window_manager = Arc::new(WindowManager::default());
+        let compositor_widget = Arc::new(CompositorWidget::default());
+        let settings_manager = SettingsManager::builder()
+            .debug_overlay(debug_overlay_manager.clone())
+            .compositor_widget(compositor_widget)
+            .application_window_manager(application_window_manager)
+            .parent_window()
+            // .color_mask_manager(x)
+            // .pie_menu_manager(x)
+            // .rotation_manager(x)
+            .build();
+        let settings_manager = Arc::new(settings_manager);
+
+        let application = Application::builder()
+            .config(args.into())
+            .settings_manager(settings_manager)
+            .socket_manager(socket_manager)
+            .debug_overlay_manager(debug_overlay_manager)
+            .build();
+        Ok(application)
+    }
+
     pub fn run(self) -> Result<(), Box<dyn Error>> {
         let app_config = self.config.clone();
         let application_id = app_config.id.clone().unwrap_or_else(|| format!("io.smearor.wrot.p{}", std::process::id()));
@@ -179,7 +219,14 @@ impl CompositorApplication {
             window.present();
 
             // 16. Launch child process if specified
-            application_ref.launch_child_process(&socket_manager.socket());
+            let child_process_manager = ChildProcessManager::new(
+                socket_manager.clone(),
+                application_ref.config.command_arguments.clone(),
+                application_ref.config.shell,
+                application_ref.config.wayland_debug,
+                application_ref.config.gsk_renderer_gl,
+            );
+            child_process_manager.launch_child_process();
         });
 
         app.run_with_args::<&str>(&[]);
@@ -299,7 +346,7 @@ impl CompositorApplication {
             debug_pointer: self.config.debug_pointer,
             debug_touch: self.config.debug_touch,
         };
-        compositor_widget.set_debug_overlay_config(debug_overlay_config);
+        compositor_widget.update_debug_overlay_config(debug_overlay_config);
 
         let socket = socket_manager.socket();
         debug!("Set socket path to: {socket}");
@@ -872,6 +919,7 @@ impl CompositorApplication {
                             PieMenuMessage::Settings => {
                                 info!("Received Settings message from pie menu");
                                 if let Ok(mut handler) = settings_handler_clone.lock() {
+                                    info!("Opening settings dialog");
                                     handler.open_settings_dialog();
                                 }
                             }
@@ -926,142 +974,5 @@ impl CompositorApplication {
             let _ = compositor_widget_clone.check_and_request_shutdown();
             ControlFlow::Continue
         });
-    }
-
-    fn launch_child_process(&self, socket: &Socket) {
-        if !self.config.command_arguments.is_empty() {
-            let socket_clone = socket.clone();
-            let command_arguments_clone = self.config.command_arguments.clone();
-            let shell_clone = self.config.shell;
-            let wayland_debug_clone = self.config.wayland_debug;
-            let gsk_renderer_gl_clone = self.config.gsk_renderer_gl;
-
-            thread::spawn(move || {
-                debug!("Launching child application in background thread");
-                debug!("Setting WAYLAND_DISPLAY environment variable in child process: {}", socket_clone);
-                unsafe {
-                    std::env::set_var("WAYLAND_DISPLAY", &socket_clone);
-                    std::env::set_var("GDK_BACKEND", "wayland");
-                    if wayland_debug_clone {
-                        std::env::set_var("WAYLAND_DEBUG", "1");
-                    }
-                    if gsk_renderer_gl_clone {
-                        std::env::set_var("GSK_RENDERER", "gl");
-                    }
-                }
-                if let Err(e) = launch_application(&socket_clone, &command_arguments_clone, shell_clone, wayland_debug_clone, gsk_renderer_gl_clone) {
-                    error!("Failed to launch child application: {}", e);
-                }
-            });
-        }
-    }
-}
-
-fn launch_application(socket: &Socket, command_arguments: &[OsString], shell: bool, wayland_debug: bool, gsk_renderer_gl: bool) -> Result<(), Box<dyn Error>> {
-    debug!("Launching application with arguments: {:?}", command_arguments);
-    debug!("Setting WAYLAND_DISPLAY to: {}", socket);
-
-    let mut command = if shell {
-        let mut cmd = Command::new("sh");
-        cmd.arg("-c");
-        cmd.arg(command_arguments.join(OsStr::new(" ")).to_string_lossy().to_string());
-        cmd
-    } else {
-        let executable_name = command_arguments[0].to_string_lossy().to_string();
-
-        let resolved_path = match which(&executable_name) {
-            Ok(path) => {
-                debug!("Resolved executable '{}' to: {}", executable_name, path.display());
-                path.to_string_lossy().to_string()
-            }
-            Err(_) => {
-                return Err(format!("Executable '{}' not found in PATH", executable_name).into());
-            }
-        };
-
-        let mut cmd = Command::new(&resolved_path);
-        if command_arguments.len() > 1 {
-            cmd.args(&command_arguments[1..]);
-        }
-        cmd
-    };
-
-    command.env("WAYLAND_DISPLAY", socket);
-    debug!("WAYLAND_DISPLAY set to: {}", socket);
-
-    if wayland_debug {
-        command.env("WAYLAND_DEBUG", "1");
-    }
-
-    if gsk_renderer_gl {
-        command.env("GSK_RENDERER", "gl");
-    }
-
-    command.env("GDK_BACKEND", "wayland");
-
-    if let Ok(xdg_runtime_dir) = std::env::var("XDG_RUNTIME_DIR") {
-        command.env("XDG_RUNTIME_DIR", xdg_runtime_dir);
-    }
-
-    if let Ok(session_bus) = std::env::var("DBUS_SESSION_BUS_ADDRESS") {
-        command.env("DBUS_SESSION_BUS_ADDRESS", session_bus);
-    }
-
-    if wayland_debug {
-        debug!("Child process environment variables:");
-        debug!("  WAYLAND_DISPLAY: {}", socket);
-        debug!("  GDK_BACKEND: wayland");
-        if gsk_renderer_gl {
-            debug!("  GSK_RENDERER: gl");
-        }
-        command.env("PRINT_ENV", "1");
-    }
-
-    for (key, value) in command.get_envs() {
-        info!("{}={}", key.to_string_lossy().to_string(), value.map(|v| v.to_string_lossy().to_string()).unwrap_or_default());
-    }
-
-    command.stdin(Stdio::inherit());
-    command.stdout(Stdio::piped());
-    command.stderr(Stdio::piped());
-
-    debug!("WAYLAND_DISPLAY and GDK_BACKEND=wayland set for child process");
-
-    let mut child = command.spawn()?;
-    let pid = child.id();
-    debug!("Application launched with PID: {}", pid);
-    debug!("Application should connect to Wayland socket: {}", socket);
-
-    if let Some(stdout) = child.stdout.take() {
-        let reader = std::io::BufReader::new(stdout);
-        thread::spawn(move || {
-            for line in reader.lines().flatten() {
-                info!("[CHILD STDOUT] {}", line);
-            }
-        });
-    }
-
-    if let Some(stderr) = child.stderr.take() {
-        let reader = std::io::BufReader::new(stderr);
-        thread::spawn(move || {
-            for line in reader.lines() {
-                if let Ok(line) = line {
-                    info!("[CHILD STDERR] {}", line);
-                }
-            }
-        });
-    }
-
-    Ok(())
-}
-
-#[derive(TypedBuilder)]
-pub struct SmearorWrotApplication {
-    socket_manager: Arc<SocketManager>,
-}
-
-impl SmearorWrotApplication {
-    pub fn socket_manager(&self) -> Arc<SocketManager> {
-        self.socket_manager.clone()
     }
 }

@@ -17,7 +17,7 @@ use smearor_wrot_compositor::DmaBufAllocator;
 use smearor_wrot_compositor::OutputGeometry;
 use smearor_wrot_compositor::SmearorCompositor;
 use smearor_wrot_compositor::WindowSizeCallbackAware;
-use smearor_wrot_model::Size;
+use smearor_wrot_geometry::Size;
 use smithay::reexports::calloop::EventLoop;
 use smithay::reexports::wayland_server::Display;
 use std::sync::Arc;
@@ -82,6 +82,7 @@ impl CompositorHandler for CompositorWidgetImpl {
         let keyboard_variant = config.keyboard_variant.clone();
         let max_fps = config.max_fps;
         let compositor = match SmearorCompositor::new(
+            child_process_manager,
             &mut event_loop,
             shared_display.clone(),
             socket,

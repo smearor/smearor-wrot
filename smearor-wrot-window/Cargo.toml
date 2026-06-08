@@ -1,5 +1,5 @@
 [package]
-name = "smearor-wrot-model"
+name = "smearor-wrot-window"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -10,11 +10,8 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-dashmap = { workspace = true }
-gtk4 = { workspace = true, optional = true }
-smithay = { workspace = true, optional = true }
-thiserror = { workspace = true }
+atomic_float = { workspace = true }
+gtk4 = { workspace = true }
+smearor-wrot-geometry = { path = "../smearor-wrot-geometry" }
+smearor-wrot-layer = { path = "../smearor-wrot-layer" }
 typed-builder = { workspace = true }
-
-[features]
-default = []

@@ -4,8 +4,8 @@ use crate::opengl_renderer::OpenGLRenderer;
 use gtk4::Snapshot;
 use gtk4::gdk;
 use gtk4::graphene::Rect;
-use smearor_wrot_compositor::color_mask::mask::ColorMask;
-use smearor_wrot_model::color::hex::ToHex;
+use smearor_wrot_color::ToHex;
+use smearor_wrot_color_mask::ColorMask;
 use tracing::debug;
 
 /// OpenGL-based color mask applier using direct OpenGL ES rendering

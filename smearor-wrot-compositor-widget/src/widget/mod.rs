@@ -3,7 +3,7 @@ pub mod color_mask;
 pub mod commit;
 pub mod compositor;
 pub mod config;
-pub mod debug_overlay;
+// pub mod debug_overlay;
 pub mod dmabuf;
 pub mod event;
 pub mod imp;

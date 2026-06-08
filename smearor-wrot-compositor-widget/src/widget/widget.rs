@@ -14,9 +14,9 @@ use gtk4::Widget;
 use gtk4::glib;
 use gtk4::prelude::WidgetExt;
 use gtk4::subclass::prelude::*;
-use smearor_wrot_model::Position;
-use smearor_wrot_model::Socket;
-use smearor_wrot_model::geometry::size::Size;
+use smearor_wrot_child_process::Socket;
+use smearor_wrot_geometry::Position;
+use smearor_wrot_geometry::Size;
 
 glib::wrapper! {
     pub struct CompositorWidget(ObjectSubclass<CompositorWidgetImpl>)

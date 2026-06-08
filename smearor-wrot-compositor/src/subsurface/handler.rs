@@ -1,7 +1,7 @@
 use crate::SmearorCompositor;
 use crate::popup::handler::PopupHandler;
 use crate::subsurface::model::SubsurfacePositionData;
-use smearor_wrot_model::geometry::position::Position;
+use smearor_wrot_geometry::Position;
 use smithay::desktop::PopupKind;
 use smithay::desktop::find_popup_root_surface;
 use smithay::reexports::wayland_server::Resource;

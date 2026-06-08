@@ -2,13 +2,21 @@
 resolver = "3"
 
 members = [
+    "smearor-wrot-application",
+    "smearor-wrot-window",
+    "smearor-wrot-child-process",
+    "smearor-wrot-color",
+    "smearor-wrot-color-mask",
     "smearor-wrot-compositor",
     "smearor-wrot-compositor-widget",
-    "smearor-wrot-model",
+    "smearor-wrot-debug-overlay",
+    "smearor-wrot-geometry",
+    "smearor-wrot-keyboard",
+    "smearor-wrot-layer",
     "smearor-wrot-pie-menu",
-    "smearor-wrot-application",
-    "smearor-wrot-wrapper",
-    "smearor-wrot-test-client"
+    "smearor-wrot-settings",
+    "smearor-wrot-test-client",
+    "smearor-wrot-wrapper"
 ]
 
 [workspace.package]

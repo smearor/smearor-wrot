@@ -1,16 +1,20 @@
-use gtk4::prelude::*;
-use gtk4::Window;
+use gtk4::ApplicationWindow;
 use gtk4::Widget;
+use gtk4::prelude::*;
+use smearor_wrot_application_window::manager::WindowManager;
 use smearor_wrot_compositor_widget::CompositorWidget;
 use smearor_wrot_compositor_widget::widget::color_mask::handler::ColorMaskHandler;
 use smearor_wrot_compositor_widget::widget::commit::CommitHandler;
 use smearor_wrot_compositor_widget::widget::config::handler::ConfigHandler;
-use smearor_wrot_compositor_widget::widget::debug_overlay::handler::DebugOverlayHandler;
 use smearor_wrot_compositor_widget::widget::dmabuf::handler::DmabufHandler;
 use smearor_wrot_compositor_widget::widget::shm::handler::ShmHandler;
+use smearor_wrot_debug_overlay::DebugOverlayHandler;
+use smearor_wrot_debug_overlay::DebugOverlayManager;
 use smearor_wrot_rotation::RotationWidget;
+use std::sync::Arc;
 use thiserror::Error;
 use tracing::debug;
+use typed_builder::TypedBuilder;
 
 #[derive(Debug, Error)]
 pub enum SettingsError {
@@ -27,40 +31,38 @@ pub enum SettingsError {
     WindowError(String),
 }
 
+#[derive(Debug, Clone, TypedBuilder)]
 pub struct SettingsManager {
-    compositor_widget: CompositorWidget,
-    parent_window: gtk4::ApplicationWindow,
-    rotation_widget: Widget,
-    disable_dma_buf: bool,
+    compositor_widget: Arc<CompositorWidget>,
+    debug_overlay: Arc<DebugOverlayManager>,
+    application_window_manager: Arc<WindowManager>,
+    parent_window: ApplicationWindow,
+    rotation_widget: Arc<RotationWidget>,
+    // disable_dma_buf: bool,
 }
 
 impl SettingsManager {
-    pub fn new(
-        compositor_widget: &CompositorWidget,
-        parent_window: &gtk4::ApplicationWindow,
-        rotation_widget: &Widget,
-        disable_dma_buf: bool,
-    ) -> Self {
-        Self {
-            compositor_widget: compositor_widget.clone(),
-            parent_window: parent_window.clone(),
-            rotation_widget: rotation_widget.clone(),
-            disable_dma_buf,
-        }
-    }
+    // pub fn new(compositor_widget: &CompositorWidget, parent_window: &ApplicationWindow, rotation_widget: &Widget, disable_dma_buf: bool) -> Self {
+    //     Self {
+    //         compositor_widget: compositor_widget.clone(),
+    //         parent_window: parent_window.clone(),
+    //         rotation_widget: rotation_widget.clone(),
+    //         disable_dma_buf,
+    //     }
+    // }
 
     pub fn set_debug_pointer(&self, enabled: bool) {
         debug!("Setting debug pointer to: {}", enabled);
-        let mut config = self.compositor_widget.debug_overlay_config();
+        let mut config = self.debug_overlay.debug_overlay_config();
         config.debug_pointer = enabled;
-        self.compositor_widget.set_debug_overlay_config(config);
+        self.debug_overlay.update_debug_overlay_config(config);
     }
 
     pub fn set_debug_touch(&self, enabled: bool) {
         debug!("Setting debug touch to: {}", enabled);
-        let mut config = self.compositor_widget.debug_overlay_config();
+        let mut config = self.debug_overlay.debug_overlay_config();
         config.debug_touch = enabled;
-        self.compositor_widget.set_debug_overlay_config(config);
+        self.debug_overlay.update_debug_overlay_config(config);
     }
 
     pub fn set_auto_color_mask(&self, enabled: bool) {

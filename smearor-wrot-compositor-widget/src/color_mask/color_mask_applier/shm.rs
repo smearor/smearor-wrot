@@ -6,8 +6,8 @@ use gtk4::graphene::Rect;
 use gtk4::prelude::SnapshotExt;
 use gtk4::prelude::TextureExt;
 use gtk4::prelude::TextureExtManual;
-use smearor_wrot_compositor::color_mask::mask::ColorMask;
-use smearor_wrot_model::color::hex::ToHex;
+use smearor_wrot_color::ToHex;
+use smearor_wrot_color_mask::ColorMask;
 use tracing::debug;
 
 /// CPU-based color mask applier for SHM textures

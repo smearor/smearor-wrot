@@ -4,7 +4,7 @@ pub(crate) mod color_mask;
 pub(crate) mod commit;
 pub(crate) mod compositor;
 pub(crate) mod config;
-pub(crate) mod debug_overlay;
+// pub(crate) mod debug_overlay;
 pub(crate) mod dmabuf;
 pub(crate) mod event;
 pub(crate) mod focus_synchronization;

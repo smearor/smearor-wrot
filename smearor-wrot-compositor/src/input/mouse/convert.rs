@@ -1,6 +1,6 @@
 use crate::SmearorCompositor;
 use crate::input::time::get_time;
-use smearor_wrot_model::Position;
+use smearor_wrot_geometry::Position;
 use smithay::backend::input::ButtonState;
 use smithay::input::pointer::ButtonEvent;
 use smithay::input::pointer::MotionEvent;

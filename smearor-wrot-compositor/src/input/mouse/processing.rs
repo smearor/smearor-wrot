@@ -2,7 +2,7 @@ use crate::SmearorCompositor;
 use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::mouse::convert::GtkToSmithayMouseEventConverter;
 use crate::surface::SurfaceQuery;
-use smearor_wrot_model::Position;
+use smearor_wrot_geometry::Position;
 use smithay::backend::input::Axis;
 use smithay::backend::input::AxisSource;
 use smithay::input::pointer::AxisFrame;

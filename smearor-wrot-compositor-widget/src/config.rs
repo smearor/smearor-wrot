@@ -1,5 +1,7 @@
 //! Configuration for compositor widgets
 
+use smearor_wrot_color_mask::ColorMask;
+
 /// Configuration for the CompositorWidget
 ///
 /// This struct defines the layout and spacing parameters for the compositor widget.
@@ -66,16 +68,16 @@ pub struct CompositorWidgetConfig {
     pub keyboard_variant: Option<String>,
 }
 
-/// Color mask configuration for background replacement
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct ColorMask {
-    /// Red component (0.0-1.0)
-    pub red: f32,
-    /// Green component (0.0-1.0)
-    pub green: f32,
-    /// Blue component (0.0-1.0)
-    pub blue: f32,
-}
+// /// Color mask configuration for background replacement
+// #[derive(Debug, Clone, Copy, PartialEq)]
+// pub struct ColorMask {
+//     /// Red component (0.0-1.0)
+//     pub red: f32,
+//     /// Green component (0.0-1.0)
+//     pub green: f32,
+//     /// Blue component (0.0-1.0)
+//     pub blue: f32,
+// }
 
 /// Default configuration for CompositorWidget
 ///

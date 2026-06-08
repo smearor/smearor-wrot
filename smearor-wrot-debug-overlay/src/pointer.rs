@@ -1,13 +1,9 @@
-use crate::RgbaColor;
-use crate::geometry::position::Position;
-#[cfg(feature = "gtk4")]
 use gtk4::Snapshot;
-#[cfg(feature = "gtk4")]
 use gtk4::gdk::RGBA;
-#[cfg(feature = "gtk4")]
 use gtk4::graphene::Rect;
-#[cfg(feature = "gtk4")]
 use gtk4::prelude::SnapshotExt;
+use smearor_wrot_color::RgbaColor;
+use smearor_wrot_geometry::Position;
 use std::fmt::Debug;
 
 pub const DEFAULT_POINTER_SIZE: f32 = 40.0;
@@ -42,7 +38,6 @@ impl<T: Debug + Clone + Copy> PointerPosition<T> {
     }
 }
 
-#[cfg(feature = "gtk4")]
 impl PointerPosition<f32> {
     pub fn new_pointer(gtk_pos: Position<f32>, app_pos: Position<f32>) -> Self {
         Self::new(

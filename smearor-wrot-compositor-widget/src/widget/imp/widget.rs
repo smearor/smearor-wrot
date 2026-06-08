@@ -4,8 +4,6 @@ use crate::color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
 use crate::opengl_renderer::OpenGLRenderer;
 use crate::widget::compositor::handler::CompositorHandler;
 use crate::widget::config::handler::ConfigHandler;
-use crate::widget::imp::debug_overlay::manager::DebugOverlayManager;
-use crate::widget::imp::debug_overlay::renderer::DebugOverlayRenderer;
 use crate::widget::imp::dmabuf::formats::DmabufFormats;
 use crate::widget::imp::event::touch::TouchEventSetup;
 use crate::widget::imp::holding_area::BufferHoldingArea;
@@ -25,13 +23,15 @@ use gtk4::prelude::WidgetExt;
 use gtk4::prelude::WidgetExtManual;
 use gtk4::subclass::prelude::WidgetImpl;
 use gtk4::subclass::prelude::WidgetImplExt;
+use smearor_wrot_child_process::Socket;
 use smearor_wrot_compositor::SmearorCompositor;
 use smearor_wrot_compositor::damage::surface::SurfaceDamage;
 use smearor_wrot_compositor::frame::count::FrameCounter;
 use smearor_wrot_compositor::frame::limit::FrameLimiter;
-use smearor_wrot_model::Position;
-use smearor_wrot_model::Size;
-use smearor_wrot_model::Socket;
+use smearor_wrot_debug_overlay::DebugOverlayManager;
+use smearor_wrot_debug_overlay::DebugOverlayRenderer;
+use smearor_wrot_geometry::Position;
+use smearor_wrot_geometry::Size;
 use smithay::backend::allocator::Fourcc;
 use smithay::backend::allocator::dmabuf::Dmabuf;
 use std::cell::Ref;
@@ -56,7 +56,7 @@ pub enum ApplicationError {
 
 pub struct CompositorWidgetImpl {
     pub(crate) compositor: RefCell<Option<Arc<Mutex<SmearorCompositor>>>>,
-    pub(crate) debug_overlay: DebugOverlayManager,
+    pub(crate) debug_overlay: RefCell<Option<Arc<DebugOverlayManager>>>,
     // TODO
     pub(crate) config: Mutex<CompositorWidgetConfig>,
     pub(crate) header_bar: RefCell<Option<gtk4::HeaderBar>>,
@@ -82,7 +82,7 @@ impl Default for CompositorWidgetImpl {
     fn default() -> Self {
         Self {
             compositor: RefCell::new(None),
-            debug_overlay: Default::default(),
+            debug_overlay: RefCell::new(None),
             // TODO
             config: Mutex::new(CompositorWidgetConfig::default()),
             header_bar: RefCell::new(None),
@@ -395,7 +395,9 @@ impl WidgetImpl for CompositorWidgetImpl {
 
     fn snapshot(&self, snapshot: &Snapshot) {
         self.render_snapshot(snapshot);
-        self.debug_overlay.snapshot(snapshot);
+        if let Some(debug_overlay) = &*self.debug_overlay.borrow() {
+            debug_overlay.snapshot(snapshot);
+        }
 
         let Ok(compositor) = self.compositor() else {
             return;

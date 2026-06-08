@@ -10,15 +10,24 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+atomic_float = { workspace = true }
+dashmap = { workspace = true }
 directories = { workspace = true }
 gtk4 = { workspace = true }
 gtk4-layer-shell = { workspace = true }
 regex = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
+smearor-wrot-window = { path = "../smearor-wrot-window" }
+smearor-wrot-child-process = { path = "../smearor-wrot-child-process" }
+smearor-wrot-color-mask = { path = "../smearor-wrot-color-mask" }
 smearor-wrot-compositor = { path = "../smearor-wrot-compositor" }
 smearor-wrot-compositor-widget = { path = "../smearor-wrot-compositor-widget" }
-smearor-wrot-model = { path = "../smearor-wrot-model" }
+smearor-wrot-debug-overlay = { path = "../smearor-wrot-debug-overlay" }
+smearor-wrot-geometry = { path = "../smearor-wrot-geometry" }
+smearor-wrot-keyboard = { path = "../smearor-wrot-keyboard" }
+smearor-wrot-layer = { path = "../smearor-wrot-layer" }
 smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
+smearor-wrot-settings = { path = "../smearor-wrot-settings" }
 smearor-wrot-rotation = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }

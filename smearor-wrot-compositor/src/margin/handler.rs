@@ -1,6 +1,6 @@
 use crate::SmearorCompositor;
-use smearor_wrot_model::geometry::size::Size;
-use smearor_wrot_model::margin::Margins;
+use smearor_wrot_geometry::Margins;
+use smearor_wrot_geometry::Size;
 use std::sync::atomic::Ordering;
 use tracing::debug;
 

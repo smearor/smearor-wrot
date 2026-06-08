@@ -6,7 +6,7 @@
 use crate::compositor::SmearorCompositor;
 use crate::damage::output::OutputDamage;
 use crate::margin::handler::MarginHandler;
-use smearor_wrot_model::geometry::size::Size;
+use smearor_wrot_geometry::Size;
 use smithay::output::Mode;
 use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
 use smithay::reexports::wayland_server::Resource;

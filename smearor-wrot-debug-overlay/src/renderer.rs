@@ -1,6 +1,6 @@
-use crate::widget::imp::debug_overlay::manager::DebugOverlayManager;
+use crate::DebugOverlayHandler;
+use crate::DebugOverlayManager;
 use gtk4::Snapshot;
-use std::sync::atomic::Ordering;
 
 pub trait DebugOverlayRenderer {
     fn snapshot(&self, snapshot: &Snapshot);
@@ -10,10 +10,10 @@ pub trait DebugOverlayRenderer {
 
 impl DebugOverlayRenderer for DebugOverlayManager {
     fn snapshot(&self, snapshot: &Snapshot) {
-        if self.debug_pointer.load(Ordering::Relaxed) {
+        if self.is_debug_pointer_enabled() {
             self.render_debug_pointer(snapshot);
         }
-        if self.debug_touch.load(Ordering::Relaxed) {
+        if self.is_debug_touch_enabled() {
             self.render_debug_touch(snapshot);
         }
     }

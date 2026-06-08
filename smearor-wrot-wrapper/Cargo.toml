@@ -14,7 +14,9 @@ name = "smearor-wrot"
 path = "src/main.rs"
 
 [dependencies]
+atomic_float = { workspace = true }
 clap = { workspace = true }
+miette = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 smearor-wrot-application = { path = "../smearor-wrot-application" }
 thiserror = { workspace = true }

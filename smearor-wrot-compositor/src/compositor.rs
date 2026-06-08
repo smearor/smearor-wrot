@@ -7,7 +7,6 @@ use std::sync::Mutex;
 
 use crate::callback::commit::CommitCallback;
 use crate::callback::window_size::WindowSizeCallback;
-use crate::color_mask::mask::ColorMask;
 use crate::color_mask::toplevel::TopLevelColorMask;
 use crate::commit::count::CommitCount;
 use crate::dma::allocator::DmaBufAllocator;
@@ -20,11 +19,11 @@ use crate::message::compositor_message::CompositorMessage;
 use crate::subsurface::model::SubsurfaceData;
 use crate::texture::cache::TextureCacheEntry;
 use crate::texture::pixel_data::BGRA;
-use crate::wayland::listener::WaylandListener;
 use dashmap::DashMap;
 use dashmap::DashSet;
-use smearor_wrot_model::Socket;
-use smearor_wrot_model::color::rgba::RgbaColor;
+use smearor_wrot_child_process::ChildProcessManager;
+use smearor_wrot_color::RgbaColor;
+use smearor_wrot_color_mask::ColorMask;
 use smithay::backend::allocator::format::FormatSet;
 use smithay::desktop::PopupManager;
 use smithay::desktop::Space;
@@ -60,7 +59,6 @@ use smithay::wayland::shell::xdg::decoration::XdgDecorationState;
 use smithay::wayland::shell::xdg::dialog::XdgDialogState;
 use smithay::wayland::shm::ShmState;
 use smithay::wayland::viewporter::ViewporterState;
-use std::ffi::OsString;
 use std::os::unix::io::RawFd;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicI64;
@@ -72,8 +70,10 @@ use tracing::info;
 
 /// Compositor state for smearor-wrot
 pub struct SmearorCompositor {
+    pub child_process_manager: Arc<ChildProcessManager>,
+
     pub start_time: Instant,
-    pub socket_name: OsString,
+    // pub socket_name: OsString,
     pub display_handle: DisplayHandle,
     pub display: Arc<Mutex<Display<SmearorCompositor>>>,
 
@@ -103,9 +103,6 @@ pub struct SmearorCompositor {
 
     // Touch slot manager for GTK EventSequence to Smithay TouchSlot conversion
     pub touch_slot_manager: ThreadSafeTouchSlotManager,
-
-    // Listening socket for accepting client connections
-    pub listening_socket: Option<ListeningSocket>,
 
     // Virtual output for rendering
     pub virtual_output: Option<Output>,
@@ -150,7 +147,7 @@ pub struct SmearorCompositor {
     pub commit_callback: Arc<Mutex<Option<CommitCallback>>>,
 
     // Pending frame callbacks to send after GTK renders frame
-    pub pending_frame_callbacks: Arc<Mutex<Vec<(smithay::reexports::wayland_server::protocol::wl_surface::WlSurface, std::time::Duration)>>>,
+    pub pending_frame_callbacks: Arc<Mutex<Vec<(WlSurface, std::time::Duration)>>>,
 
     // Channel sender for sending messages to GTK wrapper
     pub message_sender: Arc<Mutex<Option<Sender<CompositorMessage>>>>,
@@ -211,9 +208,12 @@ pub struct SmearorCompositor {
 
 impl SmearorCompositor {
     pub fn new(
+        child_process_manager: Arc<ChildProcessManager>,
+        // DONE
+        // socket: Option<Socket>,
+        // TODO
         event_loop: &mut EventLoop<CalloopData>,
         display: Arc<Mutex<Display<Self>>>,
-        socket: Option<Socket>,
         initial_width: i32,
         initial_height: i32,
         dma_buf_enabled: bool,
@@ -350,20 +350,21 @@ impl SmearorCompositor {
         virtual_output.set_preferred(initial_display_mode);
         space.map_output(&virtual_output, (0, 0));
 
-        let (socket_name, listening_socket) = Self::init_wayland_listener(display.clone(), event_loop, socket)?;
+        // let (socket_name, listening_socket) = Self::init_wayland_listener(display.clone(), event_loop, socket)?;
 
         // Get the loop signal, used to stop the event loop
         let loop_signal = event_loop.get_signal();
 
         Ok(Self {
+            child_process_manager,
+
             start_time,
             display_handle: dh,
             display,
 
             space,
             loop_signal,
-            socket_name,
-
+            // socket_name,
             compositor_state,
             xdg_shell_state,
             xdg_decoration_state,
@@ -376,7 +377,7 @@ impl SmearorCompositor {
             popups,
             seat,
             touch_slot_manager: ThreadSafeTouchSlotManager::new(),
-            listening_socket: Some(listening_socket),
+            // listening_socket: Some(listening_socket),
             virtual_output: Some(virtual_output),
 
             buffers_in_use: Arc::new(DashSet::new()),

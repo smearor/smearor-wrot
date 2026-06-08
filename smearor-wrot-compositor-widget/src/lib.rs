@@ -16,7 +16,6 @@ pub use color_mask::color_mask_applier::ColorMaskApplier;
 pub use color_mask::color_mask_applier::dma_buf::DmaBufColorMaskApplier;
 pub use color_mask::color_mask_applier::open_gl::OpenGLColorMaskApplier;
 pub use color_mask::color_mask_applier::shm::ShmColorMaskApplier;
-pub use config::ColorMask;
 pub use config::CompositorWidgetConfig;
 pub use paintable::TexturePaintable;
 pub use texture::extract_pixel_data_from_texture;

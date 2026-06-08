@@ -1,7 +1,7 @@
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use crate::widget::socket::error::SocketInitializationError;
 use crate::widget::socket::handler::SocketHandler;
-use smearor_wrot_model::Socket;
+use smearor_wrot_child_process::Socket;
 use tracing::debug;
 
 impl SocketHandler for CompositorWidgetImpl {

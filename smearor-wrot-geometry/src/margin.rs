@@ -14,6 +14,15 @@ impl Margins {
     pub fn new(left: u32, right: u32, top: u32, bottom: u32) -> Self {
         Self { left, right, top, bottom }
     }
+
+    pub fn all(margin: u32) -> Self {
+        Self {
+            left: margin,
+            right: margin,
+            top: margin,
+            bottom: margin,
+        }
+    }
 }
 
 impl Display for Margins {

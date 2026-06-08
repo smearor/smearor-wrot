@@ -1,7 +1,7 @@
 use crate::CompositorWidget;
 use crate::widget::socket::error::SocketInitializationError;
 use glib::subclass::prelude::ObjectSubclassIsExt;
-use smearor_wrot_model::Socket;
+use smearor_wrot_child_process::Socket;
 use tracing::debug;
 
 pub trait SocketHandler {

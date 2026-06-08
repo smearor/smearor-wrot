@@ -1,11 +1,11 @@
-use crate::color_mask::mask::ColorMask;
 use image::ImageBuffer;
 use image::ImageError;
 use image::Rgba;
-use smearor_wrot_model::color::frequency::ColorFrequencyMap;
-use smearor_wrot_model::color::rgb::RgbColor24;
-use smearor_wrot_model::color::rgba::RgbaColor;
-use smearor_wrot_model::geometry::size::Size;
+use smearor_wrot_color::RgbColor24;
+use smearor_wrot_color::RgbaColor;
+use smearor_wrot_color::frequency::ColorFrequencyMap;
+use smearor_wrot_color_mask::ColorMask;
+use smearor_wrot_geometry::Size;
 use std::marker::PhantomData;
 use std::ops::Deref;
 use std::path::Path;
