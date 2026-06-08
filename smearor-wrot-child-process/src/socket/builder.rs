@@ -1,5 +1,7 @@
-use crate::socket::error::SocketBuilderError;
-use smearor_wrot_model::Socket;
+use crate::DEFAULT_SOCKET_PREFIX;
+use crate::Socket;
+use crate::SocketBuilderError;
+use crate::XDG_RUNTIME_DIR;
 use std::path::PathBuf;
 
 pub struct SocketBuilder;
@@ -10,7 +12,7 @@ impl SocketBuilder {
             Self::check_socket_exists(socket)?;
             socket.clone()
         } else {
-            Self::generate_unique_socket_name("smearor-wrot")?
+            Self::generate_unique_socket_name(DEFAULT_SOCKET_PREFIX)?
         };
         Self::build_socket_path(&socket_name)
     }
@@ -27,7 +29,7 @@ impl SocketBuilder {
 
     /// Generate a unique socket name by incrementing the number at the end
     pub fn generate_unique_socket_name(base_name: &str) -> Result<String, SocketBuilderError> {
-        let runtime_dir = std::env::var("XDG_RUNTIME_DIR").map_err(|_| SocketBuilderError::XdgRuntimeDirNotSet)?;
+        let runtime_dir = std::env::var(XDG_RUNTIME_DIR).map_err(|_| SocketBuilderError::XdgRuntimeDirNotSet)?;
         let mut counter = 0;
         let mut socket_name = format!("{}-{}", base_name, counter);
         loop {

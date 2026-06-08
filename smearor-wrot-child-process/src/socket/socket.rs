@@ -5,7 +5,9 @@ use std::ops::Deref;
 use std::path::Path;
 use std::path::PathBuf;
 
-#[derive(Debug, Clone)]
+pub const DEFAULT_SOCKET_PREFIX: &str = "smearor-wrot";
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Socket(pub PathBuf);
 
 impl Deref for Socket {
