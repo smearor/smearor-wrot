@@ -1,7 +1,6 @@
 use gtk4::ApplicationWindow;
 use gtk4::Widget;
 use gtk4::prelude::*;
-use smearor_wrot_application_window::manager::WindowManager;
 use smearor_wrot_compositor_widget::CompositorWidget;
 use smearor_wrot_compositor_widget::widget::color_mask::handler::ColorMaskHandler;
 use smearor_wrot_compositor_widget::widget::commit::CommitHandler;
@@ -10,7 +9,9 @@ use smearor_wrot_compositor_widget::widget::dmabuf::handler::DmabufHandler;
 use smearor_wrot_compositor_widget::widget::shm::handler::ShmHandler;
 use smearor_wrot_debug_overlay::DebugOverlayHandler;
 use smearor_wrot_debug_overlay::DebugOverlayManager;
+use smearor_wrot_keyboard::manager::KeyboardManager;
 use smearor_wrot_rotation::RotationWidget;
+use smearor_wrot_window::WindowManager;
 use std::sync::Arc;
 use thiserror::Error;
 use tracing::debug;
@@ -35,7 +36,8 @@ pub enum SettingsError {
 pub struct SettingsManager {
     compositor_widget: Arc<CompositorWidget>,
     debug_overlay: Arc<DebugOverlayManager>,
-    application_window_manager: Arc<WindowManager>,
+    window_manager: Arc<WindowManager>,
+    keyboard_manager: Arc<KeyboardManager>,
     parent_window: ApplicationWindow,
     rotation_widget: Arc<RotationWidget>,
     // disable_dma_buf: bool,

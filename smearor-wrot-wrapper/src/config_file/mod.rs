@@ -12,6 +12,7 @@ pub mod error;
 pub mod gtk_application;
 pub mod keyboard;
 pub mod layer;
+pub mod margin;
 pub mod merge;
 pub mod rotation;
 pub mod window;

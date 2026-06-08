@@ -7,6 +7,7 @@ use crate::cli::env_vars::EnvironmentVariablesArguments;
 use crate::cli::gtk_application::GtkApplicationArguments;
 use crate::cli::keyboard::KeyboardArguments;
 use crate::cli::layer::LayerArguments;
+use crate::cli::margin::MarginArguments;
 use crate::cli::rotation::RotationArguments;
 use crate::cli::window::WindowArguments;
 use crate::config_file::application::ApplicationConfigFile;
@@ -23,6 +24,7 @@ use smearor_wrot_application::EnvironmentVariablesConfig;
 use smearor_wrot_application::GtkApplicationConfig;
 use smearor_wrot_application::KeyboardConfig;
 use smearor_wrot_application::LayerConfig;
+use smearor_wrot_application::MarginConfig;
 use smearor_wrot_application::RotationConfig;
 use smearor_wrot_application::SmearorLayer;
 use smearor_wrot_application::SocketBuilderError;
@@ -87,6 +89,9 @@ pub struct ApplicationArguments {
     pub(crate) layer: LayerArguments,
 
     #[command(flatten)]
+    pub(crate) margin: MarginArguments,
+
+    #[command(flatten)]
     pub(crate) rotation: RotationArguments,
 
     #[command(flatten)]
@@ -130,6 +135,7 @@ impl TryFrom<ApplicationArguments> for ApplicationConfig {
             .gtk_application(Arc::new(GtkApplicationConfig::from(args.gtk_application)))
             .keyboard(Arc::new(KeyboardConfig::from(args.keyboard)))
             .layer(Arc::new(LayerConfig::from(args.layer)))
+            .margin(Arc::new(MarginConfig::from(args.margin)))
             .rotation(Arc::new(RotationConfig::from(args.rotation)))
             .window(Arc::new(WindowConfig::from(args.window)))
             .build())

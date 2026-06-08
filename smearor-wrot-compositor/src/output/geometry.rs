@@ -5,7 +5,6 @@
 
 use crate::compositor::SmearorCompositor;
 use crate::damage::output::OutputDamage;
-use crate::margin::handler::MarginHandler;
 use smearor_wrot_geometry::Size;
 use smithay::output::Mode;
 use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
@@ -78,7 +77,7 @@ impl OutputGeometry for SmearorCompositor {
 
                 // Calculate the size to send (dialog-margin for dialogs, margins for normal windows)
                 let send_size = if is_dialog {
-                    let dialog_margin = self.get_dialog_margin() as i32;
+                    let dialog_margin = self.margin_manager.dialog_margin() as i32;
                     let dialog_size = output_size - Size::new(2 * dialog_margin, 2 * dialog_margin);
                     // Ensure size is positive
                     let dialog_size = dialog_size.max(&Size::new(100, 100));
@@ -86,7 +85,7 @@ impl OutputGeometry for SmearorCompositor {
                     dialog_size.max(&Size::new(100, 100))
                 } else {
                     // Apply margins for normal windows
-                    let margin_size = self.get_margin_size();
+                    let margin_size = self.margin_manager.margin_size();
                     let adjusted_size = output_size - margin_size.into();
                     // Ensure size is positive
                     let adjusted_size = adjusted_size.max(&Size::new(100, 100));

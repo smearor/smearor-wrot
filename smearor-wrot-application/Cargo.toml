@@ -26,6 +26,7 @@ smearor-wrot-debug-overlay = { path = "../smearor-wrot-debug-overlay" }
 smearor-wrot-geometry = { path = "../smearor-wrot-geometry" }
 smearor-wrot-keyboard = { path = "../smearor-wrot-keyboard" }
 smearor-wrot-layer = { path = "../smearor-wrot-layer" }
+smearor-wrot-margin = { path = "../smearor-wrot-margin" }
 smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
 smearor-wrot-settings = { path = "../smearor-wrot-settings" }
 smearor-wrot-rotation = { workspace = true }

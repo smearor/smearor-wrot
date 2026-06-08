@@ -83,6 +83,7 @@ impl CompositorHandler for CompositorWidgetImpl {
         let max_fps = config.max_fps;
         let compositor = match SmearorCompositor::new(
             child_process_manager,
+            margin_manager,
             &mut event_loop,
             shared_display.clone(),
             socket,

@@ -1,7 +1,6 @@
 //! Surface query operations
 
 use crate::compositor::SmearorCompositor;
-use crate::margin::handler::MarginHandler;
 use crate::surface::dialog::DialogSizeQuery;
 use smithay::desktop::Window;
 use smithay::reexports::wayland_server::Resource;
@@ -62,12 +61,11 @@ impl SurfaceQuery for SmearorCompositor {
                 (1920, 1080)
             };
 
-            let margin_left = self.get_margin_left() as i32;
-            let margin_right = self.get_margin_right() as i32;
-            let margin_top = self.get_margin_top() as i32;
-            let margin_bottom = self.get_margin_bottom() as i32;
-
-            let dialog_margin = self.get_dialog_margin() as i32;
+            let margin_left = self.margin_manager.margin_left() as i32;
+            let margin_right = self.margin_manager.margin_right() as i32;
+            let margin_top = self.margin_manager.margin_top() as i32;
+            let margin_bottom = self.margin_manager.margin_bottom() as i32;
+            let dialog_margin = self.margin_manager.dialog_margin() as i32;
 
             let adjusted_width = output_size.0 - margin_left - margin_right - 2 * dialog_margin;
             let adjusted_height = output_size.1 - margin_top - margin_bottom - 2 * dialog_margin;

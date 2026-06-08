@@ -33,7 +33,7 @@ impl DialogHandler for SmearorCompositor {
     }
 
     fn calculate_dialog_size(&self, app_width: i32, app_height: i32, dialog_aspect_ratio: f32) -> (i32, i32) {
-        let dialog_margin = self.get_dialog_margin() as i32;
+        let dialog_margin = self.margin_manager.dialog_margin() as i32;
 
         // Subtract dialog-margin from both sides
         let max_width = app_width - 2 * dialog_margin;

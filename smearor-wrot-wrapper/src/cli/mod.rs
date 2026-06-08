@@ -7,5 +7,6 @@ pub mod env_vars;
 pub mod gtk_application;
 pub mod keyboard;
 pub mod layer;
+pub mod margin;
 pub mod rotation;
 pub mod window;

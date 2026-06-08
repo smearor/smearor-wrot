@@ -7,6 +7,7 @@ use smearor_wrot_color_mask::ColorMaskConfig;
 use smearor_wrot_debug_overlay::DebugOverlayConfig;
 use smearor_wrot_keyboard::KeyboardConfig;
 use smearor_wrot_layer::LayerConfig;
+use smearor_wrot_margin::MarginConfig;
 use smearor_wrot_window::WindowConfig;
 use std::sync::Arc;
 use typed_builder::TypedBuilder;
@@ -36,6 +37,9 @@ pub struct ApplicationConfig {
 
     /// Configuration for the wayland layer shell
     pub layer: Arc<LayerConfig>,
+
+    /// Configuration for the margins
+    pub margin: Arc<MarginConfig>,
 
     /// Configuration for the rotation
     pub rotation: Arc<RotationConfig>,

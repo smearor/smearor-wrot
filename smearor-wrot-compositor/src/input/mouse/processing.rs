@@ -115,7 +115,7 @@ impl MouseInputProcessing for SmearorCompositor {
                 return;
             }
             if pointer_on_dialog {
-                let dialog_margin = self.get_dialog_margin() as i32;
+                let dialog_margin = self.margin_manager.dialog_margin() as i32;
                 motion_event.location.x = motion_event.location.x - output_geometry.loc.x as f64 - dialog_margin as f64;
                 motion_event.location.y = motion_event.location.y - output_geometry.loc.y as f64 - dialog_margin as f64;
                 debug!("motion event ({}, {})", motion_event.location.x, motion_event.location.y);

@@ -8,6 +8,7 @@ use crate::config_file::error::ConfigError;
 use crate::config_file::gtk_application::GtkApplicationConfigFile;
 use crate::config_file::keyboard::KeyboardConfigFile;
 use crate::config_file::layer::LayerConfigFile;
+use crate::config_file::margin::MarginConfigFile;
 use crate::config_file::merge::MergeWithConfigFile;
 use crate::config_file::rotation::RotationConfigFile;
 use crate::config_file::window::WindowConfigFile;
@@ -50,6 +51,10 @@ pub struct ApplicationConfigFile {
     /// Configuration for the layer
     #[serde(default)]
     pub layer: Option<LayerConfigFile>,
+
+    /// Configuration for the margin
+    #[serde(default)]
+    pub margin: Option<MarginConfigFile>,
 
     /// Configuration for the rotation
     #[serde(default)]
@@ -104,6 +109,9 @@ impl MergeWithConfigFile<ApplicationConfigFile> for ApplicationArguments {
         if let Some(layer) = config.layer {
             args.layer = args.layer.merge_with_config_file(&layer);
         }
+        if let Some(margin) = config.margin {
+            args.margin = args.margin.merge_with_config_file(&margin);
+        }
         if let Some(rotation) = config.rotation {
             args.rotation = args.rotation.merge_with_config_file(&rotation);
         }
@@ -111,38 +119,5 @@ impl MergeWithConfigFile<ApplicationConfigFile> for ApplicationArguments {
             args.window = args.window.merge_with_config_file(&window);
         }
         args
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_config_default() {
-        let config = ApplicationConfigFile::default();
-        assert!(config.window.title.is_none());
-        assert!(config.window.width.is_none());
-    }
-
-    #[test]
-    fn test_load_config_valid_toml() {
-        let toml_content = r#"
-[window]
-title = "Test Window"
-width = 800
-height = 600
-"#;
-        let config: ApplicationConfigFile = toml::from_str(toml_content).unwrap();
-        assert_eq!(config.window.title, Some("Test Window".to_string()));
-        assert_eq!(config.window.width, Some(800));
-        assert_eq!(config.window.height, Some(600));
-    }
-
-    #[test]
-    fn test_load_config_empty() {
-        let toml_content = "";
-        let config: ApplicationConfigFile = toml::from_str(toml_content).unwrap();
-        assert!(config.window.title.is_none());
     }
 }

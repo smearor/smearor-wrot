@@ -13,6 +13,7 @@ members = [
     "smearor-wrot-geometry",
     "smearor-wrot-keyboard",
     "smearor-wrot-layer",
+    "smearor-wrot-margin",
     "smearor-wrot-pie-menu",
     "smearor-wrot-settings",
     "smearor-wrot-test-client",
@@ -31,6 +32,7 @@ rust-version = "1.92.0"
 
 [workspace.dependencies]
 atomic_float = "1.1.0"
+atomic_ref = "0.2.1"
 clap = { version = "4.6", features = ["derive"] }
 dashmap = "6"
 directories = "6.0.0"

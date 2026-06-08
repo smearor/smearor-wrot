@@ -24,6 +24,7 @@ use dashmap::DashSet;
 use smearor_wrot_child_process::ChildProcessManager;
 use smearor_wrot_color::RgbaColor;
 use smearor_wrot_color_mask::ColorMask;
+use smearor_wrot_margin::MarginManager;
 use smithay::backend::allocator::format::FormatSet;
 use smithay::desktop::PopupManager;
 use smithay::desktop::Space;
@@ -68,19 +69,7 @@ use std::time::Instant;
 use tracing::debug;
 use tracing::info;
 
-/// Compositor state for smearor-wrot
-pub struct SmearorCompositor {
-    pub child_process_manager: Arc<ChildProcessManager>,
-
-    pub start_time: Instant,
-    // pub socket_name: OsString,
-    pub display_handle: DisplayHandle,
-    pub display: Arc<Mutex<Display<SmearorCompositor>>>,
-
-    pub space: Space<Window>,
-    pub loop_signal: LoopSignal,
-
-    // Smithay State
+pub struct SmearorCompositorStates {
     pub compositor_state: CompositorState,
     pub xdg_shell_state: XdgShellState,
     pub xdg_decoration_state: XdgDecorationState,
@@ -92,6 +81,35 @@ pub struct SmearorCompositor {
     pub data_device_state: DataDeviceState,
     pub popups: PopupManager,
     pub seat: Seat<SmearorCompositor>,
+}
+
+/// Compositor state for smearor-wrot
+pub struct SmearorCompositor {
+    pub child_process_manager: Arc<ChildProcessManager>,
+    pub margin_manager: Arc<MarginManager>,
+    pub keyboard_manager: Arc<KeyboardManager>,
+
+    pub start_time: Instant,
+    // pub socket_name: OsString,
+    pub display_handle: DisplayHandle,
+    pub display: Arc<Mutex<Display<SmearorCompositor>>>,
+
+    pub space: Space<Window>,
+    pub loop_signal: LoopSignal,
+
+    // Smithay State
+    pub states: SmearorCompositorStates,
+    // pub compositor_state: CompositorState,
+    // pub xdg_shell_state: XdgShellState,
+    // pub xdg_decoration_state: XdgDecorationState,
+    // pub xdg_dialog_state: XdgDialogState,
+    // pub viewporter_state: ViewporterState,
+    // pub shm_state: ShmState,
+    // pub output_manager_state: OutputManagerState,
+    // pub seat_state: SeatState<SmearorCompositor>,
+    // pub data_device_state: DataDeviceState,
+    // pub popups: PopupManager,
+    // pub seat: Seat<SmearorCompositor>,
 
     // DMA-BUF state
     pub dma_buf_state: Option<dmabuf::DmabufState>,
@@ -172,15 +190,6 @@ pub struct SmearorCompositor {
     // Client-side decorations control
     pub client_decorations_enabled: Arc<AtomicBool>,
 
-    // Margin control for window rendering
-    pub margin_left: Arc<AtomicU32>,
-    pub margin_right: Arc<AtomicU32>,
-    pub margin_top: Arc<AtomicU32>,
-    pub margin_bottom: Arc<AtomicU32>,
-
-    // Dialog margin for dialog positioning
-    pub dialog_margin: Arc<AtomicU32>,
-
     // Background control for rendering
     pub opacity: Arc<Mutex<f32>>,
     pub background_color: Arc<Mutex<Option<RgbaColor>>>,
@@ -209,6 +218,7 @@ pub struct SmearorCompositor {
 impl SmearorCompositor {
     pub fn new(
         child_process_manager: Arc<ChildProcessManager>,
+        margin_manager: Arc<MarginManager>,
         // DONE
         // socket: Option<Socket>,
         // TODO
@@ -357,6 +367,7 @@ impl SmearorCompositor {
 
         Ok(Self {
             child_process_manager,
+            margin_manager,
 
             start_time,
             display_handle: dh,
@@ -365,17 +376,19 @@ impl SmearorCompositor {
             space,
             loop_signal,
             // socket_name,
-            compositor_state,
-            xdg_shell_state,
-            xdg_decoration_state,
-            xdg_dialog_state,
-            viewporter_state,
-            shm_state,
-            output_manager_state,
-            seat_state,
-            data_device_state,
-            popups,
-            seat,
+            states: SmearorCompositorStates {
+                compositor_state,
+                xdg_shell_state,
+                xdg_decoration_state,
+                xdg_dialog_state,
+                viewporter_state,
+                shm_state,
+                output_manager_state,
+                seat_state,
+                data_device_state,
+                popups,
+                seat,
+            },
             touch_slot_manager: ThreadSafeTouchSlotManager::new(),
             // listening_socket: Some(listening_socket),
             virtual_output: Some(virtual_output),
@@ -421,13 +434,6 @@ impl SmearorCompositor {
 
             client_decorations_enabled: Arc::new(AtomicBool::new(true)),
 
-            margin_left: Arc::new(AtomicU32::new(0)),
-            margin_right: Arc::new(AtomicU32::new(0)),
-            margin_top: Arc::new(AtomicU32::new(0)),
-            margin_bottom: Arc::new(AtomicU32::new(0)),
-
-            dialog_margin: Arc::new(AtomicU32::new(0)),
-
             opacity: Arc::new(Mutex::new(1.0)),
             background_color: Arc::new(Mutex::new(None)),
             subsurface_background_color: Arc::new(Mutex::new(None)),
@@ -447,17 +453,6 @@ impl SmearorCompositor {
             clipboard_source: Arc::new(Mutex::new(None)),
             clipboard_pipe_read_end: Arc::new(Mutex::new(None)),
         })
-    }
-
-    /// Set dialog margin for dialog positioning
-    pub fn set_dialog_margin(&self, margin: u32) {
-        self.dialog_margin.store(margin, std::sync::atomic::Ordering::Relaxed);
-        debug!("Dialog margin set to {}", margin);
-    }
-
-    /// Get dialog margin
-    pub fn get_dialog_margin(&self) -> u32 {
-        self.dialog_margin.load(std::sync::atomic::Ordering::Relaxed)
     }
 
     /// Set opacity for background rendering

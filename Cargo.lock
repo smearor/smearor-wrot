@@ -210,6 +210,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "628d228f918ac3b82fe590352cc719d30664a0c13ca3a60266fe02c7132d480a"
 
 [[package]]
+name = "atomic_ref"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a6fa0b588ba996abc358504c724df6ccbed358b3c23d24b887576da04c8fc5e0"
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2899,6 +2905,7 @@ dependencies = [
  "smearor-wrot-geometry",
  "smearor-wrot-keyboard",
  "smearor-wrot-layer",
+ "smearor-wrot-margin",
  "smearor-wrot-pie-menu",
  "smearor-wrot-rotation",
  "smearor-wrot-settings",
@@ -2956,6 +2963,7 @@ dependencies = [
  "smearor-wrot-color",
  "smearor-wrot-color-mask",
  "smearor-wrot-geometry",
+ "smearor-wrot-margin",
  "smithay",
  "thiserror 2.0.18",
  "tracing",
@@ -3009,7 +3017,7 @@ dependencies = [
 name = "smearor-wrot-keyboard"
 version = "0.1.0"
 dependencies = [
- "dashmap",
+ "atomic_ref",
  "thiserror 2.0.18",
  "typed-builder",
 ]
@@ -3019,6 +3027,17 @@ name = "smearor-wrot-layer"
 version = "0.1.0"
 dependencies = [
  "dashmap",
+ "smearor-wrot-rotation",
+ "thiserror 2.0.18",
+ "typed-builder",
+]
+
+[[package]]
+name = "smearor-wrot-margin"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "smearor-wrot-geometry",
  "smearor-wrot-rotation",
  "thiserror 2.0.18",
  "typed-builder",
@@ -3059,6 +3078,7 @@ dependencies = [
  "gtk4",
  "smearor-wrot-compositor-widget",
  "smearor-wrot-debug-overlay",
+ "smearor-wrot-keyboard",
  "smearor-wrot-rotation",
  "smearor-wrot-window",
  "thiserror 2.0.18",

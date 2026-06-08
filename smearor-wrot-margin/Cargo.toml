@@ -1,5 +1,5 @@
 [package]
-name = "smearor-wrot-keyboard"
+name = "smearor-wrot-margin"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -10,6 +10,8 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-atomic_ref = { workspace = true }
+dashmap = { workspace = true }
 thiserror = { workspace = true }
+smearor-wrot-geometry = { path = "../smearor-wrot-geometry" }
+smearor-wrot-rotation = { workspace = true }
 typed-builder = { workspace = true }
