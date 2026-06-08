@@ -1,7 +1,7 @@
-use crate::color_mask::toplevel::DEFAULT_COLOR_MASK_TOLERANCE;
-use smearor_wrot_model::color::RgbColor;
-use smearor_wrot_model::color::hex::ParseHexError;
-use smearor_wrot_model::color::hex::ToHex;
+use crate::DEFAULT_COLOR_MASK_TOLERANCE;
+use smearor_wrot_color::ParseHexError;
+use smearor_wrot_color::RgbColor;
+use smearor_wrot_color::ToHex;
 use std::fmt::Display;
 use std::fmt::Formatter;
 
@@ -30,7 +30,7 @@ impl ColorMask {
     pub fn with_default_tolerance<R: Into<RgbColor>>(color: R) -> Self {
         Self {
             color: color.into(),
-            tolerance: 0.1,
+            tolerance: DEFAULT_COLOR_MASK_TOLERANCE,
         }
     }
 

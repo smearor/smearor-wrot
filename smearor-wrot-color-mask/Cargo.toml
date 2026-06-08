@@ -1,0 +1,16 @@
+[package]
+name = "smearor-wrot-color-mask"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+atomic_float = { workspace = true }
+smearor-wrot-color = { path = "../smearor-wrot-color" }
+thiserror = { workspace = true }
+typed-builder = { workspace = true }
