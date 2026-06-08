@@ -16,8 +16,8 @@ use gtk4::graphene::Rect;
 use gtk4::gsk::RoundedRect;
 use gtk4::prelude::*;
 use gtk4::subclass::prelude::WidgetImpl;
-use smearor_wrot_model::color::hex::ToHex;
-use smearor_wrot_model::color::rgba::RgbaColor;
+use smearor_wrot_color::RgbaColor;
+use smearor_wrot_color::ToHex;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::atomic::Ordering;
@@ -329,7 +329,8 @@ impl WidgetImpl for PieMenuWidgetImpl {
             let item_y = center_y + (radius * 0.7) * angle_rad.sin();
 
             // Draw item background circle
-            let item_color: RGBA = RgbaColor::parse_hex(&item.color).unwrap_or(RgbaColor::with_rgb(0.5, 0.5, 0.5, 0.5)).into();
+            let item_color = RgbaColor::parse_hex(&item.color).unwrap_or(RgbaColor::with_rgb(0.5, 0.5, 0.5, 0.5));
+            let item_color: RGBA = item_color.into();
             let item_radius = item.radius();
 
             // Highlight if hovered
