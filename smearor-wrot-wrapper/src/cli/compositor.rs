@@ -1,6 +1,6 @@
 use atomic_float::AtomicF32;
 use clap::Parser;
-use smearor_wrot_application::CompositorConfig;
+use smearor_wrot_application::CompositorState;
 use smearor_wrot_application::Margins;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicU32;
@@ -24,9 +24,9 @@ pub struct CompositorArguments {
     pub(crate) opacity: f32,
 }
 
-impl From<CompositorArguments> for CompositorConfig {
+impl From<CompositorArguments> for CompositorState {
     fn from(args: CompositorArguments) -> Self {
-        CompositorConfig {
+        CompositorState {
             double_buffer: AtomicBool::new(!args.disable_double_buffer),
             dma_buf: AtomicBool::new(!args.disable_dma_buf),
             client_decorations: AtomicBool::new(!args.disable_client_decorations),

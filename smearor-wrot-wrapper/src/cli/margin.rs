@@ -1,5 +1,5 @@
 use clap::Parser;
-use smearor_wrot_application::MarginConfig;
+use smearor_wrot_application::MarginState;
 use smearor_wrot_application::Margins;
 use std::sync::atomic::AtomicU32;
 
@@ -30,7 +30,7 @@ pub struct MarginArguments {
     pub(crate) margin_bottom: u32,
 }
 
-impl From<MarginArguments> for MarginConfig {
+impl From<MarginArguments> for MarginState {
     fn from(args: MarginArguments) -> Self {
         let mut margins = if let Some(margin) = args.margin {
             Margins::all(margin)
@@ -50,7 +50,7 @@ impl From<MarginArguments> for MarginConfig {
             margins.bottom = margin_bottom;
         }
 
-        MarginConfig {
+        MarginState {
             margin_left: AtomicU32::new(margins.left),
             margin_right: AtomicU32::new(margins.right),
             margin_top: AtomicU32::new(margins.top),

@@ -13,22 +13,22 @@ use crate::cli::window::WindowArguments;
 use crate::config_file::application::ApplicationConfigFile;
 use crate::config_file::merge::MergeWithConfigFile;
 use clap::Parser;
-use smearor_wrot_application::ApplicationConfig;
-use smearor_wrot_application::ChildProcessConfig;
-use smearor_wrot_application::ColorMaskConfig;
-use smearor_wrot_application::CompositorConfig;
+use smearor_wrot_application::ApplicationState;
+use smearor_wrot_application::ChildProcessState;
+use smearor_wrot_application::ColorMaskState;
+use smearor_wrot_application::CompositorState;
 use smearor_wrot_application::DEFAULT_WINDOW_HEIGHT;
 use smearor_wrot_application::DEFAULT_WINDOW_WIDTH;
-use smearor_wrot_application::DebugOverlayConfig;
-use smearor_wrot_application::EnvironmentVariablesConfig;
-use smearor_wrot_application::GtkApplicationConfig;
-use smearor_wrot_application::KeyboardConfig;
-use smearor_wrot_application::LayerConfig;
-use smearor_wrot_application::MarginConfig;
-use smearor_wrot_application::RotationConfig;
+use smearor_wrot_application::DebugOverlayState;
+use smearor_wrot_application::EnvironmentVariablesState;
+use smearor_wrot_application::GtkApplicationState;
+use smearor_wrot_application::KeyboardState;
+use smearor_wrot_application::LayerShellState;
+use smearor_wrot_application::MarginState;
+use smearor_wrot_application::RotationState;
 use smearor_wrot_application::SmearorLayer;
 use smearor_wrot_application::SocketBuilderError;
-use smearor_wrot_application::WindowConfig;
+use smearor_wrot_application::WindowState;
 use std::error::Error;
 use std::ffi::OsString;
 use std::path::PathBuf;
@@ -122,22 +122,22 @@ pub enum ApplicationConfigError {
     ChildProcessConfigError(#[from] ChildProcessConfigError),
 }
 
-impl TryFrom<ApplicationArguments> for ApplicationConfig {
+impl TryFrom<ApplicationArguments> for ApplicationState {
     type Error = ApplicationConfigError;
     fn try_from(args: ApplicationArguments) -> Result<Self, Self::Error> {
-        let child_process_config = ChildProcessConfig::try_from(args.child_process)?;
-        Ok(ApplicationConfig::builder()
+        let child_process_config = ChildProcessState::try_from(args.child_process)?;
+        Ok(ApplicationState::builder()
             .child_process(Arc::new(child_process_config))
-            .color_mask(Arc::new(ColorMaskConfig::from(args.color_mask)))
-            .compositor(Arc::new(CompositorConfig::from(args.compositor)))
-            .debug_overlay(Arc::new(DebugOverlayConfig::from(args.debug_overlay)))
-            .env_vars(Arc::new(EnvironmentVariablesConfig::from(args.env_vars)))
-            .gtk_application(Arc::new(GtkApplicationConfig::from(args.gtk_application)))
-            .keyboard(Arc::new(KeyboardConfig::from(args.keyboard)))
-            .layer(Arc::new(LayerConfig::from(args.layer)))
-            .margin(Arc::new(MarginConfig::from(args.margin)))
-            .rotation(Arc::new(RotationConfig::from(args.rotation)))
-            .window(Arc::new(WindowConfig::from(args.window)))
+            .color_mask(Arc::new(ColorMaskState::from(args.color_mask)))
+            .compositor(Arc::new(CompositorState::from(args.compositor)))
+            .debug_overlay(Arc::new(DebugOverlayState::from(args.debug_overlay)))
+            .env_vars(Arc::new(EnvironmentVariablesState::from(args.env_vars)))
+            .gtk_application(Arc::new(GtkApplicationState::from(args.gtk_application)))
+            .keyboard(Arc::new(KeyboardState::from(args.keyboard)))
+            .layer(Arc::new(LayerShellState::from(args.layer)))
+            .margin(Arc::new(MarginState::from(args.margin)))
+            .rotation(Arc::new(RotationState::from(args.rotation)))
+            .window(Arc::new(WindowState::from(args.window)))
             .build())
     }
 }

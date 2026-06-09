@@ -1,5 +1,5 @@
 use clap::Parser;
-use smearor_wrot_application::LayerConfig;
+use smearor_wrot_application::LayerShellState;
 use smearor_wrot_application::SmearorLayer;
 
 #[derive(Parser, Debug, Clone)]
@@ -13,7 +13,7 @@ pub struct LayerArguments {
     pub(crate) namespace: Option<String>,
 }
 
-impl From<LayerArguments> for LayerConfig {
+impl From<LayerArguments> for LayerShellState {
     fn from(args: LayerArguments) -> Self {
         Self {
             layer: args.layer,

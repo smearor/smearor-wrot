@@ -1,5 +1,7 @@
 use clap::Parser;
-use smearor_wrot_application::KeyboardConfig;
+use smearor_wrot_application::KeyboardState;
+use std::sync::Arc;
+use std::sync::RwLock;
 
 #[derive(Parser, Debug, Clone)]
 pub struct KeyboardArguments {
@@ -12,11 +14,11 @@ pub struct KeyboardArguments {
     pub(crate) keyboard_variant: Option<String>,
 }
 
-impl From<KeyboardArguments> for KeyboardConfig {
+impl From<KeyboardArguments> for KeyboardState {
     fn from(args: KeyboardArguments) -> Self {
         Self {
-            keyboard_layout: args.keyboard_layout,
-            keyboard_variant: args.keyboard_variant,
+            keyboard_layout: Arc::new(RwLock::new(args.keyboard_layout)),
+            keyboard_variant: Arc::new(RwLock::new(args.keyboard_variant)),
         }
     }
 }

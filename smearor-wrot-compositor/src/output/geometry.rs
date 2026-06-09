@@ -5,7 +5,8 @@
 
 use crate::compositor::SmearorCompositor;
 use crate::damage::output::OutputDamage;
-use smearor_wrot_geometry::Size;
+use smearor_wrot_model_geometry::Size;
+use smearor_wrot_state_margin::MarginStateAccessor;
 use smithay::output::Mode;
 use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
 use smithay::reexports::wayland_server::Resource;
@@ -60,10 +61,10 @@ impl OutputGeometry for SmearorCompositor {
             // Send configure events to all toplevels (not just those in space)
             // This ensures that all toplevel surfaces receive configure events, including
             // those that may not yet be mapped to the space (e.g., wl_surface#47 for application window)
-            let toplevel_count = self.xdg_shell_state.toplevel_surfaces().len();
+            let toplevel_count = self.states.xdg_shell_state.toplevel_surfaces().len();
             debug!("Sending configure events to {toplevel_count} toplevels with new size {output_size}");
 
-            for (idx, toplevel) in self.xdg_shell_state.toplevel_surfaces().iter().enumerate() {
+            for (idx, toplevel) in self.states.xdg_shell_state.toplevel_surfaces().iter().enumerate() {
                 let wl_surface = toplevel.wl_surface();
                 debug!("Toplevel {}: surface id={:?}", idx, wl_surface.id());
 

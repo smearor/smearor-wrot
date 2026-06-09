@@ -1,7 +1,7 @@
 use atomic_float::AtomicF32;
 use atomic_float::AtomicF64;
 use clap::Parser;
-use smearor_wrot_application::RotationConfig;
+use smearor_wrot_application::RotationState;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicU64;
 
@@ -28,7 +28,7 @@ pub struct RotationArguments {
     pub(crate) disable_animations: bool,
 }
 
-impl From<RotationArguments> for RotationConfig {
+impl From<RotationArguments> for RotationState {
     fn from(args: RotationArguments) -> Self {
         Self {
             disable_rotation: AtomicBool::new(args.disable_rotation),

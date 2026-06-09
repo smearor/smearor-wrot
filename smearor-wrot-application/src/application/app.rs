@@ -1,4 +1,4 @@
-use crate::ApplicationConfig;
+use crate::ApplicationState;
 use crate::KeyboardLayout;
 use crate::ScreenshotManager;
 use crate::application::env_initializer::EnvInitializer;
@@ -22,8 +22,8 @@ use gtk4::prelude::*;
 use gtk4_layer_shell::LayerShell;
 use smearor_wrot_child_process::SocketBuilder;
 use smearor_wrot_child_process::SocketManager;
-use smearor_wrot_child_process::child_process::config::GDK_BACKEND;
-use smearor_wrot_child_process::child_process::config::GDK_BACKEND_WAYLAND;
+use smearor_wrot_child_process::child_process::state::GDK_BACKEND;
+use smearor_wrot_child_process::child_process::state::GDK_BACKEND_WAYLAND;
 use smearor_wrot_compositor::DoubleBuffer;
 use smearor_wrot_compositor::background::subsurface::SubsurfaceBackground;
 use smearor_wrot_compositor::background::toplevel::ToplevelBackground;
@@ -45,8 +45,8 @@ use smearor_wrot_compositor_widget::widget::resize::handler::ResizeHandler;
 use smearor_wrot_compositor_widget::widget::shutdown::handler::ShutdownHandler;
 use smearor_wrot_compositor_widget::widget::socket::handler::SocketHandler;
 use smearor_wrot_compositor_widget::widget::window_state::handler::WindowStateHandler;
-use smearor_wrot_debug_overlay::DebugOverlayConfig;
 use smearor_wrot_debug_overlay::DebugOverlayManager;
+use smearor_wrot_debug_overlay::DebugOverlayState;
 use smearor_wrot_keyboard::manager::KeyboardManager;
 use smearor_wrot_pie_menu::PieMenuMessage;
 use smearor_wrot_pie_menu::PieMenuOverlayWidget;
@@ -72,14 +72,14 @@ use typed_builder::TypedBuilder;
 
 #[derive(Debug, Clone, TypedBuilder)]
 pub struct Application {
-    config: Arc<ApplicationConfig>,
+    config: Arc<ApplicationState>,
     socket_manager: Arc<SocketManager>,
     debug_overlay_manager: Arc<DebugOverlayManager>,
     settings_manager: Arc<SettingsManager>,
 }
 
 impl Application {
-    pub fn config(&self) -> Arc<ApplicationConfig> {
+    pub fn config(&self) -> Arc<ApplicationState> {
         self.config.clone()
     }
 
@@ -97,7 +97,7 @@ impl Application {
 }
 
 impl Application {
-    pub fn new(config: ApplicationConfig) -> Result<Self, ()> {
+    pub fn new(config: ApplicationState) -> Result<Self, ()> {
         let config = Arc::new(config);
         EnvInitializer::init_env_vars(&config.env_vars);
         let socket = SocketBuilder::build(&config.socket)?;
@@ -343,7 +343,7 @@ impl Application {
         };
         compositor_widget.set_config(config);
 
-        let debug_overlay_config = DebugOverlayConfig {
+        let debug_overlay_config = DebugOverlayState {
             debug_pointer: self.config.debug_pointer,
             debug_touch: self.config.debug_touch,
         };

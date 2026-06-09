@@ -2,7 +2,7 @@ use crate::CompositorWidget;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use smearor_wrot_debug_overlay::DebugOverlayConfig;
 use smearor_wrot_debug_overlay::DebugOverlayHandler;
-use smearor_wrot_geometry::Position;
+use smearor_wrot_model_geometry::Position;
 
 impl DebugOverlayHandler for CompositorWidget {
     fn update_debug_overlay_config(&self, config: DebugOverlayConfig) {

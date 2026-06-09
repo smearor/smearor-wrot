@@ -1,49 +1,49 @@
-use crate::config::compositor::CompositorConfig;
-use crate::config::env_vars::EnvironmentVariablesConfig;
-use crate::config::gtk_application::GtkApplicationConfig;
-use crate::config::rotation::RotationConfig;
-use smearor_wrot_child_process::ChildProcessConfig;
-use smearor_wrot_color_mask::ColorMaskConfig;
-use smearor_wrot_debug_overlay::DebugOverlayConfig;
-use smearor_wrot_keyboard::KeyboardConfig;
-use smearor_wrot_layer::LayerConfig;
-use smearor_wrot_margin::MarginConfig;
-use smearor_wrot_window::WindowConfig;
+use crate::config::env_vars::EnvironmentVariablesState;
+use crate::config::gtk_application::GtkApplicationState;
+use crate::config::rotation::RotationState;
+use crate::config::state::CompositorState;
+use smearor_wrot_child_process::ChildProcessState;
+use smearor_wrot_color_mask::ColorMaskState;
+use smearor_wrot_debug_overlay::DebugOverlayState;
+use smearor_wrot_keyboard::KeyboardState;
+use smearor_wrot_layer::LayerShellState;
+use smearor_wrot_state_margin::MarginState;
+use smearor_wrot_window::WindowState;
 use std::sync::Arc;
 use typed_builder::TypedBuilder;
 
 #[derive(Debug, TypedBuilder)]
-pub struct ApplicationConfig {
-    /// Configuration for child process
-    pub child_process: Arc<ChildProcessConfig>,
+pub struct ApplicationState {
+    /// Child process state
+    pub child_process: Arc<ChildProcessState>,
 
-    /// Configuration for the color masking
-    pub color_mask: Arc<ColorMaskConfig>,
+    /// Color masking state
+    pub color_mask: Arc<ColorMaskState>,
 
-    /// Configuration for the compositor
-    pub compositor: Arc<CompositorConfig>,
+    /// Compositor state
+    pub compositor: Arc<CompositorState>,
 
-    /// Configuration for the debug overlay
-    pub debug_overlay: Arc<DebugOverlayConfig>,
+    /// Debug overlay state
+    pub debug_overlay: Arc<DebugOverlayState>,
 
-    /// Configuration for the application environment variables
-    pub env_vars: Arc<EnvironmentVariablesConfig>,
+    /// State of the environment variables of the parent process
+    pub env_vars: Arc<EnvironmentVariablesState>,
 
-    /// Configuration for the GTK application
-    pub gtk_application: Arc<GtkApplicationConfig>,
+    /// GTK application state
+    pub gtk_application: Arc<GtkApplicationState>,
 
-    /// Configuration for the keyboard
-    pub keyboard: Arc<KeyboardConfig>,
+    /// Keyboard state
+    pub keyboard: Arc<KeyboardState>,
 
-    /// Configuration for the wayland layer shell
-    pub layer: Arc<LayerConfig>,
+    /// Wayland layer shell state
+    pub layer: Arc<LayerShellState>,
 
-    /// Configuration for the margins
-    pub margin: Arc<MarginConfig>,
+    /// Margins state
+    pub margin: Arc<MarginState>,
 
-    /// Configuration for the rotation
-    pub rotation: Arc<RotationConfig>,
+    /// Rotation state
+    pub rotation: Arc<RotationState>,
 
-    /// Configuration for the GTK application window
-    pub window: Arc<WindowConfig>,
+    /// State of the GTK application window
+    pub window: Arc<WindowState>,
 }

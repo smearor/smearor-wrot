@@ -5,6 +5,7 @@ use crate::message::compositor_message::CompositorMessage;
 use crate::message::sender::CompositorMessageSender;
 use crate::popup::handler::PopupHandler;
 use crate::surface::dialog::DialogSizeQuery;
+use smearor_wrot_state_margin::MarginStateAccessor;
 use smithay::desktop::PopupKind;
 use smithay::desktop::Window;
 use smithay::desktop::find_popup_root_surface;
@@ -25,7 +26,7 @@ use tracing::info;
 
 impl XdgShellHandler for SmearorCompositor {
     fn xdg_shell_state(&mut self) -> &mut XdgShellState {
-        &mut self.xdg_shell_state
+        &mut self.states.xdg_shell_state
     }
 
     fn new_toplevel(&mut self, surface: ToplevelSurface) {
@@ -168,12 +169,12 @@ impl XdgShellHandler for SmearorCompositor {
         debug!("new_popup called for surface: {:?}", surface.wl_surface().id());
         self.unconstrain_popup(&surface);
         let popup_kind = PopupKind::Xdg(surface.clone());
-        let _ = self.popups.track_popup(popup_kind.clone());
+        let _ = self.states.popups.track_popup(popup_kind.clone());
 
         // Activate popup grab for interactive popups
         // Smithay's PopupManager manages the grab automatically
         // when the SeatHandler is implemented
-        if let Some(_popup) = self.popups.find_popup(surface.wl_surface()) {
+        if let Some(_popup) = self.states.popups.find_popup(surface.wl_surface()) {
             // Activate grab - Smithay automatically forwards events to the popup
             // This requires that the SeatHandler is implemented
             debug!("Popup grab activated for interactive popup");
@@ -214,7 +215,11 @@ impl XdgShellHandler for SmearorCompositor {
         };
 
         // Activate the popup grab via Smithay's PopupManager
-        match self.popups.grab_popup::<SmearorCompositor>(root_surface, popup_kind, &self.seat, serial) {
+        match self
+            .states
+            .popups
+            .grab_popup::<SmearorCompositor>(root_surface, popup_kind, &self.states.seat, serial)
+        {
             Ok(_popup_grab) => {
                 debug!("Popup grab activated successfully");
             }

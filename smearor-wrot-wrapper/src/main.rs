@@ -7,7 +7,7 @@ use crate::cli::args::ApplicationArguments;
 use clap::Parser;
 use miette::IntoDiagnostic;
 use smearor_wrot_application::Application;
-use smearor_wrot_application::ApplicationConfig;
+use smearor_wrot_application::ApplicationState;
 use smearor_wrot_application::init_logging;
 use std::error::Error;
 
@@ -22,7 +22,7 @@ async fn main() -> Result<(), miette::Error> {
     let args = args.load_and_merge_config()?;
 
     // Convert arguments to configuration
-    let config: ApplicationConfig = args.into();
+    let config: ApplicationState = args.into();
 
     // Instantiate application with configuration
     let application = Application::new(config).into_diagnostic()?;

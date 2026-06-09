@@ -1,6 +1,6 @@
 use atomic_float::AtomicF32;
 use clap::Parser;
-use smearor_wrot_application::ColorMaskConfig;
+use smearor_wrot_application::ColorMaskState;
 use smearor_wrot_application::DEFAULT_COLOR_MASK_TOLERANCE;
 use std::sync::atomic::AtomicBool;
 
@@ -39,9 +39,9 @@ pub struct ColorMaskArguments {
     pub(crate) color_mask_shader: bool,
 }
 
-impl From<ColorMaskArguments> for ColorMaskConfig {
+impl From<ColorMaskArguments> for ColorMaskState {
     fn from(args: ColorMaskArguments) -> Self {
-        ColorMaskConfig {
+        ColorMaskState {
             background_color: args.background_color,
             color_mask: args.color_mask,
             auto_color_mask: AtomicBool::new(args.auto_color_mask),

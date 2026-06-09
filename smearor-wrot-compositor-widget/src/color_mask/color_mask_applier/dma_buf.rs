@@ -8,8 +8,8 @@ use gtk4::gsk::GLShaderNode;
 use gtk4::gsk::TextureNode;
 use gtk4::prelude::IsRenderNode;
 use gtk4::prelude::SnapshotExt;
-use smearor_wrot_color::ToHex;
 use smearor_wrot_color_mask::ColorMask;
+use smearor_wrot_model_color::ToHex;
 use tracing::debug;
 
 /// Shader-based color mask applier for DMA-BUF textures

@@ -1,4 +1,4 @@
-use crate::config::env_vars::EnvironmentVariablesConfig;
+use crate::config::env_vars::EnvironmentVariablesState;
 use smearor_wrot_child_process::GDK_BACKEND;
 use smearor_wrot_child_process::GDK_BACKEND_WAYLAND;
 use smearor_wrot_child_process::GSK_RENDERER;
@@ -9,7 +9,7 @@ use tracing::debug;
 
 pub struct EnvInitializer {}
 impl EnvInitializer {
-    pub fn init_env_vars(config: &EnvironmentVariablesConfig) {
+    pub fn init_env_vars(config: &EnvironmentVariablesState) {
         debug!("Initializing environment variables for the parent process");
         unsafe {
             std::env::set_var(GDK_BACKEND, GDK_BACKEND_WAYLAND);

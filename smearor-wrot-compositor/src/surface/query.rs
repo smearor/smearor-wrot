@@ -2,6 +2,7 @@
 
 use crate::compositor::SmearorCompositor;
 use crate::surface::dialog::DialogSizeQuery;
+use smearor_wrot_state_margin::MarginStateAccessor;
 use smithay::desktop::Window;
 use smithay::reexports::wayland_server::Resource;
 use smithay::reexports::wayland_server::backend::ObjectId;

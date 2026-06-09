@@ -12,10 +12,11 @@ rust-version.workspace = true
 [dependencies]
 dashmap = { workspace = true }
 gtk4 = { workspace = true }
-smearor-wrot-window = { path = "../smearor-wrot-window" }
-smearor-wrot-debug-overlay = { path = "../smearor-wrot-debug-overlay" }
-smearor-wrot-keyboard = { path = "../smearor-wrot-keyboard" }
+smearor-wrot-state-debug-overlay = { path = "../state/debug-overlay" }
+smearor-wrot-service-debug-overlay = { path = "../service/debug-overlay" }
 smearor-wrot-rotation = { workspace = true }
+smearor-wrot-state-keyboard = { path = "../state/keyboard" }
+smearor-wrot-state-window = { path = "../state/window" }
 smearor-wrot-compositor-widget = { path = "../smearor-wrot-compositor-widget" }
 thiserror = { workspace = true }
 typed-builder = { workspace = true }

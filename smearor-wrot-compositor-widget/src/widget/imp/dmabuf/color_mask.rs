@@ -1,10 +1,10 @@
 use crate::extract_pixel_data_from_texture;
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use gtk4::gdk::Texture;
-use smearor_wrot_color::ToHex;
 use smearor_wrot_color_mask::ColorMask;
 use smearor_wrot_compositor::SmearorCompositor;
 use smearor_wrot_compositor::color_mask::toplevel::TopLevelColorMask;
+use smearor_wrot_model_color::ToHex;
 use tracing::debug;
 use tracing::error;
 use tracing::info;

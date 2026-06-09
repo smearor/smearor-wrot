@@ -1,4 +1,5 @@
 use crate::SmearorCompositor;
+use smearor_wrot_state_margin::MarginStateAccessor;
 use smithay::wayland::shell::xdg::ToplevelSurface;
 use tracing::error;
 

@@ -1,9 +1,9 @@
 use crate::buffer::metadata::BufferMetadata;
 use crate::texture::pixel_data::BGRA;
 use crate::texture::pixel_data::PixelData;
-use smearor_wrot_color::RgbColor24;
-use smearor_wrot_color::RgbaColor;
 use smearor_wrot_color_mask::ColorMask;
+use smearor_wrot_model_color::RgbColor24;
+use smearor_wrot_model_color::RgbaColor;
 use std::fmt::Display;
 
 #[derive(Debug, Clone)]

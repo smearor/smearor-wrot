@@ -27,7 +27,7 @@ pub trait WindowFocus {
 
 impl WindowFocus for SmearorCompositor {
     fn set_keyboard_focus(&mut self, window: Option<&Window>, serial: Serial) {
-        let seat = &self.seat;
+        let seat = &self.states.seat;
         let Some(keyboard) = seat.get_keyboard() else {
             error!("Keyboard not available for focus setting");
             return;
@@ -45,7 +45,7 @@ impl WindowFocus for SmearorCompositor {
     }
 
     fn focused_window(&self) -> Option<Window> {
-        let seat = &self.seat;
+        let seat = &self.states.seat;
         let Some(keyboard) = seat.get_keyboard() else {
             error!("Keyboard not available for focus query");
             return None;
@@ -56,7 +56,7 @@ impl WindowFocus for SmearorCompositor {
 
     fn set_focus_to_active_window(&mut self) {
         let serial = smithay::utils::SERIAL_COUNTER.next_serial();
-        if let Some(keyboard) = self.seat.get_keyboard() {
+        if let Some(keyboard) = self.states.seat.get_keyboard() {
             let surface_to_focus = self
                 .space
                 .elements()
@@ -69,7 +69,7 @@ impl WindowFocus for SmearorCompositor {
 
     fn clear_focus(&mut self) {
         let serial = smithay::utils::SERIAL_COUNTER.next_serial();
-        if let Some(keyboard) = self.seat.get_keyboard() {
+        if let Some(keyboard) = self.states.seat.get_keyboard() {
             keyboard.set_focus(self, Option::<smithay::reexports::wayland_server::protocol::wl_surface::WlSurface>::None, serial);
         }
     }

@@ -1,12 +1,12 @@
 use crate::ChildProcess;
-use crate::ChildProcessConfig;
 use crate::ChildProcessStartError;
+use crate::ChildProcessState;
 use dashmap::DashMap;
 
 /// Manages all child processes
 pub struct ChildProcessManager {
     /// The list of child processes that are currently running with their start configuration
-    child_process: DashMap<ChildProcessConfig, ChildProcess>,
+    child_process: DashMap<ChildProcessState, ChildProcess>,
 }
 
 impl ChildProcessManager {
@@ -14,7 +14,7 @@ impl ChildProcessManager {
         Self { child_process: DashMap::new() }
     }
 
-    pub fn launch_child_process(&self, config: ChildProcessConfig) -> Result<(), ChildProcessStartError> {
+    pub fn launch_child_process(&self, config: ChildProcessState) -> Result<(), ChildProcessStartError> {
         let child_process = config.launch_child_process()?;
         self.child_process.insert(config, child_process);
         Ok(())

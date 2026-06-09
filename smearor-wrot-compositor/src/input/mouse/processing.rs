@@ -2,7 +2,8 @@ use crate::SmearorCompositor;
 use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::mouse::convert::GtkToSmithayMouseEventConverter;
 use crate::surface::SurfaceQuery;
-use smearor_wrot_geometry::Position;
+use smearor_wrot_model_geometry::Position;
+use smearor_wrot_state_margin::MarginStateAccessor;
 use smithay::backend::input::Axis;
 use smithay::backend::input::AxisSource;
 use smithay::input::pointer::AxisFrame;
@@ -23,7 +24,7 @@ impl MouseInputProcessing for SmearorCompositor {
     fn process_gtk_mouse_press(&mut self, button: u32) {
         debug!("Processing GTK mouse press: button {}", button);
 
-        let Some(pointer) = self.seat.get_pointer() else {
+        let Some(pointer) = self.states.seat.get_pointer() else {
             error!("Pointer not available for GTK mouse press");
             return;
         };
@@ -61,7 +62,7 @@ impl MouseInputProcessing for SmearorCompositor {
     }
 
     fn process_gtk_mouse_release(&mut self, button: u32) {
-        let Some(pointer) = self.seat.get_pointer() else {
+        let Some(pointer) = self.states.seat.get_pointer() else {
             error!("Pointer not available for GTK mouse release");
             return;
         };
@@ -79,7 +80,7 @@ impl MouseInputProcessing for SmearorCompositor {
             error!("Failed to get output geometry");
             return;
         };
-        let Some(pointer) = self.seat.get_pointer() else {
+        let Some(pointer) = self.states.seat.get_pointer() else {
             error!("Pointer not available for GTK mouse motion");
             return;
         };
@@ -131,7 +132,7 @@ impl MouseInputProcessing for SmearorCompositor {
     fn process_gtk_mouse_wheel(&mut self, dx: f64, dy: f64) {
         debug!("Processing GTK mouse wheel: dx={}, dy={}", dx, dy);
 
-        let Some(pointer) = self.seat.get_pointer() else {
+        let Some(pointer) = self.states.seat.get_pointer() else {
             error!("Pointer not available for GTK mouse wheel");
             return;
         };

@@ -35,7 +35,7 @@ impl KeyboardInputProcessing for SmearorCompositor {
     fn process_gtk_key_press(&mut self, keycode: u32) {
         let key_event = Self::convert_gtk_key_press(keycode);
 
-        let Some(keyboard) = self.seat.get_keyboard() else {
+        let Some(keyboard) = self.states.seat.get_keyboard() else {
             error!("Keyboard not available for GTK key press");
             return;
         };
@@ -46,7 +46,7 @@ impl KeyboardInputProcessing for SmearorCompositor {
     fn process_gtk_key_release(&mut self, keycode: u32) {
         let key_event = Self::convert_gtk_key_release(keycode);
 
-        let Some(keyboard) = self.seat.get_keyboard() else {
+        let Some(keyboard) = self.states.seat.get_keyboard() else {
             error!("Keyboard not available for GTK key release");
             return;
         };
@@ -72,7 +72,7 @@ impl KeyboardInputProcessing for SmearorCompositor {
     }
 
     fn focus_surface(&mut self, surface: &WlSurface) {
-        let Some(keyboard) = self.seat.get_keyboard() else {
+        let Some(keyboard) = self.states.seat.get_keyboard() else {
             error!("Keyboard not available for GTK key release");
             return;
         };
@@ -80,7 +80,7 @@ impl KeyboardInputProcessing for SmearorCompositor {
     }
 
     fn clear_focus(&mut self) {
-        let Some(keyboard) = self.seat.get_keyboard() else {
+        let Some(keyboard) = self.states.seat.get_keyboard() else {
             error!("Keyboard not available in seat");
             return;
         };

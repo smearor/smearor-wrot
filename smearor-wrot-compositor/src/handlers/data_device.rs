@@ -154,7 +154,7 @@ impl SelectionHandler for SmearorCompositor {
 
 impl DataDeviceHandler for SmearorCompositor {
     fn data_device_state(&self) -> &DataDeviceState {
-        &self.data_device_state
+        &self.states.data_device_state
     }
 }
 

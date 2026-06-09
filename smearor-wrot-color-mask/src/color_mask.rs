@@ -1,7 +1,7 @@
 use crate::DEFAULT_COLOR_MASK_TOLERANCE;
-use smearor_wrot_color::ParseHexError;
-use smearor_wrot_color::RgbColor;
-use smearor_wrot_color::ToHex;
+use smearor_wrot_model_color::ParseHexError;
+use smearor_wrot_model_color::RgbColor;
+use smearor_wrot_model_color::ToHex;
 use std::fmt::Display;
 use std::fmt::Formatter;
 

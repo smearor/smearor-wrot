@@ -1,6 +1,6 @@
 use clap::Parser;
-use smearor_wrot_application::ChildProcessConfig;
 use smearor_wrot_application::ChildProcessStartType;
+use smearor_wrot_application::ChildProcessState;
 use smearor_wrot_application::ChildProcessStdio;
 use smearor_wrot_application::SocketBuilder;
 use smearor_wrot_application::SocketBuilderError;
@@ -65,12 +65,12 @@ pub enum ChildProcessConfigError {
     SocketBuilderError(#[from] SocketBuilderError),
 }
 
-impl TryFrom<ChildProcessArguments> for ChildProcessConfig {
+impl TryFrom<ChildProcessArguments> for ChildProcessState {
     type Error = ChildProcessConfigError;
 
     fn try_from(args: ChildProcessArguments) -> Result<Self, Self::Error> {
         let socket = SocketBuilder::build(&args.socket)?;
-        let mut builder = ChildProcessConfig::builder(socket)
+        let mut builder = ChildProcessState::builder(socket)
             .command_arguments(args.command_arguments)
             .proxy_env_variables()
             .start_type(args.start_type.unwrap_or_default())

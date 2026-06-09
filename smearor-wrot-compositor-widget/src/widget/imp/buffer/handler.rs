@@ -7,7 +7,7 @@ use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_compositor::surface::SurfaceQuery;
 use smearor_wrot_compositor::texture::pixel_data::BGRA;
 use smearor_wrot_compositor::texture::pixel_data::PixelData;
-use smearor_wrot_geometry::Size;
+use smearor_wrot_model_geometry::Size;
 use std::path::PathBuf;
 
 impl BufferHandler for CompositorWidgetImpl {

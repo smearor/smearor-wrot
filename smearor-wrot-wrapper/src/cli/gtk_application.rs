@@ -1,5 +1,5 @@
 use clap::Parser;
-use smearor_wrot_application::GtkApplicationConfig;
+use smearor_wrot_application::GtkApplicationState;
 use std::sync::atomic::AtomicI64;
 
 #[derive(Parser, Debug, Clone)]
@@ -13,7 +13,7 @@ pub struct GtkApplicationArguments {
     pub(crate) max_fps: i64,
 }
 
-impl From<GtkApplicationArguments> for GtkApplicationConfig {
+impl From<GtkApplicationArguments> for GtkApplicationState {
     fn from(args: GtkApplicationArguments) -> Self {
         Self {
             id: args.id,

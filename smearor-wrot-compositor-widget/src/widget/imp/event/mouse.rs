@@ -14,7 +14,7 @@ use gtk4::prelude::EventControllerExt;
 use gtk4::prelude::GestureExt;
 use gtk4::prelude::GestureSingleExt;
 use gtk4::prelude::WidgetExt;
-use smearor_wrot_geometry::Position;
+use smearor_wrot_model_geometry::Position;
 use tracing::debug;
 
 impl CompositorWidgetImpl {

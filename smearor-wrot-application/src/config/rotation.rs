@@ -5,7 +5,7 @@ use std::sync::atomic::AtomicU64;
 use typed_builder::TypedBuilder;
 
 #[derive(Debug, TypedBuilder)]
-pub struct RotationConfig {
+pub struct RotationState {
     #[builder(default)]
     pub disable_rotation: AtomicBool,
 

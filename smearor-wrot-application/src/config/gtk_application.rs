@@ -2,7 +2,7 @@ use std::sync::atomic::AtomicI64;
 use typed_builder::TypedBuilder;
 
 #[derive(Debug, TypedBuilder)]
-pub struct GtkApplicationConfig {
+pub struct GtkApplicationState {
     /// The GTK application id.
     #[builder(default)]
     pub id: Option<String>,

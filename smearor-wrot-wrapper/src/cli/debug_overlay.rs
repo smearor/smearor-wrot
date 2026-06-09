@@ -1,5 +1,5 @@
 use clap::Parser;
-use smearor_wrot_application::DebugOverlayConfig;
+use smearor_wrot_application::DebugOverlayState;
 use std::sync::atomic::AtomicBool;
 
 #[derive(Parser, Debug, Clone)]
@@ -13,9 +13,9 @@ pub struct DebugOverlayArguments {
     pub(crate) debug_touch: bool,
 }
 
-impl From<DebugOverlayArguments> for DebugOverlayConfig {
+impl From<DebugOverlayArguments> for DebugOverlayState {
     fn from(args: DebugOverlayArguments) -> Self {
-        DebugOverlayConfig {
+        DebugOverlayState {
             debug_pointer: AtomicBool::new(args.debug_pointer),
             debug_touch: AtomicBool::new(args.debug_touch),
         }

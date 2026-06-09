@@ -7,7 +7,6 @@ use smearor_wrot_compositor_widget::widget::commit::CommitHandler;
 use smearor_wrot_compositor_widget::widget::config::handler::ConfigHandler;
 use smearor_wrot_compositor_widget::widget::dmabuf::handler::DmabufHandler;
 use smearor_wrot_compositor_widget::widget::shm::handler::ShmHandler;
-use smearor_wrot_debug_overlay::DebugOverlayHandler;
 use smearor_wrot_debug_overlay::DebugOverlayManager;
 use smearor_wrot_keyboard::manager::KeyboardManager;
 use smearor_wrot_rotation::RotationWidget;

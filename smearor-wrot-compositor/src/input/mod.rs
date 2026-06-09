@@ -42,7 +42,7 @@ impl InputProcessing for SmearorCompositor {
                 let serial = SERIAL_COUNTER.next_serial();
                 let time = Event::time_msec(&event);
 
-                if let Some(keyboard) = self.seat.get_keyboard() {
+                if let Some(keyboard) = self.states.seat.get_keyboard() {
                     keyboard.input::<Self, _>(self, event.key_code(), event.state(), serial, time, |_, _, _| FilterResult::Forward);
                 } else {
                     error!("Keyboard not available for input event");
@@ -64,7 +64,7 @@ impl InputProcessing for SmearorCompositor {
 
                 let serial = SERIAL_COUNTER.next_serial();
 
-                let Some(pointer) = self.seat.get_pointer() else {
+                let Some(pointer) = self.states.seat.get_pointer() else {
                     error!("Pointer not available for input event");
                     return;
                 };
@@ -83,12 +83,12 @@ impl InputProcessing for SmearorCompositor {
                 pointer.frame(self);
             }
             InputEvent::PointerButton { event, .. } => {
-                let Some(pointer) = self.seat.get_pointer() else {
+                let Some(pointer) = self.states.seat.get_pointer() else {
                     error!("Pointer not available for button event");
                     return;
                 };
 
-                let Some(keyboard) = self.seat.get_keyboard() else {
+                let Some(keyboard) = self.states.seat.get_keyboard() else {
                     error!("Keyboard not available for button event");
                     return;
                 };
@@ -133,7 +133,7 @@ impl InputProcessing for SmearorCompositor {
                 pointer.frame(self);
             }
             InputEvent::PointerAxis { event, .. } => {
-                let Some(pointer) = self.seat.get_pointer() else {
+                let Some(pointer) = self.states.seat.get_pointer() else {
                     error!("Pointer not available for axis event");
                     return;
                 };

@@ -16,7 +16,7 @@ impl SeatHandler for SmearorCompositor {
     type TouchFocus = WlSurface;
 
     fn seat_state(&mut self) -> &mut SeatState<SmearorCompositor> {
-        &mut self.seat_state
+        &mut self.states.seat_state
     }
 
     fn focus_changed(&mut self, seat: &Seat<Self>, focused: Option<&WlSurface>) {

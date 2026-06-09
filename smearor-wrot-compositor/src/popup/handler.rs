@@ -42,8 +42,8 @@ impl PopupHandler for SmearorCompositor {
     }
 
     fn handle_popup_commits(&mut self, surface: &WlSurface) {
-        self.popups.commit(surface);
-        if let Some(popup) = self.popups.find_popup(surface) {
+        self.states.popups.commit(surface);
+        if let Some(popup) = self.states.popups.find_popup(surface) {
             match popup {
                 PopupKind::Xdg(ref xdg) => {
                     if !xdg.is_initial_configure_sent() {

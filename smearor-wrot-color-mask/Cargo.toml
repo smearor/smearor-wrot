@@ -11,6 +11,6 @@ rust-version.workspace = true
 
 [dependencies]
 atomic_float = { workspace = true }
-smearor-wrot-color = { path = "../smearor-wrot-color" }
+smearor-wrot-model-color = { path = "../model/color" }
 thiserror = { workspace = true }
 typed-builder = { workspace = true }

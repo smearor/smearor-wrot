@@ -13,7 +13,7 @@ use smearor_wrot_compositor::dialog::handler::DialogHandler;
 use smearor_wrot_compositor::popup::handler::PopupHandler;
 use smearor_wrot_compositor::subsurface::handler::SubsurfaceHandler;
 use smearor_wrot_compositor::surface::SurfaceQuery;
-use smearor_wrot_geometry::Size;
+use smearor_wrot_model_geometry::Size;
 use std::sync::atomic::Ordering;
 use tracing::debug;
 

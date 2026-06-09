@@ -3,7 +3,7 @@ use crate::CompositorWidgetConfig;
 use crate::widget::config::error::ConfigError;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use gtk4::Orientation;
-use smearor_wrot_geometry::Size;
+use smearor_wrot_model_geometry::Size;
 
 pub trait ConfigHandler {
     fn set_config(&self, config: CompositorWidgetConfig);

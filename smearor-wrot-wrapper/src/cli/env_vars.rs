@@ -1,5 +1,5 @@
 use clap::Parser;
-use smearor_wrot_application::EnvironmentVariablesConfig;
+use smearor_wrot_application::EnvironmentVariablesState;
 use std::sync::atomic::AtomicBool;
 
 /// Environment variables for the parent process.
@@ -14,7 +14,7 @@ pub struct EnvironmentVariablesArguments {
     pub(crate) env_override_wayland_display: Option<String>,
 }
 
-impl From<EnvironmentVariablesArguments> for EnvironmentVariablesConfig {
+impl From<EnvironmentVariablesArguments> for EnvironmentVariablesState {
     fn from(args: EnvironmentVariablesArguments) -> Self {
         Self {
             env_override_wayland_debug: AtomicBool::new(args.env_override_wayland_debug),

@@ -17,7 +17,7 @@ use smearor_wrot_compositor::DmaBufAllocator;
 use smearor_wrot_compositor::OutputGeometry;
 use smearor_wrot_compositor::SmearorCompositor;
 use smearor_wrot_compositor::WindowSizeCallbackAware;
-use smearor_wrot_geometry::Size;
+use smearor_wrot_model_geometry::Size;
 use smithay::reexports::calloop::EventLoop;
 use smithay::reexports::wayland_server::Display;
 use std::sync::Arc;

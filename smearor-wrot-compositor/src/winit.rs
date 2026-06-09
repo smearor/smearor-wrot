@@ -117,7 +117,7 @@ pub fn init_winit(event_loop: &mut EventLoop<CalloopData>, data: &mut CalloopDat
                     }
                     // state.lock().unwrap().space.refresh();
                     if let Ok(mut state) = state.lock() {
-                        state.popups.cleanup();
+                        state.states.popups.cleanup();
                     }
 
                     let _ = display.flush_clients();

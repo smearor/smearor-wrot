@@ -12,7 +12,7 @@ use smearor_wrot_compositor::commit::timing::CommitTiming;
 use smearor_wrot_compositor::texture::pixel_data::BGRA;
 use smearor_wrot_compositor::texture::pixel_data::PixelData;
 use smearor_wrot_compositor::texture::pixel_data::RGBA;
-use smearor_wrot_geometry::Size;
+use smearor_wrot_model_geometry::Size;
 use smithay::backend::renderer::buffer_dimensions;
 use smithay::reexports::wayland_server::backend::ObjectId;
 use smithay::reexports::wayland_server::protocol::wl_buffer::WlBuffer;

@@ -1,0 +1,21 @@
+[package]
+name = "smearor-wrot-service-debug-overlay"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+dashmap = { workspace = true }
+gtk4 = { workspace = true }
+smearor-wrot-model-color = { path = "../../model/color", features = ["gtk4"] }
+smearor-wrot-model-geometry = { path = "../../model/geometry", features = ["gtk4", "smithay"] }
+smearor-wrot-state-debug-overlay = { path = "../../state/debug-overlay" }
+typed-builder = { workspace = true }
+
+[features]
+default = []

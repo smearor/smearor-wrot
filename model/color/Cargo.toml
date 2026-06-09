@@ -1,0 +1,16 @@
+[package]
+name = "smearor-wrot-model-color"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+dashmap = { workspace = true }
+gtk4 = { workspace = true, optional = true }
+thiserror = { workspace = true }
+typed-builder = { workspace = true }

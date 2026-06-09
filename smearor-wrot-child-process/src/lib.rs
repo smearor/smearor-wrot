@@ -4,9 +4,9 @@ pub mod manager;
 pub mod socket;
 
 pub use child_process::child_process::ChildProcess;
-pub use child_process::config::ChildProcessConfig;
 pub use child_process::error::ChildProcessStartError;
 pub use child_process::start_type::ChildProcessStartType;
+pub use child_process::state::ChildProcessState;
 pub use child_process::stdio::ChildProcessStdio;
 pub use env::*;
 pub use manager::ChildProcessManager;

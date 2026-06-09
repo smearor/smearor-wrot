@@ -1,0 +1,14 @@
+[package]
+name = "smearor-wrot-state-debug-overlay"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+thiserror = { workspace = true }
+typed-builder = { workspace = true }

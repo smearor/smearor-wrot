@@ -1,0 +1,17 @@
+[package]
+name = "smearor-wrot-state-window"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme.workspace = true
+repository.workspace = true
+homepage.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+atomic_float = { workspace = true }
+gtk4 = { workspace = true }
+smearor-wrot-model-geometry = { path = "../../model/geometry" }
+smearor-wrot-state-layer-shell = { path = "../layer-shell" }
+typed-builder = { workspace = true }

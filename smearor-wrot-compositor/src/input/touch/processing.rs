@@ -2,7 +2,7 @@ use crate::SmearorCompositor;
 use crate::input::keyboard::processing::KeyboardInputProcessing;
 use crate::input::time::get_time;
 use crate::surface::SurfaceQuery;
-use smearor_wrot_geometry::Position;
+use smearor_wrot_model_geometry::Position;
 use smithay::input::touch::DownEvent;
 use smithay::input::touch::MotionEvent;
 use smithay::input::touch::UpEvent;
@@ -33,11 +33,11 @@ impl TouchInputProcessing for SmearorCompositor {
             return;
         };
 
-        let Some(touch) = self.seat.get_touch() else {
+        let Some(touch) = self.states.seat.get_touch() else {
             debug!("Touch not available for GTK touch down");
             return;
         };
-        let Some(pointer) = self.seat.get_pointer() else {
+        let Some(pointer) = self.states.seat.get_pointer() else {
             debug!("Pointer not available for GTK touch down");
             return;
         };
@@ -68,7 +68,7 @@ impl TouchInputProcessing for SmearorCompositor {
     fn process_gtk_touch_up(&mut self, sequence: usize) {
         debug!("Processing GTK touch up: sequence={}", sequence);
 
-        let Some(touch) = self.seat.get_touch() else {
+        let Some(touch) = self.states.seat.get_touch() else {
             debug!("Touch not available for GTK touch up");
             return;
         };
@@ -101,7 +101,7 @@ impl TouchInputProcessing for SmearorCompositor {
             return;
         };
 
-        let Some(touch) = self.seat.get_touch() else {
+        let Some(touch) = self.states.seat.get_touch() else {
             debug!("Touch not available for GTK touch motion");
             return;
         };

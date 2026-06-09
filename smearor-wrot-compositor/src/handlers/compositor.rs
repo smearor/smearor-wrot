@@ -34,12 +34,13 @@ use crate::surface::commit::TopLevelCommitHandler;
 use crate::texture::cache::TextureCacheEntry;
 use crate::texture::pixel_data::BGRA;
 use crate::texture::pixel_data::PixelData;
+use smearor_wrot_state_margin::MarginStateAccessor;
 use tracing::debug;
 use tracing::error;
 
 impl CompositorHandler for SmearorCompositor {
     fn compositor_state(&mut self) -> &mut CompositorState {
-        &mut self.compositor_state
+        &mut self.states.compositor_state
     }
 
     fn client_compositor_state<'a>(&self, client: &'a Client) -> &'a CompositorClientState {

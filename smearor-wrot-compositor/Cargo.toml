@@ -16,11 +16,12 @@ image = { workspace = true }
 input-event-codes = { workspace = true }
 miette = { workspace = true }
 nix = { workspace = true }
+smearor-wrot-model-color = { path = "../model/color" }
 smearor-wrot-child-process = { path = "../smearor-wrot-child-process", features = ["smithay"] }
-smearor-wrot-color = { path = "../smearor-wrot-color" }
 smearor-wrot-color-mask = { path = "../smearor-wrot-color-mask" }
-smearor-wrot-geometry = { path = "../smearor-wrot-geometry", features = ["smithay"] }
-smearor-wrot-margin = { path = "../smearor-wrot-margin" }
+smearor-wrot-model-geometry = { path = "../model/geometry", features = ["smithay"] }
+smearor-wrot-state-keyboard = { path = "../state/keyboard" }
+smearor-wrot-state-margin = { path = "../state/margin" }
 smithay = { workspace = true, features = ["backend_winit", "desktop", "wayland_frontend", "renderer_gl", "use_system_lib"] }
 thiserror = { workspace = true }
 tracing = { workspace = true }

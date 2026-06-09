@@ -1,7 +1,7 @@
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_debug_overlay::DebugOverlayConfig;
 use smearor_wrot_debug_overlay::DebugOverlayHandler;
-use smearor_wrot_geometry::Position;
+use smearor_wrot_model_geometry::Position;
 
 impl DebugOverlayHandler for CompositorWidgetImpl {
     fn update_debug_overlay_config(&self, config: DebugOverlayConfig) {

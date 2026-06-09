@@ -22,9 +22,10 @@ use crate::texture::pixel_data::BGRA;
 use dashmap::DashMap;
 use dashmap::DashSet;
 use smearor_wrot_child_process::ChildProcessManager;
-use smearor_wrot_color::RgbaColor;
 use smearor_wrot_color_mask::ColorMask;
-use smearor_wrot_margin::MarginManager;
+use smearor_wrot_model_color::RgbaColor;
+use smearor_wrot_state_keyboard::manager::KeyboardManager;
+use smearor_wrot_state_margin::MarginManager;
 use smithay::backend::allocator::format::FormatSet;
 use smithay::desktop::PopupManager;
 use smithay::desktop::Space;
@@ -219,6 +220,7 @@ impl SmearorCompositor {
     pub fn new(
         child_process_manager: Arc<ChildProcessManager>,
         margin_manager: Arc<MarginManager>,
+        keyboard_manager: Arc<KeyboardManager>,
         // DONE
         // socket: Option<Socket>,
         // TODO
@@ -368,6 +370,7 @@ impl SmearorCompositor {
         Ok(Self {
             child_process_manager,
             margin_manager,
+            keyboard_manager,
 
             start_time,
             display_handle: dh,
@@ -519,7 +522,7 @@ impl SmearorCompositor {
     /// Send configure events to all toplevels to force them to send new buffers
     /// This triggers color detection because new buffers will be rendered
     pub fn force_buffer_update(&self) {
-        for toplevel in self.xdg_shell_state.toplevel_surfaces().iter() {
+        for toplevel in self.states.xdg_shell_state.toplevel_surfaces().iter() {
             if let Some(window) = self
                 .space
                 .elements()

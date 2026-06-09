@@ -1,4 +1,4 @@
-use crate::ChildProcessConfig;
+use crate::ChildProcessState;
 use crate::Socket;
 use std::io::BufRead;
 use std::io::BufReader;
@@ -12,11 +12,11 @@ pub struct ChildProcess {
     child: Child,
 
     /// The config of the child process
-    config: ChildProcessConfig,
+    config: ChildProcessState,
 }
 
 impl ChildProcess {
-    pub fn new(mut child: Child, config: ChildProcessConfig) -> Self {
+    pub fn new(mut child: Child, config: ChildProcessState) -> Self {
         Self { child, config }
     }
 

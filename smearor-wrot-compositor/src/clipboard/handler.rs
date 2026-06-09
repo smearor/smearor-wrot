@@ -21,7 +21,7 @@ impl ClipboardSelectionHandler for SmearorCompositor {
         let display_handle = display.handle();
         set_data_device_selection(
             &display_handle,
-            &self.seat,
+            &self.states.seat,
             mime_types,
             (), // TODO: Phase 1 - Clipboard Integration - Provide proper user_data
         );

@@ -12,7 +12,7 @@ pub trait ShutdownHandler {
 impl ShutdownHandler for SmearorCompositor {
     fn check_and_request_shutdown(&mut self) {
         // Check XdgShellState instead of Space, as Smithay manages surface lifecycle there
-        let toplevel_count = self.xdg_shell_state.toplevel_surfaces().len();
+        let toplevel_count = self.states.xdg_shell_state.toplevel_surfaces().len();
 
         // Also check for active subsurfaces - Firefox uses subsurface architecture
         // where content is in subsurface but toplevel might not have buffer

@@ -2,7 +2,7 @@ use atomic_float::AtomicF32;
 use clap::Parser;
 use smearor_wrot_application::Position;
 use smearor_wrot_application::Size;
-use smearor_wrot_application::WindowConfig;
+use smearor_wrot_application::WindowState;
 use std::sync::atomic::AtomicBool;
 
 #[derive(Parser, Debug, Clone)]
@@ -68,7 +68,7 @@ pub struct WindowArguments {
     pub(crate) y: Option<i32>,
 }
 
-impl From<WindowArguments> for WindowConfig {
+impl From<WindowArguments> for WindowState {
     fn from(args: WindowArguments) -> Self {
         Self {
             aspect_ratio: args.aspect_ratio.map(|aspect_ratio| AtomicF32::new(aspect_ratio)),
