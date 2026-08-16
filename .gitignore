@@ -24,5 +24,11 @@ gir-files/*.gir
 
 .idea
 
+deprecated
+
+.fastembed_cache
+
+book/book
+
 *.log
 *.bak
