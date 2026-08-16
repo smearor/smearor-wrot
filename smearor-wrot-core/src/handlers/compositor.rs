@@ -27,7 +27,7 @@ use crate::commit::count::CommitCount;
 use crate::commit::timing::CommitTiming;
 use crate::margin::handler::MarginHandler;
 use crate::message::CompositorMessage;
-use crate::message::sender::CompositorMessageSender;
+use crate::CompositorMessageSender;
 use crate::popup::handler::PopupHandler;
 use crate::subsurface::model::SubsurfaceData;
 use crate::surface::SurfaceQuery;

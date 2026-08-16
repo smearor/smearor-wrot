@@ -42,6 +42,7 @@ pub use error::CoreError;
 pub use logging::init_logging;
 pub use logging::init_logging_with_level;
 pub use message::CompositorMessage;
+pub use message::CompositorMessageSender;
 pub use output::OutputGeometry;
 pub use render::DoubleBuffer;
 pub use render::OutputRendering;

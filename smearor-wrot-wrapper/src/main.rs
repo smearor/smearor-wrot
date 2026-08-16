@@ -35,7 +35,7 @@ use smearor_wrot_core::frame::limit::FrameLimiter;
 use smearor_wrot_core::init_logging;
 use smearor_wrot_core::margin::handler::MarginHandler;
 use smearor_wrot_core::message::CompositorMessage;
-use smearor_wrot_core::message::sender::CompositorMessageSender;
+use smearor_wrot_core::CompositorMessageSender;
 use smearor_wrot_core::windows::decoration::ClientDecorationAware;
 use smearor_wrot_core::windows::title::WindowTitle;
 use smearor_wrot_gtk::CompositorWidget;

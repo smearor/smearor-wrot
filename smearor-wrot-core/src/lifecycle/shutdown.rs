@@ -1,6 +1,6 @@
 use crate::SmearorCompositor;
 use crate::message::CompositorMessage;
-use crate::message::sender::CompositorMessageSender;
+use crate::CompositorMessageSender;
 use crate::subsurface::handler::SubsurfaceHandler;
 use tracing::debug;
 

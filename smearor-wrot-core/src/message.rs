@@ -1,6 +1,7 @@
 use crate::SmearorCompositor;
-use crate::message::CompositorMessage;
 use std::sync::mpsc::Sender;
+
+pub use smearor_wrot_model::message::CompositorMessage;
 
 pub trait CompositorMessageSender {
     /// Set the message sender for communicating with GTK wrapper
