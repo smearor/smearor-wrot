@@ -38,9 +38,29 @@ impl Size<f32> {
             height: height as f32,
         }
     }
+
+    /// Rounds to the nearest integer (standard for display coordinates)
+    pub fn to_i32_round(&self) -> Size<i32> {
+        Size::new(self.width.round() as i32, self.height.round() as i32)
+    }
+
+    /// Rounds down (for clipping/bounding boxes, to not exceed any pixels)
+    pub fn to_i32_floor(&self) -> Size<i32> {
+        Size::new(self.width.floor() as i32, self.height.floor() as i32)
+    }
+
+    /// Rounds up (for damage tracking, to capture all affected pixels)
+    pub fn to_i32_ceil(&self) -> Size<i32> {
+        Size::new(self.width.ceil() as i32, self.height.ceil() as i32)
+    }
 }
 
 impl Size<i32> {
+    /// Lossless conversion from Size<i32> to Size<f32>
+    pub fn to_f32(&self) -> Size<f32> {
+        Size::new(self.width as f32, self.height as f32)
+    }
+
     pub fn max(&self, other: &Self) -> Size<i32> {
         Size::new(self.width.max(other.width), self.height.max(other.height))
     }

@@ -1,10 +1,12 @@
 use crate::RgbaColor;
 use crate::geometry::position::Position;
+#[cfg(feature = "gtk4")]
 use gtk4::Snapshot;
 #[cfg(feature = "gtk4")]
 use gtk4::gdk::RGBA;
 #[cfg(feature = "gtk4")]
 use gtk4::graphene::Rect;
+#[cfg(feature = "gtk4")]
 use gtk4::prelude::SnapshotExt;
 use std::fmt::Debug;
 
@@ -118,5 +120,86 @@ impl PointerPosition<f32> {
         snapshot.append_color(&app_color, &self.app_bottom());
         snapshot.append_color(&app_color, &self.app_left());
         snapshot.append_color(&app_color, &self.app_right());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::geometry::position::Position;
+
+    #[test]
+    fn test_pointer_position_new() {
+        let pos = PointerPosition::new(
+            Position::new(10.0, 20.0),
+            Position::new(30.0, 40.0),
+            40.0,
+            DEFAULT_GTK_POINTER_COLOR,
+            DEFAULT_APP_POINTER_COLOR,
+            2.0,
+        );
+        assert_eq!(pos.gtk_pos.x, 10.0);
+        assert_eq!(pos.gtk_pos.y, 20.0);
+        assert_eq!(pos.app_pos.x, 30.0);
+        assert_eq!(pos.app_pos.y, 40.0);
+        assert_eq!(pos.size, 40.0);
+        assert_eq!(pos.border_width, 2.0);
+    }
+
+    #[cfg(feature = "gtk4")]
+    #[test]
+    fn test_pointer_position_new_pointer() {
+        let pos = PointerPosition::<f32>::new_pointer(
+            Position::new(100.0, 200.0),
+            Position::new(150.0, 250.0),
+        );
+        assert_eq!(pos.size, DEFAULT_POINTER_SIZE);
+        assert_eq!(pos.gtk_color, DEFAULT_GTK_POINTER_COLOR);
+        assert_eq!(pos.app_color, DEFAULT_APP_POINTER_COLOR);
+        assert_eq!(pos.border_width, DEFAULT_POINTER_BORDER_WIDTH);
+    }
+
+    #[cfg(feature = "gtk4")]
+    #[test]
+    fn test_pointer_position_new_touch() {
+        let pos = PointerPosition::<f32>::new_touch(
+            Position::new(100.0, 200.0),
+            Position::new(150.0, 250.0),
+        );
+        assert_eq!(pos.size, DEFAULT_POINTER_SIZE);
+        assert_eq!(pos.gtk_color, DEFAULT_GTK_TOUCH_COLOR);
+        assert_eq!(pos.app_color, DEFAULT_APP_TOUCH_COLOR);
+    }
+
+    #[cfg(feature = "gtk4")]
+    #[test]
+    fn test_pointer_position_gtk_rect() {
+        let pos = PointerPosition::<f32>::new_pointer(
+            Position::new(100.0, 200.0),
+            Position::new(150.0, 250.0),
+        );
+        let rect = pos.gtk_rect();
+        let expected_x = 100.0 - DEFAULT_POINTER_SIZE / 2.0;
+        let expected_y = 200.0 - DEFAULT_POINTER_SIZE / 2.0;
+        assert_eq!(rect.x(), expected_x);
+        assert_eq!(rect.y(), expected_y);
+        assert_eq!(rect.width(), DEFAULT_POINTER_SIZE);
+        assert_eq!(rect.height(), DEFAULT_POINTER_SIZE);
+    }
+
+    #[cfg(feature = "gtk4")]
+    #[test]
+    fn test_pointer_position_app_rect() {
+        let pos = PointerPosition::<f32>::new_pointer(
+            Position::new(100.0, 200.0),
+            Position::new(150.0, 250.0),
+        );
+        let rect = pos.app_rect();
+        let expected_x = 150.0 - DEFAULT_POINTER_SIZE / 2.0;
+        let expected_y = 250.0 - DEFAULT_POINTER_SIZE / 2.0;
+        assert_eq!(rect.x(), expected_x);
+        assert_eq!(rect.y(), expected_y);
+        assert_eq!(rect.width(), DEFAULT_POINTER_SIZE);
+        assert_eq!(rect.height(), DEFAULT_POINTER_SIZE);
     }
 }

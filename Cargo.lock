@@ -2911,7 +2911,6 @@ checksum = "8ed6a63f02c8539c91a8685a86f4099661ba3da017932f6ebbea6de3f0fa7c90"
 name = "smearor-wrot-application"
 version = "0.1.0"
 dependencies = [
- "regex",
  "serde",
  "smearor-wrot-model",
  "thiserror 2.0.20",
@@ -2967,8 +2966,12 @@ version = "0.1.0"
 dependencies = [
  "dashmap",
  "gtk4",
+ "image",
+ "regex",
+ "serde",
  "smithay",
  "thiserror 2.0.20",
+ "toml",
  "typed-builder",
 ]
 
@@ -3025,7 +3028,6 @@ dependencies = [
  "gtk4",
  "gtk4-layer-shell",
  "miette",
- "serde",
  "smearor-wrot-application",
  "smearor-wrot-core",
  "smearor-wrot-gtk",

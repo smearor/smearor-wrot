@@ -16,8 +16,6 @@ use gtk4::graphene::Rect;
 use gtk4::gsk::RoundedRect;
 use gtk4::prelude::*;
 use gtk4::subclass::prelude::WidgetImpl;
-use smearor_wrot_model::color::hex::ToHex;
-use smearor_wrot_model::color::rgba::RgbaColor;
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::atomic::Ordering;
@@ -329,7 +327,7 @@ impl WidgetImpl for PieMenuWidgetImpl {
             let item_y = center_y + (radius * 0.7) * angle_rad.sin();
 
             // Draw item background circle
-            let item_color: RGBA = RgbaColor::parse_hex(&item.color).unwrap_or(RgbaColor::with_rgb(0.5, 0.5, 0.5, 0.5)).into();
+            let item_color: RGBA = item.color.into();
             let item_radius = item.radius();
 
             // Highlight if hovered
@@ -373,9 +371,7 @@ impl WidgetImpl for PieMenuWidgetImpl {
             let font_desc = gtk4::pango::FontDescription::from_string("Sans 7");
             pango_layout.set_font_description(Some(&font_desc));
 
-            let label_color = RgbaColor::parse_hex(&item.label_color)
-                .unwrap_or(RgbaColor::with_rgb(1.0, 1.0, 1.0, 0.5))
-                .into();
+            let label_color: RGBA = item.label_color.into();
             let (_ink_rect, logical_rect) = pango_layout.extents();
             let label_width = logical_rect.width() as f32 / gtk4::pango::SCALE as f32;
             // let label_height = logical_rect.height() as f32 / gtk4::pango::SCALE as f32;

@@ -10,9 +10,8 @@ homepage.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-regex = { workspace = true }
 serde = { workspace = true }
-smearor-wrot-model = { path = "../smearor-wrot-model" }
+smearor-wrot-model = { path = "../smearor-wrot-model", features = ["regex"] }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 typed-builder = { workspace = true }

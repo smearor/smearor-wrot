@@ -1,10 +1,9 @@
 use crate::SmearorCompositor;
 use crate::color_mask::error::ColorMaskError;
 use crate::color_mask::mask::ColorMask;
+use smearor_wrot_model::color::DEFAULT_COLOR_MASK_TOLERANCE;
 use std::sync::atomic::Ordering;
 use tracing::debug;
-
-pub const DEFAULT_COLOR_MASK_TOLERANCE: f32 = 0.1;
 
 pub trait TopLevelColorMask {
     /// Get color mask

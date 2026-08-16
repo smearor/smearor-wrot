@@ -19,11 +19,10 @@ directories = { workspace = true }
 gtk4 = { workspace = true }
 gtk4-layer-shell = { workspace = true }
 miette = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
 smearor-wrot-core = { path = "../smearor-wrot-core" }
 smearor-wrot-application = { path = "../smearor-wrot-application" }
 smearor-wrot-gtk = { path = "../smearor-wrot-gtk" }
-smearor-wrot-model = { path = "../smearor-wrot-model" }
+smearor-wrot-model = { path = "../smearor-wrot-model", features = ["serde"] }
 smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
 smearor-wrot-rotation = { workspace = true }
 tokio = { workspace = true }

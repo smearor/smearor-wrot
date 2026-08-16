@@ -21,3 +21,41 @@ impl Display for Margins {
         write!(f, "(left: {}, right: {}, top: {}, bottom: {})", self.left, self.right, self.top, self.bottom)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_margins_new() {
+        let margins = Margins::new(10, 20, 30, 40);
+        assert_eq!(margins.left, 10);
+        assert_eq!(margins.right, 20);
+        assert_eq!(margins.top, 30);
+        assert_eq!(margins.bottom, 40);
+    }
+
+    #[test]
+    fn test_margins_default() {
+        let margins = Margins::default();
+        assert_eq!(margins.left, 0);
+        assert_eq!(margins.right, 0);
+        assert_eq!(margins.top, 0);
+        assert_eq!(margins.bottom, 0);
+    }
+
+    #[test]
+    fn test_margins_display() {
+        let margins = Margins::new(10, 20, 30, 40);
+        assert_eq!(format!("{}", margins), "(left: 10, right: 20, top: 30, bottom: 40)");
+    }
+
+    #[test]
+    fn test_margins_builder() {
+        let margins = Margins::builder().left(5).right(15).top(25).bottom(35).build();
+        assert_eq!(margins.left, 5);
+        assert_eq!(margins.right, 15);
+        assert_eq!(margins.top, 25);
+        assert_eq!(margins.bottom, 35);
+    }
+}

@@ -17,7 +17,7 @@ image = { workspace = true }
 input-event-codes = { workspace = true }
 miette = { workspace = true }
 nix = { workspace = true }
-smearor-wrot-model = { path = "../smearor-wrot-model", features = ["smithay"] }
+smearor-wrot-model = { path = "../smearor-wrot-model", features = ["image", "smithay"] }
 smithay = { workspace = true, features = ["backend_winit", "desktop", "wayland_frontend", "renderer_gl", "use_system_lib"] }
 thiserror = { workspace = true }
 tokio = { workspace = true }

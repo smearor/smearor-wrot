@@ -5,7 +5,7 @@ use std::fmt::Formatter;
 use std::hash::Hash;
 use typed_builder::TypedBuilder;
 
-#[derive(Debug, Clone, Copy, TypedBuilder)]
+#[derive(Debug, Clone, Copy, PartialEq, TypedBuilder)]
 pub struct RgbColor {
     pub red: f32,
     pub green: f32,

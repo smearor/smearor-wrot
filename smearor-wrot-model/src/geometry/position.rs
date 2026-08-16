@@ -1,6 +1,8 @@
+#[cfg(feature = "gtk4")]
 use crate::geometry::size::Size;
 #[cfg(feature = "gtk4")]
 use gtk4::graphene::Rect;
+#[cfg(feature = "smithay")]
 use smithay::utils::Point;
 use std::fmt::Debug;
 use std::fmt::Display;
@@ -29,6 +31,28 @@ impl Position<f32> {
 
     pub fn new_from_i32(x: i32, y: i32) -> Self {
         Self { x: x as f32, y: y as f32 }
+    }
+
+    /// Rounds to the nearest integer (standard for display coordinates)
+    pub fn to_i32_round(&self) -> Position<i32> {
+        Position::new(self.x.round() as i32, self.y.round() as i32)
+    }
+
+    /// Rounds down (for clipping/bounding boxes, to not exceed any pixels)
+    pub fn to_i32_floor(&self) -> Position<i32> {
+        Position::new(self.x.floor() as i32, self.y.floor() as i32)
+    }
+
+    /// Rounds up (for damage tracking, to capture all affected pixels)
+    pub fn to_i32_ceil(&self) -> Position<i32> {
+        Position::new(self.x.ceil() as i32, self.y.ceil() as i32)
+    }
+}
+
+impl Position<i32> {
+    /// Lossless conversion from Position<i32> to Position<f32>
+    pub fn to_f32(&self) -> Position<f32> {
+        Position::new(self.x as f32, self.y as f32)
     }
 }
 

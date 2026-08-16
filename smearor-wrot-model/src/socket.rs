@@ -39,3 +39,42 @@ impl From<PathBuf> for Socket {
         Self(path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_socket_from_pathbuf() {
+        let path = PathBuf::from("/tmp/wayland-0");
+        let socket = Socket::from(path);
+        assert_eq!(socket.0, PathBuf::from("/tmp/wayland-0"));
+    }
+
+    #[test]
+    fn test_socket_deref() {
+        let socket = Socket::from(PathBuf::from("/tmp/wayland-0"));
+        let path: &Path = &*socket;
+        assert_eq!(path, Path::new("/tmp/wayland-0"));
+    }
+
+    #[test]
+    fn test_socket_as_ref_osstr() {
+        let socket = Socket::from(PathBuf::from("/tmp/wayland-0"));
+        let os_str: &OsStr = socket.as_ref();
+        assert_eq!(os_str, OsStr::new("/tmp/wayland-0"));
+    }
+
+    #[test]
+    fn test_socket_as_ref_str() {
+        let socket = Socket::from(PathBuf::from("/tmp/wayland-0"));
+        let s: &str = socket.as_ref();
+        assert_eq!(s, "/tmp/wayland-0");
+    }
+
+    #[test]
+    fn test_socket_display() {
+        let socket = Socket::from(PathBuf::from("/tmp/wayland-0"));
+        assert_eq!(format!("{}", socket), "/tmp/wayland-0");
+    }
+}

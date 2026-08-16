@@ -1,5 +1,11 @@
 //! Configuration for compositor widgets
 
+pub use smearor_wrot_model::color::ColorMask;
+#[cfg(feature = "serde")]
+use smearor_wrot_model::config::CompositorConfig;
+#[cfg(feature = "serde")]
+use smearor_wrot_model::config::WindowConfig;
+
 /// Configuration for the CompositorWidget
 ///
 /// This struct defines the layout and spacing parameters for the compositor widget.
@@ -66,17 +72,6 @@ pub struct CompositorWidgetConfig {
     pub keyboard_variant: Option<String>,
 }
 
-/// Color mask configuration for background replacement
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct ColorMask {
-    /// Red component (0.0-1.0)
-    pub red: f32,
-    /// Green component (0.0-1.0)
-    pub green: f32,
-    /// Blue component (0.0-1.0)
-    pub blue: f32,
-}
-
 /// Default configuration for CompositorWidget
 ///
 /// Returns a configuration with sensible defaults:
@@ -123,6 +118,52 @@ impl Default for CompositorWidgetConfig {
             color_mask_shader: false,
             animations: true,
             max_fps: 60,
+            keyboard_layout: None,
+            keyboard_variant: None,
+        }
+    }
+}
+
+/// Derive `CompositorWidgetConfig` from model-level config structs.
+///
+/// Maps the relevant fields from `WindowConfig` and `CompositorConfig` (TOML-level)
+/// to the widget-level config, falling back to defaults for unspecified fields.
+#[cfg(feature = "serde")]
+impl From<(&WindowConfig, &CompositorConfig)> for CompositorWidgetConfig {
+    fn from((window, compositor): (&WindowConfig, &CompositorConfig)) -> Self {
+        let defaults = CompositorWidgetConfig::default();
+
+        CompositorWidgetConfig {
+            spacing: defaults.spacing,
+            margin_top: compositor.margin_top.map(|v| v as i32).unwrap_or(defaults.margin_top),
+            margin_bottom: compositor.margin_bottom.map(|v| v as i32).unwrap_or(defaults.margin_bottom),
+            margin_start: defaults.margin_start,
+            margin_end: defaults.margin_end,
+            opacity: compositor.opacity.unwrap_or(defaults.opacity),
+            color_mask: None,
+            show_decorations: window.decorated.unwrap_or(defaults.show_decorations),
+            initial_position: match (window.position_x, window.position_y) {
+                (Some(x), Some(y)) => Some((x, y)),
+                _ => defaults.initial_position,
+            },
+            min_width: window.min_width.unwrap_or(defaults.min_width),
+            min_height: window.min_height.unwrap_or(defaults.min_height),
+            max_width: window.max_width.or(defaults.max_width),
+            max_height: window.max_height.or(defaults.max_height),
+            aspect_ratio: window.aspect_ratio.or(defaults.aspect_ratio),
+            fullscreen: window.fullscreen.unwrap_or(defaults.fullscreen),
+            initial_width: window.width.unwrap_or(defaults.initial_width),
+            initial_height: window.height.unwrap_or(defaults.initial_height),
+            title: window.title.clone(),
+            dma_buf_enabled: compositor.disable_dma_buf.map(|disabled| !disabled).unwrap_or(defaults.dma_buf_enabled),
+            auto_color_mask: defaults.auto_color_mask,
+            auto_subsurface_color_mask: defaults.auto_subsurface_color_mask,
+            color_mask_tolerance: defaults.color_mask_tolerance,
+            resizable: window.resizable.unwrap_or(defaults.resizable),
+            disable_client_decorations: compositor.disable_client_decorations.unwrap_or(defaults.disable_client_decorations),
+            color_mask_shader: compositor.color_mask_shader.unwrap_or(defaults.color_mask_shader),
+            animations: compositor.disable_animations.map(|disabled| !disabled).unwrap_or(defaults.animations),
+            max_fps: compositor.max_fps.unwrap_or(defaults.max_fps),
             keyboard_layout: None,
             keyboard_variant: None,
         }
