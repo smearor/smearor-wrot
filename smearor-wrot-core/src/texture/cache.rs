@@ -1,7 +1,7 @@
-use crate::buffer::metadata::BufferMetadata;
-use crate::color_mask::mask::ColorMask;
-use crate::texture::pixel_data::BGRA;
-use crate::texture::pixel_data::PixelData;
+use crate::buffer::BufferMetadata;
+use crate::color_mask::ColorMask;
+use crate::texture::BGRA;
+use crate::texture::PixelData;
 use smearor_wrot_model::color::rgb::RgbColor24;
 use smearor_wrot_model::color::rgba::RgbaColor;
 use std::fmt::Display;

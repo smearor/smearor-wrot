@@ -1,5 +1,5 @@
 use crate::CompositorWidget;
-use crate::widget::debug_overlay::config::DebugOverlayConfig;
+use crate::widget::debug_overlay::DebugOverlayConfig;
 use glib::subclass::prelude::ObjectSubclassIsExt;
 use smearor_wrot_model::Position;
 

@@ -41,7 +41,7 @@ pub use dma::buffer::DmaBuffer;
 pub use error::CoreError;
 pub use logging::init_logging;
 pub use logging::init_logging_with_level;
-pub use message::compositor_message::CompositorMessage;
+pub use message::CompositorMessage;
 pub use output::OutputGeometry;
 pub use render::DoubleBuffer;
 pub use render::OutputRendering;

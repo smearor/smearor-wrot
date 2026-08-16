@@ -18,7 +18,7 @@ use tracing::debug;
 use tracing::error;
 
 use crate::compositor::SmearorCompositor;
-use crate::message::compositor_message::CompositorMessage;
+use crate::message::CompositorMessage;
 use crate::message::sender::CompositorMessageSender;
 
 impl SelectionHandler for SmearorCompositor {

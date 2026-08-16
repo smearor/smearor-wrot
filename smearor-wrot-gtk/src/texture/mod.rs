@@ -4,8 +4,8 @@
 
 use gtk4::gdk;
 use gtk4::gdk::prelude::*;
-use smearor_wrot_core::texture::pixel_data::BGRA;
-use smearor_wrot_core::texture::pixel_data::PixelData;
+use smearor_wrot_core::texture::BGRA;
+use smearor_wrot_core::texture::PixelData;
 
 /// Extract pixel data from a GDK texture for color detection
 ///

@@ -1,5 +1,5 @@
 use crate::SmearorCompositor;
-use crate::message::compositor_message::CompositorMessage;
+use crate::message::CompositorMessage;
 use std::sync::mpsc::Sender;
 
 pub trait CompositorMessageSender {

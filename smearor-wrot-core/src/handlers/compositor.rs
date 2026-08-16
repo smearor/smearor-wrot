@@ -22,19 +22,19 @@ use smithay::wayland::compositor::with_states;
 use std::sync::LazyLock;
 use std::sync::atomic::Ordering;
 
-use crate::buffer::metadata::BufferMetadata;
+use crate::buffer::BufferMetadata;
 use crate::commit::count::CommitCount;
 use crate::commit::timing::CommitTiming;
 use crate::margin::handler::MarginHandler;
-use crate::message::compositor_message::CompositorMessage;
+use crate::message::CompositorMessage;
 use crate::message::sender::CompositorMessageSender;
 use crate::popup::handler::PopupHandler;
 use crate::subsurface::model::SubsurfaceData;
 use crate::surface::SurfaceQuery;
 use crate::surface::commit::TopLevelCommitHandler;
 use crate::texture::cache::TextureCacheEntry;
-use crate::texture::pixel_data::BGRA;
-use crate::texture::pixel_data::PixelData;
+use crate::texture::BGRA;
+use crate::texture::PixelData;
 use tracing::debug;
 use tracing::error;
 

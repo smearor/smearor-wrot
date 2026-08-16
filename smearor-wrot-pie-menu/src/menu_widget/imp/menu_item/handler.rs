@@ -1,5 +1,5 @@
 use crate::PieMenuWidgetImpl;
-use crate::menu::item::MenuItem;
+use crate::menu::MenuItem;
 use crate::menu_widget::menu_item::error::AddMenuItemError;
 use crate::menu_widget::menu_item::error::RemoveMenuItemError;
 use crate::menu_widget::menu_item::handler::PieMenuMenuItemHandler;

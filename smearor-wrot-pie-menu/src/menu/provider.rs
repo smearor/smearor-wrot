@@ -1,4 +1,4 @@
-use crate::menu::item::MenuItem;
+use crate::menu::MenuItem;
 use crate::menu::menu::Menu;
 
 pub trait MenuProvider {

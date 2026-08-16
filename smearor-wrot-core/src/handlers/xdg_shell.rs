@@ -2,7 +2,7 @@
 
 use crate::compositor::SmearorCompositor;
 use crate::margin::handler::MarginHandler;
-use crate::message::compositor_message::CompositorMessage;
+use crate::message::CompositorMessage;
 use crate::message::sender::CompositorMessageSender;
 use crate::popup::handler::PopupHandler;
 use crate::surface::dialog::DialogSizeQuery;

@@ -1,4 +1,4 @@
-use crate::menu::item::MenuItem;
+use crate::menu::MenuItem;
 use dashmap::DashMap;
 use std::ops::Deref;
 
