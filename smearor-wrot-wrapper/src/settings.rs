@@ -5,7 +5,7 @@ use smearor_wrot_gtk::CompositorWidget;
 use smearor_wrot_gtk::widget::color_mask::handler::ColorMaskHandler;
 use smearor_wrot_gtk::widget::commit::CommitHandler;
 use smearor_wrot_gtk::widget::config::handler::ConfigHandler;
-use smearor_wrot_gtk::widget::debug_overlay::handler::DebugOverlayHandler;
+use smearor_wrot_gtk::widget::DebugOverlayHandler;
 use smearor_wrot_gtk::widget::dmabuf::handler::DmabufHandler;
 use smearor_wrot_gtk::widget::shm::handler::ShmHandler;
 use smearor_wrot_rotation::RotationWidget;

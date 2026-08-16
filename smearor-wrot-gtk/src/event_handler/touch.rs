@@ -2,7 +2,7 @@ use crate::CompositorWidget;
 use crate::event_handler::error::TouchInputEventError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::debug_overlay::handler::DebugOverlayHandler;
+use crate::widget::DebugOverlayHandler;
 use smearor_wrot_core::input::touch::processing::TouchInputProcessing;
 use smearor_wrot_model::Position;
 use tracing::debug;

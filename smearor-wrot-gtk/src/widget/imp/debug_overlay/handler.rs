@@ -1,5 +1,5 @@
-use crate::widget::debug_overlay::DebugOverlayConfig;
-use crate::widget::debug_overlay::handler::DebugOverlayHandler;
+use crate::widget::DebugOverlayConfig;
+use crate::widget::DebugOverlayHandler;
 use crate::widget::imp::widget::CompositorWidgetImpl;
 use smearor_wrot_model::Position;
 

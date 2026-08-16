@@ -1,7 +1,7 @@
 use crate::event_handler::error::MouseInputEventError;
 use crate::widget::compositor::error::CompositorError;
 use crate::widget::compositor::handler::CompositorHandler;
-use crate::widget::debug_overlay::handler::DebugOverlayHandler;
+use crate::widget::DebugOverlayHandler;
 use crate::widget::widget::CompositorWidget;
 use smearor_wrot_core::input::mouse::processing::MouseInputProcessing;
 use smearor_wrot_model::Position;

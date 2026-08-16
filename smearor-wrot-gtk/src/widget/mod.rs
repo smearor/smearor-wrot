@@ -14,3 +14,6 @@ pub mod size;
 pub mod socket;
 pub mod widget;
 pub mod window_state;
+
+pub use smearor_wrot_model::config::DebugOverlayConfig;
+pub use debug_overlay::DebugOverlayHandler;
