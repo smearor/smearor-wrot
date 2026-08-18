@@ -23,7 +23,7 @@ smearor-wrot-core = { path = "../smearor-wrot-core" }
 smearor-wrot-application = { path = "../smearor-wrot-application" }
 smearor-wrot-gtk = { path = "../smearor-wrot-gtk" }
 smearor-wrot-model = { path = "../smearor-wrot-model", features = ["serde"] }
-smearor-wrot-pie-menu = { path = "../smearor-wrot-pie-menu" }
+smearor-wrot-pie-menu = { workspace = true }
 smearor-wrot-rotation = { workspace = true }
 tokio = { workspace = true }
 toml = { workspace = true }

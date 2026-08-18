@@ -54,9 +54,12 @@ use smearor_wrot_model::Socket;
 use smearor_wrot_model::color::rgba::RgbaColor;
 use smearor_wrot_model::geometry::size::Size;
 use smearor_wrot_model::margin::Margins;
+use smearor_wrot_pie_menu::CircleConfig;
+use smearor_wrot_pie_menu::MenuItem;
 use smearor_wrot_pie_menu::PieMenuMessage;
 use smearor_wrot_pie_menu::PieMenuOverlayWidget;
 use smearor_wrot_pie_menu::RotationHandler;
+use smearor_wrot_pie_menu::menu_widget::menu_item::handler::PieMenuMenuItemHandler;
 use smearor_wrot_pie_menu::overlay_widget::message::handler::PieMenuMessageSender;
 use smearor_wrot_rotation::RotationControlHandler;
 use smearor_wrot_rotation::RotationWidget;
@@ -929,70 +932,74 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 match pie_menu_receiver.try_recv() {
                     Ok(message) => {
                         match message {
-                            PieMenuMessage::RotateCw => {
-                                info!("Received RotateCw message from pie menu");
-                                if let Some(rotation_widget) = rotation_widget_clone.downcast_ref::<RotationWidget>() {
-                                    let current_rotation = rotation_widget.rotation();
-                                    let new_rotation = (current_rotation + 90.0) % 360.0;
-                                    rotation_widget.set_rotation_with_animation(new_rotation as f64);
-                                }
+                            PieMenuMessage::Opened => {
+                                debug!("Pie menu opened");
                             }
-                            PieMenuMessage::RotateCcw => {
-                                info!("Received RotateCcw message from pie menu");
-                                if let Some(rotation_widget) = rotation_widget_clone.downcast_ref::<RotationWidget>() {
-                                    let current_rotation = rotation_widget.rotation();
-                                    let new_rotation = (current_rotation - 90.0 + 360.0) % 360.0;
-                                    rotation_widget.set_rotation_with_animation(new_rotation as f64);
-                                }
+                            PieMenuMessage::Closed => {
+                                debug!("Pie menu closed");
                             }
                             PieMenuMessage::Rotate(rotation) => {
                                 // Store the rotation value, will apply the last one after loop
                                 last_rotation_message = Some(rotation);
                             }
-                            PieMenuMessage::Settings => {
-                                info!("Received Settings message from pie menu");
-                                settings::show_settings_dialog(
-                                    window_clone.as_ref(),
-                                    &compositor_widget_clone,
-                                    &rotation_widget_clone,
-                                    command_line_arguments_clone.disable_dma_buf,
-                                );
-                            }
-                            PieMenuMessage::Screenshot => {
-                                info!("Received Screenshot message from pie menu");
-                                if let Some(compositor_widget) = compositor_widget_clone.downcast_ref::<CompositorWidget>() {
-                                    let _ = screenshot_manager.screenshot();
+                            PieMenuMessage::Event(event) => {
+                                info!("Received event message from pie menu: {}", event);
+                                match event.as_str() {
+                                    "rotate-cw" => {
+                                        if let Some(rotation_widget) = rotation_widget_clone.downcast_ref::<RotationWidget>() {
+                                            let current_rotation = rotation_widget.rotation();
+                                            let new_rotation = (current_rotation + 90.0) % 360.0;
+                                            rotation_widget.set_rotation_with_animation(new_rotation as f64);
+                                        }
+                                    }
+                                    "rotate-ccw" => {
+                                        if let Some(rotation_widget) = rotation_widget_clone.downcast_ref::<RotationWidget>() {
+                                            let current_rotation = rotation_widget.rotation();
+                                            let new_rotation = (current_rotation - 90.0 + 360.0) % 360.0;
+                                            rotation_widget.set_rotation_with_animation(new_rotation as f64);
+                                        }
+                                    }
+                                    "settings" => {
+                                        settings::show_settings_dialog(
+                                            window_clone.as_ref(),
+                                            &compositor_widget_clone,
+                                            &rotation_widget_clone,
+                                            command_line_arguments_clone.disable_dma_buf,
+                                        );
+                                    }
+                                    "screenshot" => {
+                                        if let Some(compositor_widget) = compositor_widget_clone.downcast_ref::<CompositorWidget>() {
+                                            let _ = screenshot_manager.screenshot();
+                                        }
+                                    }
+                                    "exit" => {
+                                        window_clone.close();
+                                    }
+                                    "toggle-maximize" => {
+                                        if window_clone.is_maximized() {
+                                            window_clone.unmaximize();
+                                        } else {
+                                            window_clone.maximize();
+                                        }
+                                        if let Some(compositor_widget) = compositor_widget_clone.downcast_ref::<CompositorWidget>() {
+                                            let _ = compositor_widget.toggle_maximize_first_toplevel();
+                                        }
+                                    }
+                                    "minimize" => {
+                                        window_clone.minimize();
+                                    }
+                                    "toggle-fullscreen" => {
+                                        window_clone.set_fullscreened(!window_clone.is_fullscreen());
+                                        if let Some(compositor_widget) = compositor_widget_clone.downcast_ref::<CompositorWidget>() {
+                                            let _ = compositor_widget.toggle_fullscreen_first_toplevel();
+                                        }
+                                    }
+                                    _ => {
+                                        info!("Unknown pie menu event: {}", event);
+                                    }
                                 }
                             }
-                            PieMenuMessage::Exit => {
-                                info!("Received Exit message from pie menu");
-                                window_clone.close();
-                            }
-                            PieMenuMessage::ToggleMaximize => {
-                                info!("Received ToggleMaximize message from pie menu");
-                                if window_clone.is_maximized() {
-                                    window_clone.unmaximize();
-                                } else {
-                                    window_clone.maximize();
-                                }
-                                if let Some(compositor_widget) = compositor_widget_clone.downcast_ref::<CompositorWidget>() {
-                                    let _ = compositor_widget.toggle_maximize_first_toplevel();
-                                }
-                            }
-                            PieMenuMessage::Minimize => {
-                                info!("Received Minimize message from pie menu");
-                                window_clone.minimize();
-                            }
-                            PieMenuMessage::ToggleFullscreen => {
-                                info!("Received ToggleFullscreen message from pie menu");
-                                window_clone.set_fullscreened(!window_clone.is_fullscreen());
-                                if let Some(compositor_widget) = compositor_widget_clone.downcast_ref::<CompositorWidget>() {
-                                    let _ = compositor_widget.toggle_fullscreen_first_toplevel();
-                                }
-                            }
-                            PieMenuMessage::Custom(event) => {
-                                info!("Received Custom message from pie menu: {}", event);
-                            }
+                            _ => {}
                         }
                     }
                     Err(_) => break,
@@ -1052,6 +1059,144 @@ async fn main() -> Result<(), Box<dyn Error>> {
         let pie_menu_widget = PieMenuOverlayWidget::new(Some(&rotation_widget));
         pie_menu_widget.set_message_sender(pie_menu_sender);
         pie_menu_widget.set_rotation(command_line_arguments_for_closure.rotation);
+
+        // Add menu items (previously provided by DefaultMenuProvider)
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("rotate-cw")
+                .angle(0.0)
+                .radius(30.0)
+                .event("rotate-cw")
+                .widget_type("circle")
+                .close_on_click(false)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("object-rotate-right-symbolic")
+                        .label("Rotate CW")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("screenshot")
+                .angle(45.0)
+                .radius(30.0)
+                .event("screenshot")
+                .widget_type("circle")
+                .close_on_click(true)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("camera-photo-symbolic")
+                        .label("Screenshot")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("settings")
+                .angle(90.0)
+                .radius(30.0)
+                .event("settings")
+                .widget_type("circle")
+                .close_on_click(true)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("settings-symbolic")
+                        .label("Settings")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("exit")
+                .angle(135.0)
+                .radius(30.0)
+                .event("exit")
+                .widget_type("circle")
+                .close_on_click(true)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("window-close-symbolic")
+                        .label("Exit")
+                        .color("#55222277")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("rotate-ccw")
+                .angle(180.0)
+                .radius(30.0)
+                .event("rotate-ccw")
+                .widget_type("circle")
+                .close_on_click(false)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("object-rotate-left-symbolic")
+                        .label("Rotate CCW")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("toggle-maximize")
+                .angle(225.0)
+                .radius(30.0)
+                .event("toggle-maximize")
+                .widget_type("circle")
+                .close_on_click(true)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("window-maximize-symbolic")
+                        .label("Maximize")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("minimize")
+                .angle(270.0)
+                .radius(30.0)
+                .event("minimize")
+                .widget_type("circle")
+                .close_on_click(true)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("window-minimize-symbolic")
+                        .label("Minimize")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
+        let _ = pie_menu_widget.add_menu_item(
+            MenuItem::builder()
+                .id("toggle-fullscreen")
+                .angle(315.0)
+                .radius(30.0)
+                .event("toggle-fullscreen")
+                .widget_type("circle")
+                .close_on_click(true)
+                .config(
+                    CircleConfig::builder()
+                        .icon_name("view-fullscreen-symbolic")
+                        .label("Fullscreen")
+                        .color("#00000077")
+                        .build(),
+                )
+                .build(),
+        );
 
         // Synchronize rotation between RotationWidget and PieMenuOverlayWidget
         let rotation_widget_clone = rotation_widget.clone();
